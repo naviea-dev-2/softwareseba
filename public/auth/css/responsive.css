@@ -1,0 +1,352 @@
+@media (min-width: 320px) and (max-width: 575.99px) {
+    .container_main {
+        width: auto;
+    }
+    header h1 {
+        font-size: 18px;
+    }
+    .logo_url p {
+        font-family: "Roboto", sans-serif;
+        font-size: 13px;
+        position: absolute;
+        right: 65px;
+        bottom: -10px;
+        color: white;
+    }
+    header {
+        width: 394px;
+        padding-left: 5px;
+        margin: 0 auto;
+    }
+
+    .logo_url {
+        width: 180px;
+        height: 71px;
+        position: relative;
+    }
+
+    .singin_main .item {
+        width: 400px;
+        margin: 0 auto;
+        flex-direction: column-reverse;
+    }
+    .singin_main .item .left_part {
+        /* width: 750px; */
+        width: auto;
+    }
+    .singin_main .item .right_part {
+        width: auto;
+    }
+    .singin_main {
+        margin-top: 20px;
+        height: auto;
+    }
+
+    .singup {
+        margin-top: 20px;
+    }
+    .singin_main .left .items {
+        width: 400px;
+        justify-content: center;
+    }
+
+    .singin_main .right {
+        width: auto;
+        margin: 0 auto;
+    }
+
+    .singin_main .header_two {
+        font-size: 22px;
+        margin-bottom: 21px;
+        padding: 0;
+    }
+
+    .singin_main .left .header {
+        font-size: 16px;
+        /* margin: 10px; */
+        margin-bottom: 40px;
+        margin-top: 39px;
+    }
+
+    footer {
+        padding: 0 10px;
+        justify-content: center;
+    }
+
+    footer .one {
+        font-size: 12px;
+    }
+    footer h2 {
+        font-size: 15px;
+        margin-top: 5px;
+    }
+    .icon {
+        font-size: 22px;
+    }
+    footer .Two {
+        width: auto;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 768.99px) {
+    .container_main {
+        width: auto;
+    }
+    header h1 {
+        font-size: 22px;
+    }
+    header {
+        width: 600px;
+        padding-left: 5px;
+        margin: 0 auto;
+    }
+
+    .singin_main .item {
+        width: 400px;
+        margin: 0 auto;
+        flex-direction: column-reverse;
+    }
+    .singin_main .item .left_part {
+        /* width: 750px; */
+        width: auto;
+    }
+    .singin_main .item .right_part {
+        width: auto;
+    }
+    .singin_main .item {
+        width: 400px;
+        margin: 0 auto;
+    }
+    .singin_main .item .left_part {
+        /* width: 750px; */
+        width: auto;
+    }
+    .singin_main {
+        margin-top: 20px;
+        height: auto;
+    }
+
+    .singin_main .left .items {
+        width: 400px;
+        justify-content: center;
+    }
+    .singin_main .left .header {
+        font-size: 16px;
+        /* margin: 10px; */
+        margin-bottom: 40px;
+        margin-top: 39px;
+    }
+
+    .singin_main .right {
+        width: auto;
+        margin: 0 auto;
+    }
+    .singin_main .header_two {
+        font-size: 22px;
+        margin-bottom: 21px;
+        padding: 0;
+    }
+    footer {
+        padding: 0 10px;
+        justify-content: center;
+    }
+
+    footer .one {
+        font-size: 12px;
+    }
+    footer h2 {
+        font-size: 15px;
+        margin-top: 5px;
+    }
+    .icon {
+        font-size: 22px;
+    }
+    footer .Two {
+        width: auto;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 991.99px) {
+    .container_main {
+        width: auto;
+    }
+    header h1 {
+        font-size: 22px;
+    }
+    header {
+        width: 469px;
+        padding-left: 5px;
+        margin: 0 auto;
+    }
+    .logo_url {
+        width: 180px;
+        height: 71px;
+        position: relative;
+    }
+    .singin_main .item {
+        width: 400px;
+        margin: 0 auto;
+        flex-direction: column-reverse;
+    }
+    .singin_main .item .right_part {
+        width: auto;
+    }
+    .singin_main .item .left_part {
+        /* width: 750px; */
+        width: auto;
+    }
+    .singin_main {
+        margin-top: 20px;
+        height: auto;
+    }
+
+    .singin_main .left .items {
+        width: 400px;
+        justify-content: center;
+    }
+    .singin_main .left .header {
+        font-size: 16px;
+        /* margin: 10px; */
+        margin-bottom: 40px;
+        margin-top: 39px;
+    }
+    .singin_main .right {
+        width: auto;
+        margin: 0 auto;
+    }
+    .singin_main .header_two {
+        font-size: 22px;
+        margin-bottom: 21px;
+        padding: 0;
+    }
+    footer {
+        padding: 0 10px;
+        justify-content: center;
+    }
+
+    footer .one {
+        font-size: 12px;
+    }
+    footer h2 {
+        font-size: 15px;
+        margin-top: 5px;
+    }
+    .icon {
+        font-size: 22px;
+    }
+    footer .Two {
+        width: auto;
+    }
+}
+@media (min-width: 992px) and (max-width: 1299.99px) {
+    .container_main {
+        width: 100%;
+        padding: 0 20px;
+    }
+    header h1 {
+        font-size: 22px;
+    }
+    header {
+        width: auto;
+        padding-left: 5px;
+        margin: 0 20px;
+    }
+    .singin_main {
+        margin-top: 20px;
+        min-height: 61vh;
+    }
+
+    .logo_url {
+        width: 180px;
+        height: 71px;
+        position: relative;
+        margin-top: 10px;
+    }
+
+    .singin_main .item {
+        width: 100%;
+        /* margin: 0 auto;
+        flex-direction: column-reverse; */
+    }
+    .singin_main .item .right_part {
+        width: 50%;
+        /* margin-top: 68px!important; */
+    }
+    .singin_main .item .left_part {
+        /* width: 750px; */
+        width: 50%;
+    }
+
+    .singin_main .left .items {
+        width: 100%;
+        gap: 0px;
+        justify-content: center;
+    }
+    .singin_main .left .header {
+        font-size: 21px;
+        margin-bottom: 26px;
+    }
+    .singin_main .left .items .one {
+        /* width: 25%; */
+    }
+    .singin_main .right {
+        width: 100%;
+        margin: 0;
+        padding: 10px;
+    }
+    .singin_main .header_two {
+        font-size: 22px;
+        margin-bottom: 21px;
+        padding: 0;
+    }
+    footer {
+        /* padding: 0 10px;
+        justify-content: center; */
+    }
+
+    .logo_url p {
+        right: 68px;
+        bottom: -17px;
+    }
+    .singin_main .right .one {
+        width: 50%;
+        padding: 0 10px;
+    }
+    .singin_main .right .one .text {
+        font-size: 16px;
+    }
+    footer .Two {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: auto;
+    }
+    footer h2 {
+        font-family: "Roboto", sans-serif;
+        font-size: 23px;
+        font-weight: 500;
+    }
+    .icon {
+        font-size: 25px;
+    }
+    /* .singin_main .left .items .one {
+        width: 23%;
+
+        border: 1px solid;
+        padding: 10px;
+        margin: 0px 5px;
+        margin-bottom: 10px;
+    } */
+}
+.singin_main .left .items .one{
+    /* border: 1px solid; */
+}
+.logo_url img {
+    aspect-ratio: 90/29;
+}
+.iti {
+    width: 100%;
+}
+.forgot a {
+    color: white;
+}
