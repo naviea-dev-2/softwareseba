@@ -1,0 +1,1 @@
+ALTER TABLE `purchases` ADD `is_ini_p` TINYINT NOT NULL DEFAULT '0' AFTER `bank_account_id`;

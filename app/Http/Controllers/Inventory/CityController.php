@@ -78,7 +78,9 @@ class CityController extends Controller
    
         return response()->json($json_data);
     }
+
     function select2CitiesByState(Request $request){
+        $data = [];
         $cities = City::select('id', 'name')->where('state_id',$request->state_id)->where("name", "LIKE", "%$request->value%")->get();
         foreach ($cities as $city) {
             $data[] = ['id' => $city->id, 'text' => $city->name];

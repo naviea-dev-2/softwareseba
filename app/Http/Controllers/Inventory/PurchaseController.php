@@ -362,7 +362,7 @@ class PurchaseController extends Controller
                     $stock->save();
                     $product_stock =  Product::find($product_id);
                     if($product_stock){
-                        $product_stock->qty= $product_stock->qty + ($request->qty[$k]?? 0);
+                        $product_stock->total_qty= $product_stock->qty + ($request->qty[$k]?? 0);
                         $product_stock->save();
                     }
 

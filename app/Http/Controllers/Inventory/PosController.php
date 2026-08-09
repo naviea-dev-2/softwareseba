@@ -24,36 +24,38 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use App\Models\Inventory\ProductInvoice;
 use App\Models\Inventory\Invoice;
+
 class PosController extends Controller
 {
-    function pack_option(){
+    function pack_option()
+    {
         $user = auth()->user();
         //dd($user);
         $arr_con = [];
-        if($user->user_type == 0){
+        if ($user->user_type == 0) {
             //$arr_con = ['inventory','hr-payroll','accounts','general'];
             $au_business = $user->business;
-            if($au_business->package){
-                $arr_con = json_decode($au_business->package?->pack_option,true);
-                array_push($arr_con,'general');
-            }else{
-                $arr_con = ['inventory','hr-payroll','accounts','general'];
+            if ($au_business->package) {
+                $arr_con = json_decode($au_business->package?->pack_option, true);
+                array_push($arr_con, 'general');
+            } else {
+                $arr_con = ['inventory', 'hr-payroll', 'accounts', 'general'];
             }
-
-        }else{
+        } else {
             $au_business = $user->business;
-            if($au_business->package){
-                $arr_con = json_decode($au_business->package?->pack_option,true);
-                array_push($arr_con,'general');
-            }else{
-                $arr_con = ['inventory','hr-payroll','accounts','general'];
+            if ($au_business->package) {
+                $arr_con = json_decode($au_business->package?->pack_option, true);
+                array_push($arr_con, 'general');
+            } else {
+                $arr_con = ['inventory', 'hr-payroll', 'accounts', 'general'];
             }
         }
         return $arr_con;
     }
-    function init_account(){
-        $salesHead = AccountHead::where("code",'4000')->first();
-        if($salesHead == null){
+    function init_account()
+    {
+        $salesHead = AccountHead::where("code", '4000')->first();
+        if ($salesHead == null) {
             $salesHead = new AccountHead;
             $salesHead->title = "Sales";
             $salesHead->code = '4000';
@@ -63,8 +65,8 @@ class PosController extends Controller
             $salesHead->status = 1;
             $salesHead->save();
         }
-        $acReceivableHead = AccountHead::where("code",'1000')->first();
-        if($acReceivableHead == null){
+        $acReceivableHead = AccountHead::where("code", '1000')->first();
+        if ($acReceivableHead == null) {
             $acReceivableHead = new AccountHead;
             $acReceivableHead->code = '1000';
             $acReceivableHead->title = "Account Receivable";
@@ -75,17 +77,19 @@ class PosController extends Controller
             $acReceivableHead->save();
         }
     }
-    function index(){
-        if(can_p('pos.sale.index') == false){
+    function index()
+    {
+        if (can_p('pos.sale.index') == false) {
             return redirect()->route('dashboard');
         }
 
-        $data['methods']=PaymentMethod::orderBy('id','DESC')->get();
+        $data['methods'] = PaymentMethod::orderBy('id', 'DESC')->get();
 
 
-        return view ('Inventory.pos.manage', $data );
+        return view('Inventory.pos.manage', $data);
     }
-    function ajaxPos(Request $request){
+    function ajaxPos(Request $request)
+    {
 
         $columns = array(
             0 => 'invoices.id',
@@ -98,7 +102,7 @@ class PosController extends Controller
             7 => 'invoices.status',
             8 => 'invoices.payment_status',
         );
-        $totalData = Invoice::where('invoices.is_pos',1)->count();
+        $totalData = Invoice::where('invoices.is_pos', 1)->count();
         $totalFiltered = $totalData;
 
         $limit = $request->input('length');
@@ -106,22 +110,20 @@ class PosController extends Controller
         $order = $columns[$request->input('order.0.column')];
         $dir = $request->input('order.0.dir');
         $search = $request->input('search.value');
-        $invoices = Invoice::leftjoin('customers','customers.id','invoices.customer_id')
-                            ->where('invoices.is_pos',1);
-        if(auth()->user()->user_type != 0 && auth()->user()?->role?->is_admin != 1){
-            $invoices->where('branch_id',auth()->user()->branch_id);
+        $invoices = Invoice::leftjoin('customers', 'customers.id', 'invoices.customer_id')
+            ->where('invoices.is_pos', 1);
+        if (auth()->user()->user_type != 0 && auth()->user()?->role?->is_admin != 1) {
+            $invoices->where('branch_id', auth()->user()->branch_id);
         }
-        if(!empty($search))
-        {
-            $invoices = $invoices->where(function($q) use($search){
-                $q->where("invoices.invoice_date","LIKE","%{$search}%")
-                ->orWhere("invoices.reference_no","LIKE","%{$search}%")
-                ->orWhere("customers.name","LIKE","%{$search}%");
+        if (!empty($search)) {
+            $invoices = $invoices->where(function ($q) use ($search) {
+                $q->where("invoices.invoice_date", "LIKE", "%{$search}%")
+                    ->orWhere("invoices.reference_no", "LIKE", "%{$search}%")
+                    ->orWhere("customers.name", "LIKE", "%{$search}%");
             });
-
         }
         $totalFiltered = $invoices->count();
-        $invoices = $invoices->select('invoices.*','customers.name as cus_name')->offset($start)->limit($limit)->orderBy($order,$dir)->get();
+        $invoices = $invoices->select('invoices.*', 'customers.name as cus_name')->offset($start)->limit($limit)->orderBy($order, $dir)->get();
 
 
         // $invoices = PosSale::leftjoin('customers','customers.id','pos_sales.customer_id')->;
@@ -139,9 +141,8 @@ class PosController extends Controller
         // $invoices = $invoices->select('pos_sales.*','customers.name')->offset($start)->limit($limit)->orderBy($order,$dir)->get();
 
         $data = array();
-        if(!empty($invoices))
-        {
-            $i = $start == 0 ? 1 : $start+1;
+        if (!empty($invoices)) {
+            $i = $start == 0 ? 1 : $start + 1;
             // $p_edit = can_p('invoice.edit');
             // $p_delete = can_p('invoice.delete');
             // $p_view = can_p('invoice.view');
@@ -149,8 +150,7 @@ class PosController extends Controller
             // $p_payment_show = can_p('invoice.payment_show');
             // $p_sales_return = can_p('invoice_return.add');
             //$p_print= can_p('invoice.print');
-            foreach($invoices as $invoice)
-            {
+            foreach ($invoices as $invoice) {
                 $nestedData['id'] = $i++;
 
                 $nestedData['date'] = date('Y-m-d', strtotime($invoice->invoice_date));
@@ -160,28 +160,28 @@ class PosController extends Controller
                 $nestedData['paid'] = auth()->user()->currency_symbol . number_format($invoice->paid_amount, 2);
                 $nestedData['due'] = auth()->user()->currency_symbol . number_format($invoice->grand_total - $invoice->paid_amount, 2);
                 $status = '';
-                if($invoice->status == 1){
+                if ($invoice->status == 1) {
                     $status = '<div class="badge bg-success">Received</div>';
-                }else if($invoice->status == 2){
+                } else if ($invoice->status == 2) {
                     $status = '<div class="badge bg-secondary">Partial</div>';
-                }else if($invoice->status == 3){
+                } else if ($invoice->status == 3) {
                     $status = '<div class="badge bg-danger">Pending</div>';
-                }else{
+                } else {
                     $status = '<div class="badge bg-success">Ordered</div>';
                 }
-                $nestedData['status'] =$status;
+                $nestedData['status'] = $status;
                 $payment_status = '';
-                if($invoice->payment_status == 0){
+                if ($invoice->payment_status == 0) {
                     $payment_status = '<div class="badge bg-danger">Due</div>';
-                }else if($invoice->payment_status == 1){
+                } else if ($invoice->payment_status == 1) {
                     $payment_status = '<div class="badge bg-warning">Partial</div>';
-                }else{
+                } else {
                     $payment_status = '<div class="badge bg-success">Paid</div>';
                 }
-                $nestedData['payment_status'] =$payment_status;
+                $nestedData['payment_status'] = $payment_status;
                 $nestedData['options'] = '<div class="btn-group"><button type="button" class="btn btn-default btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Action</button><ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">';
                 // if($p_view){
-                     $nestedData['options'] .= ' <li><button data-id="'.$invoice->id.'" type="button" class="btn btn-link view"><i class="bx bx-show"></i>View</button> </li>';
+                $nestedData['options'] .= ' <li><button data-id="' . $invoice->id . '" type="button" class="btn btn-link view"><i class="bx bx-show"></i>View</button> </li>';
                 // }
                 // if($p_edit){
                 //     $nestedData['options'] .= ' <li><a href="'. route('invoice.edit', $invoice->id).'" class="btn btn-link"><i class="bx bx-edit"></i> Edit</a></li>';
@@ -206,7 +206,6 @@ class PosController extends Controller
                 // }
 
                 $data[] = $nestedData;
-
             }
         }
         $json_data = array(
@@ -218,121 +217,121 @@ class PosController extends Controller
 
         return json_encode($json_data);
     }
-    function create(){
+    function create()
+    {
         $this->init_account();
-        $data['categories']=$categories = Category::where('business_id',auth()->user()->business->id)->orderBy('id','DESC')->get();
-        $data['brands']=$brands = Brand::where('business_id',auth()->user()->business->id)->orderBy('id','DESC')->get();
-        $data['products']=$products = Product::where('is_variant',0)->where('business_id',auth()->user()->business->id)->paginate(20);
-        $data['methods']=PaymentMethod::where('for_pos',1)->orderBy('sorting','asc')->get();
-        //dd($products);
-        return view('Inventory.pos.create',$data);
+        $data['categories'] = $categories = Category::where('business_id', auth()->user()->business->id)->orderBy('id', 'DESC')->get();
+        $data['brands'] = $brands = Brand::where('business_id', auth()->user()->business->id)->orderBy('id', 'DESC')->get();
+
+        $data['products'] = $products = Product::where('is_variant', 0)->where('business_id', auth()->user()->business->id)->paginate(20);
+
+        $data['methods'] = PaymentMethod::where('for_pos', 1)->orderBy('sorting', 'asc')->get();
+        return view('Inventory.pos.create', $data);
     }
-    function searchProduct(Request $request){
+    function searchProduct(Request $request)
+    {
 
-        $products = Product::where('is_variant',0)->where('business_id',auth()->user()->business->id);
-        if($request->category_id){
-            $products = $products->where('category_id',$request->category_id);
+        $products = Product::where('is_variant', 0)->where('business_id', auth()->user()->business->id);
+        if ($request->category_id) {
+            $products = $products->where('category_id', $request->category_id);
         }
-        if($request->brand_id){
-            $products = $products->where('brand_id',$request->brand_id);
+        if ($request->brand_id) {
+            $products = $products->where('brand_id', $request->brand_id);
         }
-        if($request->search){
-            if($request->is_barcode){
-                //dd("ss");
-                $p_arr = explode('-',$request->search);
-                if(isset($p_arr[1])){
-                    $products =$products->where('id',$p_arr[1]);
-                }else{
-                    $products = $products->where('id',$request->search);
+
+        if ($request->search) {
+            if ($request->is_barcode) {
+                $p_arr = explode('-', $request->search);
+                if (isset($p_arr[1])) {
+                    $products = $products->where('id', $p_arr[1]);
+                } else {
+                    $products = $products->where('id', $request->search);
                 }
-            }else{
-                //dd("ssdf");
+            } else {
                 $search = $request->search;
-                $products = $products->where(function($query) use ($search){
-                    $query->where('product_name', 'like', '%'.$search.'%');
-                    $query->where('product_code', 'like','%'.$search.'%');
+                $products = $products->where(function ($query) use ($search) {
+                    $query->where('product_name', 'like', '%' . $search . '%')
+                        ->orWhere('product_code', 'like', '%' . $search . '%');
                 });
-
-                //dd($products->get());
             }
         }
-        if($request->current_product_con){
-            if($request->current_product_con == "category_id"){
-                $products = $products->where('category_id',$request->current_product_con_val);
+        if ($request->current_product_con) {
+            if ($request->current_product_con == "category_id") {
+                $products = $products->where('category_id', $request->current_product_con_val);
             }
-            if($request->current_product_con == "brand_id"){
-                $products = $products->where('brand_id',$request->current_product_con_val);
+            if ($request->current_product_con == "brand_id") {
+                $products = $products->where('brand_id', $request->current_product_con_val);
             }
         }
         $products = $products->paginate(20);
         //return $products;
-        $data['products']=$products;
+        $data['products'] = $products;
         //dd($products);
-        if($request->search){
-            if($request->is_barcode){
-                if($products->count() > 0){
-                    return response()->json(['data'=>view('Inventory.pos.search-product-list',$data)->render(),'barcode_res'=>true]);
-                }else{
-                    return response()->json(['barcode_res'=>false]);
+        if ($request->search) {
+            if ($request->is_barcode) {
+                if ($products->count() > 0) {
+                    return response()->json(['data' => view('Inventory.pos.search-product-list', $data)->render(), 'barcode_res' => true]);
+                } else {
+                    return response()->json(['barcode_res' => false]);
                 }
-            }else{
-                return response()->json(['data'=>view('Inventory.pos.search-product-list',$data)->render()]);
+            } else {
+                return response()->json(['data' => view('Inventory.pos.search-product-list', $data)->render()]);
             }
-        }else{
-            if($request->current_product_con){
-                return response()->json(['data'=>view('Inventory.pos.product-list',$data)->render()]);
-            }else{
-                return response()->json(['data'=>view('Inventory.pos.product-list',$data)->render(),'pagination'=>view('Inventory.pos.custom-pagination',$data)->render()]);
+        } else {
+            if ($request->current_product_con) {
+                return response()->json(['data' => view('Inventory.pos.product-list', $data)->render()]);
+            } else {
+                return response()->json(['data' => view('Inventory.pos.product-list', $data)->render(), 'pagination' => view('Inventory.pos.custom-pagination', $data)->render()]);
             }
-
         }
-
     }
-    function searchCustomer(Request $request){
+    function searchCustomer(Request $request)
+    {
         $search = $request->search;
         $customers = Customer::query();
-        $customers = $customers->where("customers.name","LIKE","%{$search}%")
-                        ->orWhere("customers.mobile","LIKE","%{$search}%");
+        $customers = $customers->where("customers.name", "LIKE", "%{$search}%")
+            ->orWhere("customers.mobile", "LIKE", "%{$search}%");
 
         $data['customers'] = $customers->select('customers.*')->paginate(10);
-        return response()->json(['data'=>view('Inventory.pos.search-customer-list',$data)->render()]);
+        return response()->json(['data' => view('Inventory.pos.search-customer-list', $data)->render()]);
     }
-    function productDetails(Request $request){
+    function productDetails(Request $request)
+    {
         $product = Product::find($request->id);
-       // $product_stock = $product->product_stock;
-        $data['unit_price']=$unit_price =  $product->sale_price;
-        $data['purchase_price']=  $product->purchase_price;
-        $data['stock']= $product->qty;
-        $data['discount_type']=$dis_type =$product->discount_type ?? 'percent';
-        $data['discount']=$dis= $product->discount ?? 0;
-        $data['tax_id']=$tax_id= $product->tax_id ?? 0;
-        $data['unit_id']=$unit_id= $product->unit_id ?? 0;
-        $data['taxes']=Tax::get();
-        $data['qty']=1;
+        // $product_stock = $product->product_stock;
+        $data['unit_price'] = $unit_price =  $product->sale_price;
+        $data['purchase_price'] =  $product->purchase_price;
+        $data['stock'] = $product->qty;
+        $data['discount_type'] = $dis_type = $product->discount_type ?? 'percent';
+        $data['discount'] = $dis = $product->discount ?? 0;
+        $data['tax_id'] = $tax_id = $product->tax_id ?? 0;
+        $data['unit_id'] = $unit_id = $product->unit_id ?? 0;
+        $data['taxes'] = Tax::get();
+        $data['qty'] = 1;
         $data['product'] = $product;
         $tax = Tax::find($tax_id);
-        $data['tax_r']= 0;
-        if($tax){
-            if($tax->rate_type == "Percentage"){
-                $data['tax_r']= $unit_price * $tax->rate/100;
-            }else{
-                $data['tax_r']= $tax->rate;
+        $data['tax_r'] = 0;
+        if ($tax) {
+            if ($tax->rate_type == "Percentage") {
+                $data['tax_r'] = $unit_price * $tax->rate / 100;
+            } else {
+                $data['tax_r'] = $tax->rate;
             }
-
         }
-        if($dis_type == 'percent'){
-            $data['p_discount']= $unit_price *  $dis/100;
-        }else{
-            $data['p_discount']= $dis;
+        if ($dis_type == 'percent') {
+            $data['p_discount'] = $unit_price *  $dis / 100;
+        } else {
+            $data['p_discount'] = $dis;
         }
 
-        return response()->json(['data'=>view('Inventory.pos.cart-product',$data)->render(),'product'=>$product]);
+        return response()->json(['data' => view('Inventory.pos.cart-product', $data)->render(), 'product' => $product]);
     }
-    function addCustomer(Request $request){
-        $validator = Validator::make($request->all(),[
-            'name'=> 'required',
-            'mobile'=> 'required',
-            'email'=>[
+    function addCustomer(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required',
+            'mobile' => 'required',
+            'email' => [
                 'required',
                 'email',
                 Rule::unique('customers')->where(function ($query) {
@@ -340,101 +339,103 @@ class PosController extends Controller
                 }),
             ],
         ]);
-        if($validator->fails()){
+        if ($validator->fails()) {
             return response([
                 'status' => 'errors',
                 'errors' => $validator->errors()
             ]);
         }
-        try{
+        try {
             DB::beginTransaction();
-            $data=new Customer();
-            $data->name=$request->name;
-            $data->email=$request->email ?? '';
-            $data->mobile=$request->mobile ?? '';
-            $data->address=$request->address ?? '';
-            $data->country_id=$request->country ?? 0;
-            $data->state_id=$request->state ?? 0;
-            $data->city_id=$request->city ?? 0;
-            $data->zip_code=$request->zip_code ?? '';
+            $data = new Customer();
+            $data->name = $request->name;
+            $data->email = $request->email ?? '';
+            $data->mobile = $request->mobile ?? '';
+            $data->address = $request->address ?? '';
+            $data->country_id = $request->country ?? 0;
+            $data->state_id = $request->state ?? 0;
+            $data->city_id = $request->city ?? 0;
+            $data->zip_code = $request->zip_code ?? '';
             $data->save();
             DB::commit();
             return response([
                 'status' => 1,
-                'data'=>$data,
+                'data' => $data,
                 'message' => 'Save successfully.',
             ]);
-        }catch(\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
             return response([
                 'status' => 0,
-                'message'=> $e->getMessage(),
+                'message' => $e->getMessage(),
                 'error' => 'Something went Wrong!',
             ]);
         }
     }
-    function salePos(Request $request){
-     //dd($request->all());
+    function salePos(Request $request)
+    {
+        //dd($request->all());
 
-        $validator_arr["qty"] =["required"];
+        $validator_arr["qty"] = ["required"];
         $validator_e_msgg_arr["qty"] = "Product is required";
-        $validator = Validator::make($request->all(),
+        $validator = Validator::make(
+            $request->all(),
             $validator_arr,
             $validator_e_msgg_arr,
-        // "color.*"  => "required|string|distinct|min:3",
+            // "color.*"  => "required|string|distinct|min:3",
         );
 
         if ($validator->fails()) {
-            $notification=array(
-                'errors'=>$validator->errors()->all(),
-                'status'=>'errors'
+            $notification = array(
+                'errors' => $validator->errors()->all(),
+                'status' => 'errors'
             );
             return response()->json($notification);
-            return back()->withErrors($validator->errors())->with("cus_errors",$validator->errors()->all())->withInput($request->all());
+            return back()->withErrors($validator->errors())->with("cus_errors", $validator->errors()->all())->withInput($request->all());
         }
-        try{
+        try {
             DB::beginTransaction();
-            $invoice = New Invoice;
-            $invoice->reference_no = 'pos-' . date("Ymd") . '-'. date("his");
+            $invoice = new Invoice;
+            $invoice->reference_no = 'pos-' . date("Ymd") . '-' . date("his");
             $invoice->branch_id = $request->branch ?? 0;
 
-            $invoice->customer_id= $request->customer_id ?? 0;
+            $invoice->customer_id = $request->customer_id ?? 0;
             $invoice->item = $request->item ?? 0;
             $invoice->total_qty = $request->total_qty;
-            $invoice->total_discount = round($request->total_discount,2);
-            $invoice->total_cost = round($request->sub_total,2);
+            $invoice->total_discount = round($request->total_discount, 2);
+            $invoice->total_cost = round($request->sub_total, 2);
             // $invoice->order_discount = round($request->order_discount,2);
             // $invoice->shipping_cost = round($request->shipping_cost,2);
-            $invoice->total_tax = round($request->total_tax,2);
-            $invoice->paid_amount = round($request->grand_total,2);
+            $invoice->total_tax = round($request->total_tax, 2);
+            $invoice->paid_amount = round($request->grand_total, 2);
 
-            $invoice->receive_amount = round($request->receive_amount,2);
-            $invoice->change_amount = round($request->change_amount,2);
+            $invoice->receive_amount = round($request->receive_amount, 2);
+            $invoice->change_amount = round($request->change_amount, 2);
 
             $invoice->due_amount = 0;
-            $invoice->grand_total = round($request->grand_total,2);
-            $invoice->payment_method= $request->payment_method ?? 0;
-            $invoice->bank_account_id= $request->account ?? 0;
-            $invoice->is_pos= 1;
+            $invoice->grand_total = round($request->grand_total, 2);
+            $invoice->payment_method = $request->payment_method ?? 0;
+            $invoice->bank_account_id = $request->account ?? 0;
+            $invoice->is_pos = 1;
             $invoice->status = 1;
-            if(array_search('accounts',$this->pack_option()) != false){
-                if($request->payment_method != ''){
-                    if($invoice->due_amount == 0){
+            if (array_search('accounts', $this->pack_option()) != false) {
+                if ($request->payment_method != '') {
+                    if ($invoice->due_amount == 0) {
                         $invoice->payment_status = 2;
-                    }else{
+                    } else {
                         $invoice->payment_status = 1;
                     }
-                }else{
+                } else {
                     $invoice->payment_status = 0;
                 }
-            }else{
-                if($request->payment_method != ''){
-                    if($invoice->due_amount == 0){
+            } else {
+                if ($request->payment_method != '') {
+                    if ($invoice->due_amount == 0) {
                         $invoice->payment_status = 2;
-                    }else{
+                    } else {
                         $invoice->payment_status = 1;
                     }
-                }else{
+                } else {
                     $invoice->payment_status = 0;
                 }
                 //$invoice->payment_status = $request->payment_status ?? 0;
@@ -444,20 +445,20 @@ class PosController extends Controller
             $invoice->invoice_date = now();
             // $invoice->sale_date = now();
             $invoice->save();
-            foreach($request->qty as $product_id=>$qty) {
-                if(null != $product_id){
-                    $product_invoice = New ProductInvoice;
+            foreach ($request->qty as $product_id => $qty) {
+                if (null != $product_id) {
+                    $product_invoice = new ProductInvoice;
                     $product_invoice->invoice_id = $invoice->id;
                     $product_invoice->product_id = $product_id;
                     $product_invoice->unit_id = $request->unit[$product_id];
                     $product_invoice->qty = $qty ?? 0;
-                    $product_invoice->tax = round($request->tax[$product_id] ?? 0,2);
-                    $product_invoice->per_cost = round($request->price[$product_id] ?? 0,2);
-                    $product_invoice->purchase_price = round($request->purchase_price[$product_id] ?? 0,2);
-                    $product_invoice->total = round((($request->price[$product_id] * $qty) ?? 0),2);
-                    $product_invoice->total_purchase = round((($request->purchase_price[$product_id] * $qty) ?? 0),2);
-                    $product_invoice->discount = round($request->discount[$product_id] ?? 0,2);
-                    $product_invoice->is_pos= 1;
+                    $product_invoice->tax = round($request->tax[$product_id] ?? 0, 2);
+                    $product_invoice->per_cost = round($request->price[$product_id] ?? 0, 2);
+                    $product_invoice->purchase_price = round($request->purchase_price[$product_id] ?? 0, 2);
+                    $product_invoice->total = round((($request->price[$product_id] * $qty) ?? 0), 2);
+                    $product_invoice->total_purchase = round((($request->purchase_price[$product_id] * $qty) ?? 0), 2);
+                    $product_invoice->discount = round($request->discount[$product_id] ?? 0, 2);
+                    $product_invoice->is_pos = 1;
                     $product_invoice->save();
 
                     $stock = new Stock;
@@ -466,23 +467,23 @@ class PosController extends Controller
                     $stock->product_id = $product_id;
                     $stock->unit_id = $request->unit[$product_id] ?? 0;
                     $stock->out_qty = $qty ?? 0;
-                    $stock->sale_price =round((($request->price[$product_id] * $qty) ?? 0),2);
+                    $stock->sale_price = round((($request->price[$product_id] * $qty) ?? 0), 2);
                     $stock->inventory_type = 'Sales';
                     $stock->save();
 
                     $product_stock =  Product::find($product_id);
-                    if($product_stock){
-                        $product_stock->qty= $product_stock->qty - ($qty ?? 0);
+                    if ($product_stock) {
+                        $product_stock->qty = $product_stock->qty - ($qty ?? 0);
                         $product_stock->save();
                     }
                 }
             }
 
-            if(array_search('accounts',$this->pack_option()) != false){
-                $salesHead = AccountHead::where("code",'4000')->first();
+            if (array_search('accounts', $this->pack_option()) != false) {
+                $salesHead = AccountHead::where("code", '4000')->first();
 
-                $sc_trans = New AccountTransaction();
-                $sc_trans->amount = round($request->grand_total,2);
+                $sc_trans = new AccountTransaction();
+                $sc_trans->amount = round($request->grand_total, 2);
                 $sc_trans->account_id = $salesHead->id;
                 $sc_trans->type = "credit";
                 $sc_trans->sub_type = "Pos Sales";
@@ -491,11 +492,11 @@ class PosController extends Controller
                 $sc_trans->relation_id = $invoice->id;
                 $sc_trans->relation_with = "Pos Sales";
                 $sc_trans->save();
-                if($request->payment_method == ''){
-                    $acReceivableHead = AccountHead::where("code",'1000')->first();
+                if ($request->payment_method == '') {
+                    $acReceivableHead = AccountHead::where("code", '1000')->first();
 
-                    $due_trans = New AccountTransaction;
-                    $due_trans->amount = round($request->grand_total,2);
+                    $due_trans = new AccountTransaction;
+                    $due_trans->amount = round($request->grand_total, 2);
                     $due_trans->account_id = $acReceivableHead->id;
                     $due_trans->type = "debit";
                     $due_trans->sub_type = "Pos Sales";
@@ -507,22 +508,22 @@ class PosController extends Controller
                     $due_trans->save();
                     $sc_trans->trans_id = $due_trans->id;
                     $sc_trans->save();
-                }else{
+                } else {
 
                     $balance_account = BalanceAccount::find($request->account);
-                    $payment = New Payment();
-                    $payment->payment_method= $request->payment_method ?? 0;
-                    $payment->bank_account_id= $request->account ?? 0;
+                    $payment = new Payment();
+                    $payment->payment_method = $request->payment_method ?? 0;
+                    $payment->bank_account_id = $request->account ?? 0;
                     // $payment->transaction_id= $sc_pay_transaction->id;
                     $payment->relation_id = $invoice->id;
                     $payment->relation_type = "Pos Sales Payment";
-                    $payment->amount = round($invoice->paid_amount,2);
+                    $payment->amount = round($invoice->paid_amount, 2);
                     $payment->date = date('Y-m-d');
                     $payment->note = $request->order_note;
                     $payment->save();
 
-                    $pay_trans = New AccountTransaction;
-                    $pay_trans->amount = round($invoice->paid_amount,2);
+                    $pay_trans = new AccountTransaction;
+                    $pay_trans->amount = round($invoice->paid_amount, 2);
                     $pay_trans->account_id = $balance_account->account_head_id;
                     $pay_trans->type = "debit";
                     $pay_trans->sub_type = "Pos Sales";
@@ -533,20 +534,20 @@ class PosController extends Controller
                     $pay_trans->payment_id = $payment->id;
                     $pay_trans->trans_id = $sc_trans->id;
                     $pay_trans->save();
-                    $payment->transaction_id= $pay_trans->id;
+                    $payment->transaction_id = $pay_trans->id;
                     $payment->save();
                     $sc_trans->trans_id = $pay_trans->id;
                     $sc_trans->save();
-                    if( $invoice->due_amount > 0){
-                        $salesDueHead = AccountHead::where("code",'1000')->first();
+                    if ($invoice->due_amount > 0) {
+                        $salesDueHead = AccountHead::where("code", '1000')->first();
 
-                        $sc_due_transaction = New AccountTransaction;
-                        $sc_due_transaction->amount = round($request->grand_total-$invoice->paid_amount,2);
+                        $sc_due_transaction = new AccountTransaction;
+                        $sc_due_transaction->amount = round($request->grand_total - $invoice->paid_amount, 2);
                         $sc_due_transaction->account_id = $salesDueHead->id;
                         $sc_due_transaction->type = "debit";
                         $sc_due_transaction->sub_type = "Pos Sales";
                         $sc_due_transaction->reason = "Pos Sale Product To Customer With Due";
-                        $sc_due_transaction->date =  date('Y-m-d') ;
+                        $sc_due_transaction->date =  date('Y-m-d');
                         $sc_due_transaction->relation_id = $invoice->id;
                         $sc_due_transaction->relation_with = "Pos Sales";
                         $sc_due_transaction->is_trans2 = 2;
@@ -556,52 +557,52 @@ class PosController extends Controller
                         $sc_trans->trans2_id = $sc_due_transaction->id;
                         $sc_trans->save();
                     }
-
-
                 }
             }
 
             DB::commit();
-            if($request->type =="Sales"){
+            if ($request->type == "Sales") {
                 $data['pos_sale'] = $invoice;
-                $notification=array(
-                    'message'=>"Sale Successfully Completed",
-                    'data'=>$invoice,
-                    'invoice'=>view('Inventory.pos.invoice',$data)->render(),
-                    'status'=>'success'
+                $notification = array(
+                    'message' => "Sale Successfully Completed",
+                    'data' => $invoice,
+                    'invoice' => view('Inventory.pos.invoice', $data)->render(),
+                    'status' => 'success'
                 );
-            }else{
-                $notification=array(
-                    'message'=>"Sale Successfully Completed",
-                    'data'=>$invoice,
-                    'status'=>'success'
+            } else {
+                $notification = array(
+                    'message' => "Sale Successfully Completed",
+                    'data' => $invoice,
+                    'status' => 'success'
                 );
             }
 
             return response()->json($notification);
-
-        }catch (\Exception $e){
+        } catch (\Exception $e) {
             DB::rollBack();
-           // dd($e->getMessage());
-            $notification=array(
+            // dd($e->getMessage());
+            $notification = array(
                 // 'message'=>"Something went Wrong!",
-                'message'=>$e->getMessage(),
-                'status'=>'error'
+                'message' => $e->getMessage(),
+                'status' => 'error'
             );
             return response()->json($notification);
             return redirect()->back()->with($notification)->withInput($request->all());
         }
     }
-    function saleInvoice(Request $request,$id){
+    function saleInvoice(Request $request, $id)
+    {
         $data['pos_sale'] = Invoice::find($id);
-        return view('Inventory.pos.invoice',$data);
+        return view('Inventory.pos.invoice', $data);
     }
-    function salePrint(Request $request,$id){
+    function salePrint(Request $request, $id)
+    {
         $data['pos_sale'] = Invoice::find($id);
-        return view('Inventory.pos.invoice',$data);
+        return view('Inventory.pos.invoice', $data);
     }
-    function saleDedtails($id){
+    function saleDedtails($id)
+    {
         $data['pos_sale'] = Invoice::find($id);
-        return view('Inventory.pos.ajax-details',$data);
+        return view('Inventory.pos.ajax-details', $data);
     }
 }
