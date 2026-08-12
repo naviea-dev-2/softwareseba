@@ -821,7 +821,6 @@ class HrController extends Controller
             return response()->json($data);
         }
         $this->inital_account();
-    //    dd($request);
         $this->validate($request,[
             'monthDate'=>'required',
             'empID'=>'required',
@@ -832,11 +831,10 @@ class HrController extends Controller
             DB::beginTransaction();
 
             $checkHas=SalarySheet::where('empID',$request->empID)->where('month',$request->monthDate)->first();
-            // dd($checkHas);
             if(!$checkHas){
-                $employee=Employee::where('id',$request->empID)->first();
-                $payroll=Payroll::first();
-                $month=MonthManage::where('monthDate',$request->monthDate)->first();
+                $employee = Employee::where('id',$request->empID)->first();
+                $payroll = Payroll::first();
+                $month = MonthManage::where('monthDate',$request->monthDate)->first();
 
                 $lastAttendance=Attendance::orderBy('dutyDate','DESC')->where('dutyDate','LIKE',$request->monthDate.'%')->first();
 

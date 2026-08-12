@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 class shiftManageController extends Controller
 {
     public function view(){
+        
         if(can_p('viewDepartment') == false){
             return redirect()->route('dashboard');
         }

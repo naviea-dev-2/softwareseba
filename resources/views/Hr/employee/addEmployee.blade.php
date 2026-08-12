@@ -304,7 +304,7 @@
                             </div>
 
                             <div class="col-md-3 mt-2">
-                                <label for="">Regine Date </label>
+                                <label for="">Re-join Date </label>
                                 <input onclick="this.showPicker()" value="{{ old('rejineDate') }}" type="date" class=" form-control  {{ $errors->has('rejineDate') ? 'is-invalid' : '' }}" name="rejineDate" autocomplete="off">
                                 @if ($errors->has('rejineDate'))
                                     <span class="invalid-feedback mb-0">
