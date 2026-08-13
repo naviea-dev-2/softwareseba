@@ -1714,12 +1714,12 @@
         containerCssClass: 'select-sm',
         dropdownParent:$( '#customerAddModal' ) ,
         ajax: {
-            url:'{{route('select2.states.bycountry')}}' ,
+            url:'{{route("select2.states.bycountry")}}' ,
             dataType: 'json',
             delay: 250,
             data: function (params) {
             return {
-                country_id:$("#"+country).val(),
+                country_id:$("#country").val(),
                 value: $.trim(params.term),
             };
             },
@@ -1740,11 +1740,12 @@
         containerCssClass: 'select-sm',
         dropdownParent:$( '#customerAddModal' ) ,
         ajax: {
-            url:'{{route('select2.cities.byState')}}' ,
+            url:'{{route("select2.cities.byState")}}' ,
             dataType: 'json',
             delay: 250,
             data: function (params) {
             return {
+                state_id: $('#state').val(),
                 value: $.trim(params.term),
             };
             },

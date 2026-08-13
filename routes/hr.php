@@ -146,7 +146,7 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::post('/getDesigName', 'App\Http\Controllers\Hr\EmployeeController@getDesigName')->name('/getDesigName');
     Route::post('/getEmployeeId', 'App\Http\Controllers\Hr\EmployeeController@getEmployeeId')->name('/getEmployeeId');
 
-    Route::post('/getDesigName1', 'App\Http\Controllers\Hr\EmployeeController@getDesigName')->name('/getDesigName1');
+    Route::post('/getDesigName1', 'App\Http\Controllers\Hr\EmployeeController@getDesigName')->name('getDesigName1');
     Route::post('/getEmployeeId1', 'App\Http\Controllers\Hr\EmployeeController@getEmployeeId')->name('/getEmployeeId1');
 
     Route::post('/getDesigName2', 'App\Http\Controllers\Hr\EmployeeController@getDesigName')->name('/getDesigName2');

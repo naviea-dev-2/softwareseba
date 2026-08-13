@@ -223,6 +223,7 @@
 						@if($au_business->user_type == 0)
 							@php
 								$results = \App\Models\Tp_option::where('option_name', 'user_limit')->first();
+								
 								$data = array();
 								if($results){
 									$dataObj = json_decode($results->option_value);
@@ -230,7 +231,14 @@
 								}else{
 									$data['days'] = 0;
 								}
-								$user_end_date = \Carbon\Carbon::parse($au_business->start_date)->addDays($data['days']);
+
+								$days = filter_var($data['days'], FILTER_VALIDATE_INT);
+
+								if ($days === false) {
+									throw new \Exception('Invalid days value.');
+								}
+
+								$user_end_date = \Carbon\Carbon::parse($au_business->start_date)->addDays($days);
 								$user_now_date = \Carbon\Carbon::now();
 							
 								if($user_now_date > $user_end_date){

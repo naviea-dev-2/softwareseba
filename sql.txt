@@ -1,0 +1,5 @@
+ALTER TABLE `purchases` ADD `is_ini_p` TINYINT NOT NULL DEFAULT '0' AFTER `bank_account_id`;
+ALTER TABLE `products` CHANGE `stock_qty` `qty` INT(11) NOT NULL DEFAULT '0';
+ALTER TABLE `product_invoices` ADD `purchase_price` DECIMAL NULL DEFAULT '0' AFTER `per_cost`;
+ALTER TABLE `product_invoices` ADD `total_purchase` INT NOT NULL DEFAULT '0' AFTER `total`;
+ALTER TABLE `product_invoices` ADD `is_pos` TINYINT NOT NULL DEFAULT '0' AFTER `total_purchase`;

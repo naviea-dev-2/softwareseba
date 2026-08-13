@@ -12,7 +12,6 @@ use App\Traits\WithBusinesstype;
 use App\Models\Business;
 class Product extends Model
 {
-    use HasFactory;
     use HasFactory, Multitenantable, WithBusinesstype;
     function getImageShowAttribute(){
         return $this->image == '' ? $this->no_image : asset("public/upload/products/".$this->image);

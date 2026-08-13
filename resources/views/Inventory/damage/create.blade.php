@@ -521,32 +521,7 @@
 
         // $(this).val(0).trigger('change');
     });
-    $(document).on('change','.select_batch_no',function(){
-        var p_id= $(this).attr('p-id');
-        var row_no= $(this).attr('data-in');
-        var b_no= $(this).val();
-        $.ajax({
-            url: "{{route('invoice.check-batch-availability') }}",
-            method: 'GET',
-            data:{
-                p_id:p_id,
-                b_no:b_no,
-            },
-            success: function(res) {
-                console.log(res);
-                if(res.status == "no"){
-                    toastr.warning(res.msg);
-                    $('.batch_no_'+row_no).val('');
-                    $('.ex_date_'+row_no).val('');
-                }else{
-                    $('.batch_no_'+row_no).val(res.expire_p.batch_no);
-                    $('.ex_date_'+row_no).val(res.expire_p.expire_date);
-                    $(".datepicker").flatpickr();
-                }
-            }
-        });
-
-    });
+    
     function FillProductOption(id,row_no,old=0,qty=1,unit_option=null){
          $.ajax({
             url: "{{route('damage.get_product_by') }}",

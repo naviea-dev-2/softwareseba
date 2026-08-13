@@ -182,23 +182,25 @@ class UserController extends Controller
         return  view('user.edit',$data);
     }
     function update(Request $request, $id){
+
         if($request->user_type == 0){
             $this->validate($request,[
                 'name'=>'required',
                 'email'=>'required',
-                'branch'=>'required',
+                'branch'=>'nullable',
                 'business_logo'=>'image|mimes:jpeg,png,jpg,webp',
             ]);
         }else{
             $this->validate($request,[
                 'name'=>'required',
                 'email'=>'required',
-                'role'=>'required',
-                'branch'=>'required',
+                'role'=>'nullable',
+                'branch'=>'nullable',
                 'business_logo'=>'image|mimes:jpeg,png,jpg,webp',
             ]);
         }
        
+
        try{
            DB::beginTransaction();
 
@@ -218,6 +220,7 @@ class UserController extends Controller
            $user->role_id = $request->role ?? 0;
            $user->branch_id = $request->branch ?? 0;
           
+
            $user->save();
            $notification=array(
                    'message'=>"Update Success",
@@ -231,7 +234,6 @@ class UserController extends Controller
 
        }catch(\Exception $e){
            DB::rollBack();
-          // dd($e->getMessage());
            $notification=array(
                    'message'=>"Something Went Wrong",
                    'alert-type'=>'error'
