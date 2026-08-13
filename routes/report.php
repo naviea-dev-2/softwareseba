@@ -16,6 +16,7 @@ Route::get('/invoice-return-report','App\Http\Controllers\Report\InventoryReport
 Route::get('/stock-report','App\Http\Controllers\Report\InventoryReport@stock')->name('report.stock');
 Route::get('/product-wise-profit-report','App\Http\Controllers\Report\InventoryReport@productWiseProfit')->name('report.product_wise_profit');
 Route::get('/sale-wise-profit-report','App\Http\Controllers\Report\InventoryReport@saleWiseProfit')->name('report.sale_wise_profit');
+Route::get('/product-expire-report','App\Http\Controllers\Report\InventoryReport@productExpire')->name('report.product_expire');
 Route::get('/damage-product-report','App\Http\Controllers\Report\InventoryReport@damageProduct')->name('report.damage_product_report');
 Route::get('/damage-product-stock','App\Http\Controllers\Report\InventoryReport@damageProductStock')->name('report.damage_product_stock');
 
@@ -48,6 +49,7 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::get('/report/stock_print','App\Http\Controllers\Report\PrintReport@stockReport')->name('stock_report_print');
     Route::get('/report/product-wise-profit','App\Http\Controllers\Report\PrintReport@productWiseProfit')->name('product_wise_profit_report_print');
     Route::get('/report/sale-wise-profit','App\Http\Controllers\Report\PrintReport@saleWiseProfit')->name('sale_wise_profit_report_print');
+    Route::get('/report/product-expire-print','App\Http\Controllers\Report\PrintReport@productExpire')->name('product_expire_report_print');
     Route::get('/report/damage-report-print','App\Http\Controllers\Report\PrintReport@damageProductReport')->name('damage_product_report_print');
     Route::get('/report/damage-stock-print','App\Http\Controllers\Report\PrintReport@damageProductStockReport')->name('damage_product_stock_print');
     
@@ -84,7 +86,8 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::get('/report/stock_excel','App\Http\Controllers\Report\ReportExportController@stockReport')->name('stock_report_excel');
     Route::get('/report/product_wise_profit_excel','App\Http\Controllers\Report\ReportExportController@productWiseProfit')->name('product_wise_profit_report_excel');
     Route::get('/report/sale_wise_profit_excel','App\Http\Controllers\Report\ReportExportController@saleWiseProfit')->name('sale_wise_profit_report_excel');
-     Route::get('/report/damage-product-report-excel','App\Http\Controllers\Report\ReportExportController@damageProductReport')->name('damage_product_report_excel');
+    Route::get('/report/product-expire-excel','App\Http\Controllers\Report\ReportExportController@productExpire')->name('product_expire_report_excel');
+    Route::get('/report/damage-product-report-excel','App\Http\Controllers\Report\ReportExportController@damageProductReport')->name('damage_product_report_excel');
     Route::get('/report/damage-product-stock-print','App\Http\Controllers\Report\ReportExportController@damageProductStock')->name('damage_product_stock_excel');
     
      //accounting
@@ -117,7 +120,8 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::get('/report/stock_pdf','App\Http\Controllers\Report\PdfExportController@stockReport')->name('stock_report_pdf');
     Route::get('/report/product_wise_profit_pdf','App\Http\Controllers\Report\PdfExportController@productWiseProfit')->name('product_wise_profit_report_pdf');
     Route::get('/report/sale_wise_profit_pdf','App\Http\Controllers\Report\PdfExportController@saleWiseProfit')->name('sale_wise_profit_report_pdf');
-     Route::get('/report/damage-product-report-pdf','App\Http\Controllers\Report\PdfExportController@damageProductReport')->name('damage_product_report_pdf');
+    Route::get('/report/product-expire-pdf','App\Http\Controllers\Report\PdfExportController@productExpire')->name('product_expire_report_pdf');
+    Route::get('/report/damage-product-report-pdf','App\Http\Controllers\Report\PdfExportController@damageProductReport')->name('damage_product_report_pdf');
     Route::get('/report/damage-product-stock-pdf','App\Http\Controllers\Report\PdfExportController@damageProductStock')->name('damage_product_stock_pdf');
     
     //accounting
