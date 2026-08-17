@@ -13,7 +13,8 @@ use Carbon\Carbon;
 class ZKDeviceController extends Controller
 {
     function cDataResponse(Request $request){
-        // Log::info("att r: " . json_encode($request->all()));
+        // Log::info("test r: " . json_encode($request->all()));
+        // Log::info("test c: " . json_encode($request->getContent()));
         // Log::info("t".$request->table == "ATTLOG");
         //  return response("OK");
         try{
@@ -127,6 +128,34 @@ class ZKDeviceController extends Controller
                         }
                     }
                 }
+            }else{
+                
+                $raw = $request->getContent();
+                $raw = trim($raw);
+                if (str_starts_with($raw, 'FP ')) {
+                    preg_match(
+                        '/FP\s+PIN=([^\t]+)\s+FID=(\d+)\s+Size=(\d+)\s+Valid=(\d+)\s+TMP=(.+)$/s',
+                        $raw,
+                        $matches
+                    );
+                    if ($matches) {
+                        $pin = trim($matches[1]);
+                        $fingerId = (int) $matches[2];
+                        $size = (int) $matches[3];
+                        $valid = (int) $matches[4];
+                        $template = trim($matches[5]);
+
+                        $device_mapping =DeviceMapping::leftJoin('employees',"employees.id","device_mappings.emp_id")
+                        ->where("device_mappings.device_sn",$sn)
+                        ->where('employees.employee_id',$pin)
+                        ->first(); 
+                        $device_mapping->finger_id = $fingerId;
+                        $device_mapping->size = $size;
+                        $device_mapping->valid = $valid;
+                        $device_mapping->template = $template;
+                        $device_mapping->save();
+                    }
+                }
             }
         }catch(\Exception $e){
             Log::info($e->getMessage());
@@ -138,35 +167,55 @@ class ZKDeviceController extends Controller
         // Log::info("r: " . json_encode($request->all()));
         // return response("OK");
         $sn = $request->input('SN','unknown');
-        // return response("OK");
         $device_mapping =DeviceMapping::leftJoin('employees',"employees.id","device_mappings.emp_id")
         ->where("device_mappings.device_sn",$sn)
-        // ->where("device_mappings.device_id",$m_id)
         ->where('device_mappings.is_done',0)
-        ->select('employees.employee_id as userId',"employees.employee_name as name","device_mappings.id")  
+        ->select('employees.employee_id as userId',"employees.employee_name as name","device_mappings.id","device_mappings.command_type","device_mappings.finger_id","device_mappings.template")  
         ->first(); 
-        // Log::info("device_mapping: " . json_encode($device_mapping));
         if($device_mapping){
-            $f_device_mapping = DeviceMapping::find($device_mapping->id);
-            $f_device_mapping->is_done = 1;
-            $f_device_mapping->save();
-            // Log::info("tse : " . json_encode($f_device_mapping));
-            // $device_mapping->update([
-            //     'is_done'=>1,
-            // ]);
-            $cmdStr = "C:{$device_mapping->userId}:DATA USER PIN={$device_mapping->userId}\tName={$device_mapping->name}\tPrivilege=0\tPassword=";
-            //  Log::info("cmdStr : " . json_encode($cmdStr));
-            return response($cmdStr);
-        } 
+            if($device_mapping->command_type == "add"){
+                $device_mapping->is_done = 1;
+                $device_mapping->save();
+                $cmdStr = "C:{$device_mapping->userId}:DATA USER PIN={$device_mapping->userId}\tName={$device_mapping->name}\tPrivilege=0\tPassword=";
+                return response($cmdStr);
+            }else if($device_mapping->command_type == "delete"){
+                $device_mapping->is_done = 1;
+                $device_mapping->save();
+                $cmdStr = "C:{$device_mapping->userId}:DATA DELETE USERINFO PIN={$device_mapping->userId}";
+                return response($cmdStr);
+            }
+            else if($device_mapping->command_type == "upload fr"){
+                $device_mapping->is_done = 1;
+                $device_mapping->save();
+                $cmdStr = "C:{$device_mapping->userId}:DATA FP " . "PIN={$device_mapping->userId}" ."\tFID={$device_mapping->finger_id}" ."\tTMP={$device_mapping->template}";
+                return response($cmdStr);
+            } 
+
+        }
         return response("OK");
     }
     function cDataCmd(Request $request){
-        // Log::info("d cmd: " . json_encode($request->all()));
-        // return response("OK");
-        $sn = $request->input('SN','unknown');
-        DeviceMapping::where('device_sn',$sn)
-        ->where('is_done',1)
-        ->update(['is_done'=>2]);
+        $raw = $request->getContent();
+        parse_str($raw, $data);
+        $empId = $data['ID'] ?? '';
+        $return = $data['Return'] ?? '';
+        if($return == 0){
+            $sn = $request->input('SN','unknown');
+            $device_mapping =DeviceMapping::leftJoin('employees',"employees.id","device_mappings.emp_id")
+            ->where("device_mappings.device_sn",$sn)
+            ->where('employees.employee_id',$empId)
+            ->where('device_mappings.is_done',1)
+            ->select('device_mappings.*')
+            ->first();
+            if($device_mapping){
+                if($device_mapping->command_type == "add" || $device_mapping->command_type == "upload fr"){
+                    $device_mapping->is_done = 2;
+                    $device_mapping->save();
+                }else if($device_mapping->command_type == "delete"){
+                    $device_mapping->delete();
+                }
+            }  
+        }
         return response("OK");
     }
 }

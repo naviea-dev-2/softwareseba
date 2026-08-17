@@ -183,7 +183,14 @@ class DeviceIDMappingController extends Controller
         try{
             DB::beginTransaction();
             $data=DeviceMapping::find($request->id);
-            $data->delete();
+            if($data->is_done != 0){
+                $data->is_done = 0;
+                $data->command_type = "delete";
+                $data->save();
+            }else{
+                $data->delete();
+            }
+            
             DB::commit();
             return response()->json(['status'=>'yes',"msg"=>"Deleted successfully."]);
         }catch(\Exception $e){
