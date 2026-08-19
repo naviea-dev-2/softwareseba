@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     // ->withRouting(
@@ -35,6 +36,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/user.php'));
             Route::middleware('web')
                 ->group(base_path('routes/crm.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/dealer.php'));
         },
 
     )

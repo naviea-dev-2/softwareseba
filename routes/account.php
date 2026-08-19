@@ -34,12 +34,9 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     //transaction
     Route::resource('transaction', App\Http\Controllers\Account\TransactionController::class);
 
-
     //balance_account
     Route::resource('balance_account', App\Http\Controllers\Account\BalanceAccountController::class);
     Route::get('select2/balance_accounts',[App\Http\Controllers\Account\BalanceAccountController::class,'select2BalanceAccounts'])->name('select2.balance_accounts');
-
-
 
     //bankaccount
     Route::get('/bank-account-view','App\Http\Controllers\Account\bankaccountController@view')->name('bankaccount.view');
