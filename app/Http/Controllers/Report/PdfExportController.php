@@ -567,6 +567,47 @@ class PdfExportController extends Controller
         $name = 'Product Wise Profit Report_ ' . date('Y-m-d i:h:s');
         $mpdf->Output($name.'.pdf', 'D');
     }
+    function productExpire(Request $request){
+        DB::statement("SET SQL_MODE=''");
+        $reports = PExpire::leftjoin("products","products.id","p_expires.product_id")
+       ->leftjoin("categories","categories.id","products.category_id")
+         ->select('product_name','product_code','p_expires.batch_no','p_expires.qty','p_expires.expire_date','categories.name as cat_name');
+
+        if(!empty($request->category)){
+            $reports = $reports->where('products.category_id', $request->category);
+        }
+        if(!empty($request->p_product)){
+            $reports = $reports->where('p_expires.product_id', $request->p_product);
+        }
+        // dd($reports->get());
+        // ->groupBy("product_purchases.product_id")
+        $data['reports']= $reports->get();
+         //return view('pdf.purchase_report', $data);
+        $html = view('pdf.product_expire_report', $data);
+        $mpdf = new mPDF([
+            'mode' => 'UTF-8',
+            'margin_left' => 5,
+            'margin_right' => 5,
+            'margin_top' => 5,
+            'margin_bottom' => 0,
+            'margin_header' => 0,
+            'margin_footer' => 0,
+        ]);
+
+        //For Multilanguage Start
+        $mpdf->autoScriptToLang = true;
+        $mpdf->baseScript = 1;
+        $mpdf->autoLangToFont = true;
+        $mpdf->autoVietnamese = true;
+        $mpdf->autoArabic = true;
+
+        //For Multilanguage End
+        $mpdf->setAutoTopMargin = 'stretch';
+        $mpdf->setAutoBottomMargin = 'stretch';
+        $mpdf->writeHTML($html);
+        $name = 'Product Expire Report_ ' . date('Y-m-d i:h:s');
+        $mpdf->Output($name.'.pdf', 'D');
+    }
     function invoiceReturnReport(Request $request){
          DB::statement("SET SQL_MODE=''");
        $reports = ProductInvoiceReturn::leftjoin("invoice_returns","invoice_returns.id","product_invoice_returns.invoice_return_id")

@@ -321,6 +321,23 @@ class PrintReport extends Controller
         $data['reports']= $reports->get();
         return view('print.product_wise_profit_report', $data);
     }
+    function productExpire(Request $request){
+        DB::statement("SET SQL_MODE=''");
+        $reports = PExpire::leftjoin("products","products.id","p_expires.product_id")
+       ->leftjoin("categories","categories.id","products.category_id")
+         ->select('product_name','product_code','p_expires.batch_no','p_expires.qty','p_expires.expire_date','categories.name as cat_name');
+        if(!empty($request->p_category)){
+            $reports = $reports->where('products.category_id', $request->category);
+        }
+        if(!empty($request->p_product)){
+            $reports = $reports->where('product_invoices.product_id', $request->product);
+        }
+       // dd($reports->get());
+        // dd($reports->get());
+        // ->groupBy("product_purchases.product_id")
+        $data['reports']= $reports->get();
+        return view('print.product_expire_report', $data);
+    }
     function posSaleReport(Request $request){
         DB::statement("SET SQL_MODE=''");
         $reports = PosSaleDetails::leftjoin("pos_sales","pos_sales.id","pos_sale_details.sale_id")

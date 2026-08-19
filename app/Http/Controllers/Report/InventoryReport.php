@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
@@ -348,6 +347,39 @@ class InventoryReport extends Controller
         // dd($reports->paginate($per_page));
         $data['reports']= $reports->paginate($per_page);
         return view('Reports.Inventory.product-wise-profit', $data);
+
+    }
+    function productExpire(Request $request){
+
+        if(can_p('report.product_expire') == false){
+            return redirect()->route('dashboard');
+        }
+        DB::statement("SET SQL_MODE=''");
+       $reports = PExpire::leftjoin("products","products.id","p_expires.product_id")
+       ->leftjoin("categories","categories.id","products.category_id")
+         ->select('product_name','product_code','p_expires.batch_no','p_expires.qty','p_expires.expire_date','categories.name as cat_name');
+
+
+
+
+        if(!empty($request->category)){
+            $reports = $reports->where('products.category_id', $request->category);
+        }
+        if(!empty($request->product)){
+            $reports = $reports->where('p_expires.product_id', $request->product);
+        }
+        // ->groupBy("product_purchases.product_id")
+        if(!empty($request->per_page)){
+            $per_page = $request->per_page;
+        }else{
+            $per_page = 50;
+        }
+        //dd("ddd");
+        $data['per_page']=$per_page;
+        //dd($per_page);
+        // dd($reports->paginate($per_page));
+        $data['reports']= $reports->paginate($per_page);
+        return view('Reports.Inventory.product-expire', $data);
 
     }
     function posSale(Request $request){
