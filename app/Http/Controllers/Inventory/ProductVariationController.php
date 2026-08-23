@@ -328,7 +328,7 @@ class ProductVariationController extends Controller
             // $product= Product::find($request->RecordId);
             // if($product){
             //     $new_product = new Product;
-            //     $new_product->title = $product->title;
+            //     $new_product->title = $product->product_name;
             //     $new_product->cost_price = $request->cost_price;
             //     $new_product->sale_price = $request->sale_price;
             //     $new_product->old_price = $request->old_price;

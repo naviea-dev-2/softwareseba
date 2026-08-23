@@ -23,3 +23,4 @@ Route::post('dealer-purchase-orders/{dealerPurchaseOrder}/reject',[DealerPurchas
 Route::post('dealer-purchase-orders/{dealerPurchaseOrder}/cancel',[DealerPurchaseOrderController::class, 'cancel'])->name('dealer-purchase-orders.cancel');
 Route::get('dealer-deliveries/{dealerDelivery}/status',[DealerDeliveryController::class, 'statusForm'])->name('dealer-deliveries.status.form');
 Route::put('dealer-deliveries/{dealerDelivery}/status',[DealerDeliveryController::class, 'updateStatus'])->name('dealer-deliveries.status.update');
+

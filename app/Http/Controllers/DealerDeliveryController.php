@@ -9,6 +9,7 @@ use App\Models\Depot;
 use App\Models\Inventory\Product;
 use App\Services\DealerDeliveryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DealerDeliveryController extends Controller
 {
@@ -19,7 +20,9 @@ class DealerDeliveryController extends Controller
         
         $this->service = $service;
         $this->middleware(function($request, $next) {
-            $this->businessId = auth()->user()->business ? auth()->user()->business->business_type_id : 0;
+             $this->businessId = Auth::user()->business
+                ? Auth::user()->business->business_type_id
+                : 0;
             return $next($request);
         });
 

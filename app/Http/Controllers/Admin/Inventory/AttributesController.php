@@ -55,7 +55,7 @@ class AttributesController extends Controller
            foreach($products as $product)
            {
                $nestedData['id'] = $i++;
-               $nestedData['title'] = $product->title;
+               $nestedData['title'] = $product->product_name;
                $nestedData['order'] = $product->order;
                $nestedData['business_name'] = $product->business?->business_name;
               

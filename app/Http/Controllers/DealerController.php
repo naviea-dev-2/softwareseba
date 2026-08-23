@@ -7,6 +7,7 @@ use App\Models\Depot;
 use App\Models\Hr\Employee;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DealerController extends Controller
 {
@@ -29,7 +30,7 @@ class DealerController extends Controller
             ->orderBy('name')
             ->get();
 
-        $salesPersons = Employee::orderBy('employee_name')->where('business_id', auth()->user()->business->id)->get();
+        $salesPersons = Employee::orderBy('employee_name')->where('business_id', Auth::user()->business->id)->get();
 
         return view(
             'distribution.dealers.create',
