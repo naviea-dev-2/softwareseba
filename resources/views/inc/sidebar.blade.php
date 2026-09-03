@@ -56,7 +56,7 @@
                     $pack_expire = true;
                 }
                 $arr_con = json_decode($au_business->package?->pack_option,true);
-                array_push($arr_con,'general');
+                array_push($arr_con,'general','dealer','work_order','production');
             }else{
                 $results = \App\Models\Tp_option::where('option_name', 'user_limit')->first();
                 $data = array();
