@@ -14,17 +14,19 @@ use App\Http\Controllers\Production\RawMaterialStockController;
 use App\Http\Controllers\Production\WorkerController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('production')->name('production.')->middleware(['auth'])->group(function () {
-    Route::resource('workers', WorkerController::class);
-    Route::resource('materials', RawMaterialController::class);
-    Route::resource('material-stock', RawMaterialStockController::class);
-    Route::resource('production-plans', ProductionPlanController::class);
-    Route::resource('production-orders', ProductionOrderController::class);
-    Route::resource('production-capacities', ProductionCapacityController::class);
-    Route::resource('boms', BomController::class);
-    Route::resource('machines', MachineController::class);
-    Route::resource('machine-maintenances', MachineMaintenanceController::class);
-    Route::resource('quality-inspections', QualityInspectionController::class);
-    Route::resource('quality-reports', QualityReportController::class);
-    Route::resource('production-history', ProductionHistoryController::class)->only(['index', 'show']);
+Route::prefix('business')->middleware(['auth', "is_active", 'permission'])->group(function () {
+    Route::prefix('production')->name('production.')->middleware(['auth'])->group(function () {
+        Route::resource('workers', WorkerController::class);
+        Route::resource('materials', RawMaterialController::class);
+        Route::resource('material-stock', RawMaterialStockController::class);
+        Route::resource('production-plans', ProductionPlanController::class);
+        Route::resource('production-orders', ProductionOrderController::class);
+        Route::resource('production-capacities', ProductionCapacityController::class);
+        Route::resource('boms', BomController::class);
+        Route::resource('machines', MachineController::class);
+        Route::resource('machine-maintenances', MachineMaintenanceController::class);
+        Route::resource('quality-inspections', QualityInspectionController::class);
+        Route::resource('quality-reports', QualityReportController::class);
+        Route::resource('production-history', ProductionHistoryController::class)->only(['index', 'show']);
+    });
 });
