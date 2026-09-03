@@ -985,13 +985,13 @@
                             <span class="value">{{ $workOrder->customer->phone }}</span>
                         </div>
                         @endif
-                        @if($workOrder->customer->address || $workOrder->customer->city)
+                        @if($workOrder->customer->address || $workOrder->customer->city->name)
                         <div class="customer-field" style="grid-column: 1 / -1;">
                             <span class="label">Address</span>
                             <span class="value">
                                 {{ $workOrder->customer->address ?? '' }}
-                                @if($workOrder->customer->city || $workOrder->customer->state)
-                                {{ $workOrder->customer->city ?? '' }} {{ $workOrder->customer->state ?? '' }} {{ $workOrder->customer->zip ?? '' }}
+                                @if($workOrder->customer->city->name || $workOrder->customer->state->name)
+                                {{ $workOrder->customer->city->name ?? '' }} {{ $workOrder->customer->state->name ?? '' }} {{ $workOrder->customer->zip ?? '' }}
                                 @endif
                             </span>
                         </div>
