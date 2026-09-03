@@ -13,7 +13,7 @@ class DealerController extends Controller
 {
     public function index()
     {
-        $dealers = Dealer::with(['depot.superDepot',])
+        $dealers = Dealer::with(['depot.superDepot'])
             ->latest()
             ->paginate(20);
 

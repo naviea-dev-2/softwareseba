@@ -47,7 +47,7 @@
                 if($user_now_date > $user_end_date){
                     $free_exipre = true;
                 }
-                $arr_con = ['inventory','hr-payroll','accounts','dealer','general','crm'];
+                $arr_con = ['inventory','hr-payroll','accounts','dealer','work_order','production','general','crm'];
             }
         }else{
             if($au_business->package){
@@ -72,7 +72,7 @@
                 if($user_now_date > $user_end_date){
                     $free_exipre = true;
                 }
-                $arr_con = ['inventory','hr-payroll','accounts','dealer','general','crm'];
+                $arr_con = ['inventory','hr-payroll','accounts','dealer','work_order','production','general','crm'];
             }
             
         }
@@ -230,7 +230,7 @@
                                 @php
                                     $menu_allow = true;
                                     if($m_menu->is_condition == 1){
-                                        //$arr_con_a = ['inventory','hr-payroll','accounts','dealer','general','crm'];
+                                        //$arr_con_a = ['inventory','hr-payroll','accounts','dealer','work_order','production','general','crm'];
                                         $arr_con_val = in_array($m_menu->condition_type,$arr_con);
                                         if($m_menu->condition_val == 0){
                                             if($arr_con_val == false){

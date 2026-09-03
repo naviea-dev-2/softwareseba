@@ -80,9 +80,3 @@ Route::get('forget-passowrd',[ForgotPasswordController::class,'getForgetPass'])-
 Route::post('forgot-password', [ForgotPasswordController::class, 'sentMailforgotPassword'])->name('forget.send_mail');
 Route::get('forgot-password/{id}', [ForgotPasswordController::class, 'getResetPassword']);
 Route::post('forgot-password/{id}', [ForgotPasswordController::class, 'setResetPassword'])->name('reset.forgot_password');
-//Business
-
-
-
-
-
