@@ -56,7 +56,7 @@
                     $pack_expire = true;
                 }
                 $arr_con = json_decode($au_business->package?->pack_option,true);
-                array_push($arr_con,'general','dealer','work_order','production');
+                array_push($arr_con,'general');
             }else{
                 $results = \App\Models\Tp_option::where('option_name', 'user_limit')->first();
                 $data = array();
@@ -76,9 +76,9 @@
             }
             
         }
-       
     @endphp
-
+    
+   
     @if($free_exipre == false)
         @if($pack_expire == false)
             @if($user->business->business_type_id == 17)
@@ -230,7 +230,6 @@
                                 @php
                                     $menu_allow = true;
                                     if($m_menu->is_condition == 1){
-                                        //$arr_con_a = ['inventory','hr-payroll','accounts','dealer','work_order','production','general','crm'];
                                         $arr_con_val = in_array($m_menu->condition_type,$arr_con);
                                         if($m_menu->condition_val == 0){
                                             if($arr_con_val == false){
