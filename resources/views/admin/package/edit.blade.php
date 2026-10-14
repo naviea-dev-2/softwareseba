@@ -105,6 +105,24 @@
                             CRM
                         </label>
                     </div>
+                     <div class="form-check">
+                        <input @if(array_search('dealer',old('option',json_decode($package->pack_option,true))) != false) checked @endif class="form-check-input" type="checkbox" value="dealer" id="dealer" name="option[5]">
+                        <label class="form-check-label" for="dealer">
+                            Dealer
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input @if(array_search('production',old('option',json_decode($package->pack_option,true))) != false) checked @endif class="form-check-input" type="checkbox" value="production" id="production" name="option[6]">
+                        <label class="form-check-label" for="production">
+                            Production
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input @if(array_search('work_order',old('option',json_decode($package->pack_option,true))) != false) checked @endif class="form-check-input" type="checkbox" value="work_order" id="work_order" name="option[7]">
+                        <label class="form-check-label" for="work_order">
+                            Work Order
+                        </label>
+                    </div>
                    @if ($errors->has('option'))
                     <span class="invalid-feedback mb-0" style="display:block;">
                     <strong>{{ $errors->first('option') }}</strong>
