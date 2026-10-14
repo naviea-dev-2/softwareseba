@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Models\Production;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class WheatPurchase extends Model
+{
+    use SoftDeletes;
+    protected $table = 'production_wheat_purchases';
+    protected $guarded = ['id'];
+    protected $casts = [
+        'purchase_date' => 'date',
+        'empty_weight_kg' => 'decimal:3',
+        'loaded_weight_kg' => 'decimal:3',
+        'net_weight_kg' => 'decimal:3',
+        'rate_per_kg' => 'decimal:4',
+        'purchase_amount' => 'decimal:2',
+    ];
+    public function rawMaterial() { return $this->belongsTo(RawMaterial::class, 'raw_material_id'); }
+}

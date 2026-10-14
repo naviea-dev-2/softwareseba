@@ -1,0 +1,12 @@
+@extends('inc.master')
+@section('content')
+@include('production.wheat-purchases._style')
+<div class="wheat-wrap"><div class="wheat-top wheat-no-print"><div><h2>Wheat Purchase Report</h2><div class="wheat-muted">Monthly, supplier-wise and detailed purchase report</div></div><div class="wheat-actions"><a class="wheat-btn light" href="{{ route('production.wheat-purchases.index') }}">Back</a><a class="wheat-btn light" href="{{ route('production.wheat-purchases.export',request()->query()) }}">Export CSV</a><button type="button" class="wheat-btn" onclick="window.print()">Print / Save PDF</button></div></div>
+<div class="wheat-card wheat-no-print">@include('production.wheat-purchases._filters',['action'=>route('production.wheat-purchases.report')])</div>
+<div class="wheat-print-title"><h2>Kazi Global Food Products Industries Limited</h2><h3>Kazi Flour Mill</h3><div>Wheat (Purchase) In Record</div><small>{{ request('from') ?: 'All dates' }} — {{ request('to') ?: 'All dates' }}</small></div>
+@include('production.wheat-purchases._summary')
+<div class="wheat-card"><h4>Detailed Purchase Register</h4>@include('production.wheat-purchases._table',['actions'=>false])</div>
+<div class="wheat-card"><h4>Monthly Purchase Summary</h4><div class="wheat-table-wrap"><table class="wheat-table"><thead><tr><th>Month</th><th>Deliveries</th><th>Net Weight (KG)</th><th>Monthly Purchase TON</th><th>Monthly Purchase (৳)</th></tr></thead><tbody>@forelse($monthly as $m)<tr><td>{{ $m->period }}</td><td>{{ $m->deliveries }}</td><td>{{ number_format($m->total_kg,3) }}</td><td>{{ number_format($m->total_kg/1000,3) }}</td><td>{{ number_format($m->amount,2) }}</td></tr>@empty<tr><td colspan="5">No dated records</td></tr>@endforelse</tbody></table></div></div>
+<div class="wheat-card"><h4>Supplier-wise Summary</h4><div class="wheat-table-wrap"><table class="wheat-table"><thead><tr><th>Supplier</th><th>Deliveries</th><th>Net Weight (KG)</th><th>Weight (TON)</th><th>Purchase Amount (৳)</th></tr></thead><tbody>@foreach($suppliers as $s)<tr><td>{{ $s->supplier_name ?: 'Unspecified' }}</td><td>{{ $s->deliveries }}</td><td>{{ number_format($s->total_kg,3) }}</td><td>{{ number_format($s->total_kg/1000,3) }}</td><td>{{ number_format($s->amount,2) }}</td></tr>@endforeach</tbody></table></div></div>
+</div>
+@endsection

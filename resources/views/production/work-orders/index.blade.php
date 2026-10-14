@@ -10,7 +10,7 @@ $statusColors = ['pending' => 'bg-gray-100 text-gray-600','in_progress' => 'bg-y
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/><path d="M12 5v14"/><path d="M5 12h14"/></svg>
             Work Orders
         </h1>
-        <a href="{{ route('production.production.work-orders.create') }}" class="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800">
+        <a href="{{ route('production.work-orders.create') }}" class="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
             Add Work Order
         </a>
@@ -51,8 +51,8 @@ $statusColors = ['pending' => 'bg-gray-100 text-gray-600','in_progress' => 'bg-y
                     </td>
                     <td class="py-3 px-4 text-right">
                         <div class="flex items-center justify-end gap-2">
-                            <a href="{{ route('production.production.work-orders.edit', $item) }}" class="p-1.5 hover:bg-gray-200 rounded"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></a>
-                            <form method="POST" action="{{ route('production.production.work-orders.destroy', $item) }}" class="inline" onsubmit="return confirm('Are you sure?')">
+                            <a href="{{ route('production.work-orders.edit', $item) }}" class="p-1.5 hover:bg-gray-200 rounded"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></a>
+                            <form method="POST" action="{{ route('production.work-orders.destroy', $item) }}" class="inline" onsubmit="return confirm('Are you sure?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="p-1.5 hover:bg-red-100 rounded"><svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg></button>
                             </form>

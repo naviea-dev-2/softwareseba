@@ -32,14 +32,14 @@ class ProductionPlanController extends Controller
             ->paginate(20);
 
         return view(
-            'production.production-plans.index',
+            'production.plans.index',
             compact('plans')
         );
     }
 
     public function create()
     {
-        return view('production.production-plans.create');
+        return view('production.plans.create');
     }
 
     public function store(Request $request)
@@ -58,7 +58,7 @@ class ProductionPlanController extends Controller
         ]);
 
         return redirect()
-            ->route('production.production-plans.index')
+            ->route('production.plans.index')
             ->with('success', 'Production plan created successfully.');
     }
 
@@ -70,7 +70,7 @@ class ProductionPlanController extends Controller
         )->findOrFail($id);
 
         return view(
-            'production.production-plans.show',
+            'production.plans.show',
             compact('plan')
         );
     }
@@ -83,7 +83,7 @@ class ProductionPlanController extends Controller
         )->findOrFail($id);
 
         return view(
-            'production.production-plans.edit',
+            'production.plans.edit',
             compact('plan')
         );
     }
@@ -106,7 +106,7 @@ class ProductionPlanController extends Controller
         $plan->update($validated);
 
         return redirect()
-            ->route('production.production-plans.index')
+            ->route('production.plans.index')
             ->with('success', 'Production plan updated successfully.');
     }
 
@@ -120,7 +120,7 @@ class ProductionPlanController extends Controller
             ->delete();
 
         return redirect()
-            ->route('production.production-plans.index')
+            ->route('production.plans.index')
             ->with('success', 'Production plan deleted successfully.');
     }
 }
