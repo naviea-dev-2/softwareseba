@@ -52,7 +52,7 @@ class QualityReportController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'report_number' => 'required|unique:quality_reports,report_number',
+            'report_number' => 'required|unique:production_quality_reports,report_number',
             'inspection_id' => 'nullable',
             'report_period_start' => 'nullable|date',
             'report_period_end' => 'nullable|date',
@@ -116,7 +116,7 @@ class QualityReportController extends Controller
         )->findOrFail($id);
 
         $validated = $request->validate([
-            'report_number' => 'required|unique:quality_reports,report_number,' . $id,
+            'report_number' => 'required|unique:production_quality_reports,report_number,' . $id,
             'inspection_id' => 'nullable',
             'report_period_start' => 'nullable|date',
             'report_period_end' => 'nullable|date',

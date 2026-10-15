@@ -59,7 +59,7 @@ class BomController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'bom_number' => 'required|unique:bill_of_materials,bom_number',
+            'bom_number' => 'required|unique:production_bill_of_materials,bom_number',
             'name' => 'required',
             'product_id' => 'nullable',
             'version' => 'nullable',
@@ -145,7 +145,7 @@ class BomController extends Controller
         )->findOrFail($id);
 
         $validated = $request->validate([
-            'bom_number' => 'required|unique:bill_of_materials,bom_number,' . $id,
+            'bom_number' => 'required|unique:production_bill_of_materials,bom_number,' . $id,
             'name' => 'required',
             'product_id' => 'nullable',
             'version' => 'nullable',

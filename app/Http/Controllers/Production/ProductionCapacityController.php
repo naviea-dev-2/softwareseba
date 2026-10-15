@@ -35,7 +35,7 @@ class ProductionCapacityController extends Controller
             ->paginate(20);
 
         return view(
-            'production.production-capacities.index',
+            'production.capacities.index',
             compact('capacities')
         );
     }
@@ -55,7 +55,7 @@ class ProductionCapacityController extends Controller
         $products = Product::latest()->get();
 
         return view(
-            'production.production-capacities.create',
+            'production.capacities.create',
             compact('machines', 'workers', 'products')
         );
     }
@@ -78,7 +78,7 @@ class ProductionCapacityController extends Controller
         ]);
 
         return redirect()
-            ->route('production.production-capacities.index')
+            ->route('production.capacities.index')
             ->with('success', 'Production capacity created successfully.');
     }
 
@@ -90,7 +90,7 @@ class ProductionCapacityController extends Controller
         )->findOrFail($id);
 
         return view(
-            'production.production-capacities.show',
+            'production.capacities.show',
             compact('capacity')
         );
     }
@@ -115,7 +115,7 @@ class ProductionCapacityController extends Controller
         $products = Product::latest()->get();
 
         return view(
-            'production.production-capacities.edit',
+            'production.capacities.edit',
             compact('capacity', 'machines', 'workers', 'products')
         );
     }
@@ -139,7 +139,7 @@ class ProductionCapacityController extends Controller
         $capacity->update($validated);
 
         return redirect()
-            ->route('production.production-capacities.index')
+            ->route('production.capacities.index')
             ->with('success', 'Production capacity updated successfully.');
     }
 
@@ -153,7 +153,7 @@ class ProductionCapacityController extends Controller
             ->delete();
 
         return redirect()
-            ->route('production.production-capacities.index')
+            ->route('production.capacities.index')
             ->with('success', 'Production capacity deleted successfully.');
     }
 }

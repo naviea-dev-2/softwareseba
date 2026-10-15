@@ -1,47 +1,7 @@
 @extends('inc.master')
-
 @section('content')
-<div class="p-6 max-w-7xl mx-auto">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
-            Production History
-        </h1>
-    </div>
-
-    <form method="GET" class="relative mb-4">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search history..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none">
-    </form>
-
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm">
-            <thead>
-                <tr class="bg-gray-50 border-b border-gray-200">
-                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Date</th>
-                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Production Order</th>
-                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Work Order</th>
-                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Action</th>
-                    <th class="text-right py-3 px-4 font-semibold text-gray-700">Quantity</th>
-                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($items as $item)
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
-                    <td class="py-3 px-4 text-gray-500">{{ $item->created_at?->format('Y-m-d H:i') ?? '-' }}</td>
-                    <td class="py-3 px-4 font-medium">{{ $item->productionOrder?->order_number ?? $item->production_order_id ?? '-' }}</td>
-                    <td class="py-3 px-4 text-gray-500">{{ $item->workOrder?->work_order_number ?? $item->work_order_id ?? '-' }}</td>
-                    <td class="py-3 px-4">{{ $item->action ?? '-' }}</td>
-                    <td class="py-3 px-4 text-right">{{ $item->quantity ?? '-' }}</td>
-                    <td class="py-3 px-4 text-gray-500">{{ $item->notes ?? '-' }}</td>
-                </tr>
-                @empty
-                <tr><td colspan="6" class="text-center py-8 text-gray-400">No history records found</td></tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    @if($items->hasPages())<div class="mt-4">{{ $items->links() }}</div>@endif
-</div>
+<style>
+.factory-wrap{max-width:1440px;margin:0 auto;padding:24px 16px 48px;color:#25354a}.factory-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap}.factory-top h2{font-size:25px;font-weight:750;margin:0}.factory-top p{color:#78889b;margin:5px 0 0}.factory-card{background:#fff;border:1px solid #e5eaf0;border-radius:16px;box-shadow:0 4px 18px rgba(28,43,64,.05);padding:24px;margin-bottom:18px}.factory-card h4{font-weight:700;font-size:15px;margin:0 0 20px}.factory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.factory-field label{display:block;font-weight:650;margin-bottom:8px;color:#34455a}.factory-field input,.factory-field select,.factory-field textarea{width:100%;border:1px solid #d9e1e9;border-radius:10px;min-height:45px;padding:10px 12px;background:#fff;color:#26374b}.factory-field textarea{min-height:105px}.factory-btn{display:inline-block;border:0;border-radius:9px;padding:11px 17px;background:#2563eb;color:#fff!important;text-decoration:none!important;font-weight:650;cursor:pointer}.factory-btn.light{background:#f1f5f9;color:#334155!important}.factory-btn.danger{background:#fff0f0;color:#b91c1c!important}.factory-table{width:100%;border-collapse:collapse;min-width:720px}.factory-table th{background:#26384d;color:#fff;padding:13px;text-align:left;font-size:12px}.factory-table td{border-bottom:1px solid #e7ebf0;padding:12px;font-size:13px}.factory-table-wrap{overflow-x:auto}.factory-actions{display:flex;gap:7px;flex-wrap:wrap}.factory-actions .factory-btn{padding:7px 10px;font-size:12px}.factory-error{color:#b91c1c;font-size:12px}.factory-alert{padding:12px 16px;border-radius:10px;margin-bottom:15px;background:#ecfdf5;color:#065f46}@media(max-width:700px){.factory-grid{grid-template-columns:1fr}.factory-card{padding:16px}}
+</style>
+<div class="factory-wrap"><div class="factory-top"><div><h2>Production History</h2><p>Manage and review production history</p></div></div><div class="factory-card"><div class="factory-top"><form method="GET" style="display:flex;gap:8px;flex-wrap:wrap"><input class="form-control" name="search" placeholder="Search records" value="{{ request('search') }}"><button class="factory-btn" type="submit">Search</button></form></div><div class="factory-table-wrap"><table class="factory-table"><thead><tr><th>#</th><th>Production Order Id</th><th>Work Order Id</th><th>Event Type</th><th>Quantity</th><th>Recorded At</th><th>Actions</th></tr></thead><tbody>@forelse($history as $historyItem)<tr><td>{{ $historyItem->id }}</td><td>{{ $historyItem->production_order_id ?? "—" }}</td><td>{{ $historyItem->work_order_id ?? "—" }}</td><td>{{ $historyItem->event_type ?? "—" }}</td><td>{{ $historyItem->quantity ?? "—" }}</td><td>{{ $historyItem->recorded_at ?? "—" }}</td><td><div class="factory-actions"><a class="factory-btn light" href="{{ route('production.history.show', $historyItem->id) }}">View</a></div></td></tr>@empty<tr><td colspan="7" style="text-align:center;padding:28px">No records found</td></tr>@endforelse</tbody></table></div><div style="margin-top:18px">{{ $history->links() }}</div></div></div>
 @endsection

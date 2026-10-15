@@ -36,7 +36,7 @@ class ProductionHistoryController extends Controller
             ->paginate(20);
 
         return view(
-            'production.production-history.index',
+            'production.history.index',
             compact('history')
         );
     }
@@ -54,7 +54,7 @@ class ProductionHistoryController extends Controller
             ->findOrFail($id);
 
         return view(
-            'production.production-history.show',
+            'production.history.show',
             compact('historyItem')
         );
     }

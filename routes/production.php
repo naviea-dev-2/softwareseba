@@ -11,6 +11,7 @@ use App\Http\Controllers\Production\QualityInspectionController;
 use App\Http\Controllers\Production\QualityReportController;
 use App\Http\Controllers\Production\RawMaterialController;
 use App\Http\Controllers\Production\RawMaterialStockController;
+use App\Http\Controllers\Production\WheatPurchaseController;
 use App\Http\Controllers\Production\WorkerController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,14 +20,18 @@ Route::prefix('business')->middleware(['auth', "is_active", 'permission'])->grou
         Route::resource('workers', WorkerController::class);
         Route::resource('materials', RawMaterialController::class);
         Route::resource('material-stock', RawMaterialStockController::class);
-        Route::resource('production-plans', ProductionPlanController::class);
-        Route::resource('production-orders', ProductionOrderController::class);
-        Route::resource('production-capacities', ProductionCapacityController::class);
+        Route::resource('plans', ProductionPlanController::class);
+        Route::resource('orders', ProductionOrderController::class);
+        Route::resource('capacities', ProductionCapacityController::class);
         Route::resource('boms', BomController::class);
         Route::resource('machines', MachineController::class);
         Route::resource('machine-maintenances', MachineMaintenanceController::class);
         Route::resource('quality-inspections', QualityInspectionController::class);
         Route::resource('quality-reports', QualityReportController::class);
-        Route::resource('production-history', ProductionHistoryController::class)->only(['index', 'show']);
+        Route::resource('history', ProductionHistoryController::class)->only(['index', 'show']);
+        
+        Route::get('wheat-purchases/report', [WheatPurchaseController::class, 'report'])->name('wheat-purchases.report');
+        Route::get('wheat-purchases/export', [WheatPurchaseController::class, 'export'])->name('wheat-purchases.export');
+        Route::resource('wheat-purchases', WheatPurchaseController::class);
     });
 });

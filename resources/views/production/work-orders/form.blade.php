@@ -3,7 +3,7 @@
 @section('content')
 <div class="p-6 max-w-3xl mx-auto" x-data="woForm()">
     <div class="flex items-center gap-3 mb-6">
-        <a href="{{ route('production.production.work-orders.index') }}" class="p-2 hover:bg-gray-100 rounded-lg">
+        <a href="{{ route('production.work-orders.index') }}" class="p-2 hover:bg-gray-100 rounded-lg">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         </a>
         <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -19,7 +19,7 @@
     </div>
     @endif
 
-    <form method="POST" action="{{ isset($workOrder) ? route('production.production.work-orders.update', $workOrder) : route('production.production.work-orders.store') }}" class="bg-white rounded-xl border border-gray-200 p-6 space-y-5" @submit.prevent="loading=true;$el.submit()">
+    <form method="POST" action="{{ isset($workOrder) ? route('production.work-orders.update', $workOrder) : route('production.work-orders.store') }}" class="bg-white rounded-xl border border-gray-200 p-6 space-y-5" @submit.prevent="loading=true;$el.submit()">
         @csrf
         @if(isset($workOrder)) @method('PUT') @endif
 
@@ -102,7 +102,7 @@
         </div>
 
         <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
-            <a href="{{ route('production.production.work-orders.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</a>
+            <a href="{{ route('production.work-orders.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</a>
             <button type="submit" :disabled="loading" class="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50">
                 <span x-text="loading ? 'Saving...' : ({{ isset($workOrder) ? 'true' : 'false' }} ? 'Update' : 'Create')"></span>
             </button>

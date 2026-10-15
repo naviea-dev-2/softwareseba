@@ -1,967 +1,1294 @@
-@extends('inc.master')
-@section('head')
 
+@extends('inc.master')
+
+@section('head')
 <title>Create Purchase</title>
 
-@endsection
-@section('content')
 <style>
-    .auto-search{
-        width: 100%;
-        display: block;
-        position: relative;
-    }
-    .auto-search-product{
-        width: 100%;
-        display: block;
-        position: relative;
-    }
-    .auto-search-container{
-       position: absolute;
-        background: #fff;
-        z-index: 999;
-        width: 100%;
-        border: 1px solid #c3b9b9;
-        box-shadow: 0px 0 2px 0px;
+.purchase-wrap {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 4px 40px;
+}
+.page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.page-head .ph-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.page-head .ph-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#2f6fed,#1d4ed8);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 6px 14px rgba(47,111,237,.30);
+}
+.page-head h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #101828;
+    margin: 0;
+}
+.page-head .ph-sub {
+    font-size: 12.5px;
+    color: #667085;
+    margin: 2px 0 0;
+}
+.btn-back-p {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid #d9dee4;
+    border-radius: 8px;
+    background: #fff;
+    color: #344054;
+    font-size: 13px;
+    font-weight: 500;
+    transition: .15s;
+}
+.btn-back-p:hover {
+    background: #f2f4f7;
+    color: #101828;
+    text-decoration: none;
+}
+.p-card {
+    background: #fff;
+    border: 1px solid #e6e8eb;
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(16,24,40,.05);
+    margin-bottom: 18px;
+    overflow: visible;
+}
+.p-card-header {
+    padding: 14px 20px;
+    border-bottom: 1px solid #eef0f3;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.p-card-header .icon-box {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+}
+.icon-blue { background:#eef4ff;color:#2f6fed; }
+.icon-green { background:#e7f6ee;color:#12a05c; }
+.icon-purple { background:#f1edfd;color:#7047eb; }
+.icon-orange { background:#fdf1e7;color:#ea7a1f; }
+.p-card-header h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #101828;
+    margin: 0;
+}
+.p-card-header .sub {
+    font-size: 11.5px;
+    color: #98a2b3;
+    margin: 1px 0 0;
+}
+.p-card-body { padding:18px 20px; }
+.form-label-p {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    color: #667085;
+    margin-bottom: 6px;
+    display: block;
+}
+.form-label-p .req { color:#e04438; }
+.purchase-wrap .form-control {
+    height: 38px;
+    border: 1px solid #d9dee4;
+    border-radius: 8px;
+    font-size: 13px;
+    padding: .45rem .75rem;
+    color: #101828;
+    background: #fff;
+    transition: border-color .15s,box-shadow .15s;
+}
+.purchase-wrap .form-control:focus {
+    border-color: #2f6fed;
+    box-shadow: 0 0 0 3px rgba(47,111,237,.12);
+}
+.purchase-wrap textarea.form-control { height:auto; }
+.purchase-wrap .form-control.is-invalid { border-color:#e04438; }
+.purchase-wrap .invalid-feedback { font-size:11.5px; }
+.purchase-wrap input[type="file"].form-control {
+    padding: 7px .75rem;
+    height: auto;
+}
+.input-icon { position:relative; }
+.input-icon > i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #98a2b3;
+    font-size: 14px;
+    pointer-events: none;
+}
+.input-icon > .form-control { padding-left:34px; }
+.auto-search,
+.auto-search-product {
+    width: 100%;
+    display: block;
+    position: relative;
+}
+.auto-search-container {
+    position: absolute;
+    background: #fff;
+    z-index: 9999;
+    width: 100%;
+    border: 1px solid #e3e6ea;
+    border-radius: 10px;
+    box-shadow: 0 12px 28px rgba(16,24,40,.14);
+    overflow: hidden;
+    margin-top: 4px;
+}
+.auto-search-container ul { padding:6px;margin:0; }
+.auto-search-container ul li {
+    list-style: none;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 7px;
+    font-size: 13px;
+    color: #344054;
+}
+.auto-search-container ul li + li { margin-top:2px; }
+.auto-search-container ul li:hover { background:#f2f4f7; }
+.auto-search-container .no-result {
+    color: #98a2b3;
+    cursor: default;
+}
+.picker-row {
+    background: #f8f9fb;
+    border: 1px dashed #d9dee4;
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+.picker-row .form-label-p { margin-bottom:5px; }
+.barcode-addon {
+    background: #101828;
+    color: #fff;
+    border: none;
+    border-radius: 8px 0 0 8px;
+    width: 42px;
+}
+.barcode-addon:hover { background:#000;color:#fff; }
+.table-card .p-card-body { padding:0; }
+.table-scroll { width:100%;overflow-x:auto; }
+table.order-list {
+    width: 100%;
+    min-width: 1050px;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+table.order-list thead th {
+    background: #101828;
+    color: #e4e7ec;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    padding: 11px 10px;
+    border: none;
+    white-space: nowrap;
+    text-align: center;
+}
+table.order-list tbody td {
+    padding: 8px;
+    vertical-align: middle;
+    border-bottom: 1px solid #eef0f3;
+    background: #fff;
+    font-size: 13px;
+}
+table.order-list tbody tr:nth-child(even) td {
+    background: #fafbfc;
+}
+table.order-list tbody tr:hover td { background:#f5f8ff; }
+table.order-list tbody .form-control {
+    height: 34px;
+    font-size: 12.5px;
+    padding: .35rem .6rem;
+    border-radius: 7px;
+}
+table.order-list tfoot th {
+    background: #f2f4f7;
+    color: #101828;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 11px 10px;
+    border-top: 2px solid #e3e6ea;
+    text-align: center;
+    white-space: nowrap;
+}
+.delete_item {
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    border: 1px solid #f3d2cf;
+    background: #fef3f2;
+    color: #d92d20;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: .15s;
+}
+.delete_item:hover { background:#d92d20;color:#fff; }
+.empty-cart {
+    text-align: center;
+    padding: 34px 10px;
+    color: #98a2b3;
+}
+.empty-cart i {
+    font-size: 30px;
+    display: block;
+    margin-bottom: 8px;
+    color: #d0d5dd;
+}
+.empty-cart p { margin:0;font-size:13px; }
+.bootstrap-touchspin input {
+    width: 100% !important;
+    text-align: center;
+}
+.add-ajax-product input { padding:.2rem !important; }
+.select_qty { text-align:center; }
+.summary-card .sum-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    font-size: 13px;
+    color: #475467;
+}
+.summary-card .sum-row + .sum-row {
+    border-top: 1px dashed #e6e8eb;
+}
+.summary-card .sum-row .val {
+    font-weight: 600;
+    color: #101828;
+    font-variant-numeric: tabular-nums;
+}
+.summary-card .form-control { height:36px;font-size:13px; }
+.grand-total-box {
+    background: linear-gradient(135deg,#101828,#1d2939);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 12px;
+}
+.grand-total-box .gt-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: #98a2b3;
+    margin: 0;
+}
+.grand-total-box .gt-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+}
+#submit-btn {
+    width: 100%;
+    height: 44px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    background: linear-gradient(135deg,#2f6fed,#1d4ed8);
+    border: none;
+    box-shadow: 0 6px 14px rgba(47,111,237,.30);
+}
+#submit-btn:hover { filter:brightness(1.06); }
+.select2-container { max-width:100%; }
+.select2-container .select2-selection--single {
+    height: 38px !important;
+    border: 1px solid #d9dee4 !important;
+    border-radius: 8px !important;
+}
+.select2-container--default .select2-selection--single
+.select2-selection__rendered {
+    line-height: 36px !important;
+    font-size: 13px;
+    color: #101828;
+}
+.select2-container--default .select2-selection--single
+.select2-selection__arrow {
+    height: 36px !important;
+}
+.toast-message { color:#fff; }
+@media(max-width:991px) {
+    .purchase-wrap .col-sidebar { margin-top:4px; }
+}
+@media(max-width:767px) {
+    .p-card-body { padding:14px; }
+    .page-head h1 { font-size:18px; }
+}
 
-    }
-    .auto-search-container ul{
-        padding-inline-start: 0;
-        padding: 10px;
-        margin: 0;
-    }
-    .auto-search-container ul li:nth-child(1){
-         border-top: 1px solid #d3cfcf;
-    }
-    .auto-search-container ul li{
-        text-decoration: none;
-        list-style: none;
-        cursor: pointer;
-        padding: 5px;
-        border-bottom: 1px solid #d3cfcf;
-    }
-    .auto-search-container ul li:hover{
-        background-color: #e9ecef;
-    }
-    .heading-elements a{
-        color:#000!important;
-    }
-    .card a{
-        color:#000!important;
-    }
-    .card{
-        box-shadow: 0px 4px 25px 0px rgba(0, 0, 0, 0.1)!important;
-    }
-    .border {
-        border: 1px solid #dee2e6!important;
-    }
-    . {
-        height: calc(1em + 1rem + 2px);
-        padding: 0.5rem 1.5rem;
-        font-size: 0.7rem;
-        line-height: 1;
-        border-radius: 4px;
-    }
-    select.form-control{
-        display: block;
-        width: 100%;
-        height: calc( 1em + 1.4rem + 1px) !important;
-        padding: 0.7rem 0.7rem;
-        font-size: 0.8rem;
-        font-weight: 400;
-        line-height: 1.25;
-        color: #4e5154;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 5px;
-        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    }
-    .toast-message{
-        color:white;
-    }
-    .bootstrap-touchspin{
-        flex-direction: column;
-    }
-    .bootstrap-touchspin input{
-        width: 100%!important;
-        margin: 1px;
-    }
-    .add-ajax-product input{
-        padding: 0.2rem 0.2rem !important;
-    }
-    .select_qty{
-        text-align: center;
-    }
-    .select2-container .select2-selection--single{
-        height: 37px!important;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__rendered{
-        line-height: 37px!important;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__arrow{
-        height: 37px!important;
-    }
+/* ==========================================
+   PURCHASE QUANTITY - TOUCHSPIN UI FIX
+========================================== */
+
+.purchase-wrap .add-ajax-product .bootstrap-touchspin {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    flex-wrap: nowrap !important;
+    width: 140px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+    height: 38px !important;
+    margin: 0 auto !important;
+    border: 1px solid #d9dee4;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* Minus and plus button wrappers */
+.purchase-wrap .add-ajax-product
+.bootstrap-touchspin .input-group-btn {
+    display: flex !important;
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Buttons */
+.purchase-wrap .add-ajax-product
+.bootstrap-touchspin .bootstrap-touchspin-down,
+
+.purchase-wrap .add-ajax-product
+.bootstrap-touchspin .bootstrap-touchspin-up {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #eef4ff !important;
+    color: #2563eb !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+.purchase-wrap .add-ajax-product
+.bootstrap-touchspin .bootstrap-touchspin-down:hover,
+
+.purchase-wrap .add-ajax-product
+.bootstrap-touchspin .bootstrap-touchspin-up:hover {
+    background: #2563eb !important;
+    color: #fff !important;
+}
+
+/* Quantity input */
+.purchase-wrap .add-ajax-product
+.bootstrap-touchspin input.select_qty {
+    display: block !important;
+    flex: 1 1 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    height: 36px !important;
+    margin: 0 !important;
+    padding: 0 3px !important;
+    border: none !important;
+    border-left: 1px solid #d9dee4 !important;
+    border-right: 1px solid #d9dee4 !important;
+    border-radius: 0 !important;
+    text-align: center !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+}
+
+/* Fix Bootstrap TouchSpin vertical button layout */
+.purchase-wrap .add-ajax-product
+.bootstrap-touchspin .input-group-btn-vertical {
+    position: static !important;
+    display: flex !important;
+    flex-direction: row !important;
+    width: 36px !important;
+    height: 36px !important;
+}
+
+.purchase-wrap .add-ajax-product
+.bootstrap-touchspin .input-group-btn-vertical > .btn {
+    position: static !important;
+    width: 36px !important;
+    height: 36px !important;
+    margin: 0 !important;
+}
+
+/* Remove number input browser arrows */
+.purchase-wrap .select_qty::-webkit-inner-spin-button,
+.purchase-wrap .select_qty::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.purchase-wrap .select_qty {
+    -moz-appearance: textfield;
+}
+.purchase-wrap .add-ajax-product .select_tax_rate {
+    min-width: 55px;
+    width: 65px;
+    height: 36px;
+    text-align: center;
+    font-size: 13px;
+    border-radius: 6px 0 0 6px;
+}
+
+.purchase-wrap .add-ajax-product .input-group-text {
+    height: 36px;
+    padding: 0 8px;
+    background: #eef4ff;
+    color: #2563eb;
+    font-weight: 600;
+}
+/* Compact horizontal tax field */
+.purchase-wrap .purchase-tax-cell {
+    min-width: 130px;
+    vertical-align: middle;
+}
+
+.purchase-wrap .purchase-tax-control {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+    min-width: 125px;
+    height: 36px;
+    gap: 0 !important;
+    border: 1px solid #d9dee4;
+    border-radius: 7px;
+    background: #fff;
+    overflow: hidden;
+}
+
+/* Currency / percentage dropdown */
+.purchase-wrap .purchase-tax-control .select_tax_type {
+    flex: 0 0 49px !important;
+    width: 49px !important;
+    min-width: 49px !important;
+    height: 34px !important;
+    margin: 0 !important;
+    padding: 0 3px !important;
+    border: none !important;
+    border-right: 1px solid #d9dee4 !important;
+    border-radius: 0 !important;
+    background: #f1f5f9 !important;
+    color: #334155;
+    font-size: 13px;
+    text-align: center;
+    box-shadow: none !important;
+}
+
+/* Tax value input */
+.purchase-wrap .purchase-tax-control .select_tax_rate {
+    flex: 1 1 0 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    height: 34px !important;
+    margin: 0 !important;
+    padding: 0 5px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    font-size: 12px;
+    text-align: center;
+    box-shadow: none !important;
+}
+
+/* Remove number spinner arrows */
+.purchase-wrap .purchase-tax-control
+.select_tax_rate::-webkit-inner-spin-button,
+.purchase-wrap .purchase-tax-control
+.select_tax_rate::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.purchase-wrap .purchase-tax-control
+.select_tax_rate {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+/* Focus state */
+.purchase-wrap .purchase-tax-control:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, .12);
+}
 </style>
-<div class="container pt-0" style="box-shadow: 0 0 2px gray;border-top:4px solid gray;margin-top:0px;padding-bottom:30px;padding-left:10px;">
-    <h4>Add New Purchase</h4>
-    <form action="{{ route('purchase.store') }}" method="post">
-        @csrf
-        <div class="card shadow border">
-            <div class="card-header" style="padding:5px;">
-                <h4 class="card-title">
-                    <a data-action="collapse">Billing Information</a>
-                </h4>
-                <a class="heading-elements-toggle"><i class="fa fa-ellipsis-v font-medium-3"></i></a>
-                <div class="heading-elements">
-                    <ul class="list-inline mb-0">
-                    <li><a data-action="collapse" class="rotate"><i class="fas fa-arrow-down"></i></a></li>
-                    </ul>
-                </div>
+@endsection
+
+@section('content')
+<div class="purchase-wrap">
+
+    <div class="page-head">
+        <div class="ph-left">
+            <div class="ph-icon">
+                <i class="bx bx-cart-download"></i>
             </div>
-            <div class="card-content collapse show">
-                <div class="card-body pt-0">
-
-                    <div class="row p-1">
-                        <div class="col-md-3">
-                            <label for=""><b>Company Name</b></label>
-                            <input type="text" class=" form-control vendor-auto-search @error('name')  is-invalid @enderror" name="name" autocomplete="off" value="{{old('name')}}">
-                            @error('name')
-                            <span class="invalid-feedback mb-0">
-                            <strong>{{ $errors->first('name') }}</strong>
-                            </span>
-                            @endif
-                        </div>
-                        <div class="col-md-3">
-                            <label for=""><b>Company Email</b></label>
-                            <input type="email" class=" form-control vendor-auto-search {{ $errors->has('email') ? 'is-invalid' : '' }}" name="email" autocomplete="off" value="{{ old('email') }}">
-                            @if ($errors->has('email'))
-                            <span class="invalid-feedback mb-0">
-                            <strong>{{ $errors->first('email') }}</strong>
-                            </span>
-                            @endif
-                        </div>
-                        <div class="col-md-3">
-                            <label for=""><b>Company Mobile</b></label>
-                            <input type="number" class=" form-control vendor-auto-search {{ $errors->has('mobile') ? 'is-invalid' : '' }}" name="mobile" autocomplete="off" value="{{ old('mobile') }}">
-                            @if ($errors->has('mobile'))
-                                <span class="invalid-feedback mb-0">
-                                    <strong>{{ $errors->first('mobile') }}</strong>
-                                </span>
-                            @endif
-                        </div>
-                        <div class="col-md-3">
-                            <label for=""><b>Company Address</b></label>
-                            <input type="text" class=" form-control vendor-auto-search {{ $errors->has('address') ? 'is-invalid' : '' }}" name="address" autocomplete="off" value="{{ old('address') }}">
-                             @if ($errors->has('addres'))
-                            <span class="invalid-feedback mb-0">
-                            <strong>{{ $errors->first('address') }}</strong>
-                            </span>
-                            @endif
-                        </div>
-                    </div>
-                    <div class="row p-1">
-                        <div class="col-md-3">
-                            <label for=""><b>Purchase Date</b></label>
-                            <input type="text" class=" form-control  datepicker {{ $errors->has('purchase_date') ? 'is-invalid' : '' }}" value="{{ date('Y-m-d') }}" name="purchase_date" autocomplete="off" required name="{{ old('purchase_date') }}">
-                             @if ($errors->has('purchase_date'))
-                            <span class="invalid-feedback mb-0">
-                            <strong>{{ $errors->first('purchase_date') }}</strong>
-                            </span>
-                            @endif
-                        </div>
-                        @if(auth()->user()->user_type == 0 || auth()->user()?->role?->is_admin == 1)
-                        <div class="col-sm-3">
-                            <label for=""><b>Branch</b></label>
-                            <input type="hidden" name="h_branch" id="h_branch" value="{{  old('h_branch',auth()->user()?->branch?->name)  }}"/>
-                            <select id="select_branch" class="form-control select_branch  {{ $errors->has('branch') ? 'is-invalid' : '' }}" name="branch">
-                                <option value="">-- Select One --</option>
-
-
-                            </select>
-                             @if ($errors->has('branch'))
-                            <span class="invalid-feedback mb-0">
-                            <strong>{{ $errors->first('branch') }}</strong>
-                            </span>
-                            @endif
-                        </div>
-                        @else
-                            <div class="col-sm-3">
-                                <label for=""><b>Branch</b></label>
-                                <input type="text" disabled value="{{auth()->user()?->branch?->name}}"/>
-
-                                <input type="hidden" value="{{auth()->user()->branch_id}}" name="branch">
-                            </div>
-                        @endif
-                        <div class="col-md-3">
-                            <label><b>Purchase Status</b></label>
-                            <select name="status" class="form-control mb-0 {{ $errors->has('status') ? 'is-invalid' : '' }}">
-                                <option @if(old('status') == 1) selected @endif value="1">Received</option>
-                                <option @if(old('status') == 2) selected @endif value="2">Partial</option>
-                                <option @if(old('status') == 3) selected @endif value="3">Pending</option>
-                                <option @if(old('status') == 4) selected @endif value="4">Ordered</option>
-                            </select>
-                            @if($errors->has('status'))
-                                <span class="invalid-feedback mb-0">
-                                    <strong>{{ $errors->first('status') }}</strong>
-                                </span>
-                            @endif
-
-                        </div>
-                    </div>
-                    <div class="row p-1">
-                        <div class="col-md-3">
-                            <label><b>Select Category</b></label>
-                            <select data-in="1" class="form-control" id="select_category">
-                                <option value="">Category</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label><b>Select Product</b></label>
-                            <select data-in="1" class="form-control" id="select_product">
-                                <option value="">Product</option>
-                            </select>
-                        </div>
-                        <div class="col-md-5">
-                            <label><b>Select Product By Search</b></label>
-                            <div class="search-box input-group">
-                                <button class="btn btn-secondary" type="button"><i class="bx bx-barcode"></i></button>
-                                <input type="text" name="product_code_name" form="form2" id="productcodeSearch" placeholder="Please type product code and select..." class="form-control" />
-                                <div style="    width: 100%;" id="auto-serach-res-f"></div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                </div>
+            <div>
+                <h1>Add New Purchase</h1>
+                <p class="ph-sub">Create a purchase order for your supplier</p>
             </div>
         </div>
-        <div class="card shadow border">
-            <div class="card-content p-3">
-                <div class="container-fluid">
-                    <table class="order-list table-responsive table-bordered table-sm text-center nowrap" cellspacing="0" width="100%">
-                        <thead>
-                            <tr>
-                                <th width="20%">Product</th>
-                                <th width="10%">Manufacture</th>
-                                <th width="10%">Brand</th>
-                                <th width="10%">Qty</th>
-                                <th width="13%">Unit</th>
-                                <th width="10%">Price</th>
-                                <th width="6%">Tax</th>
-                                <th width="10%">Discount</th>
-                                <th width="10%">Total Price</th>
-                                <th width="4%"></th>
-                            </tr>
-                        </thead>
-                        <tbody class="add-ajax-product">
+        <a href="{{ url()->previous() }}" class="btn-back-p">
+            <i class="bx bx-arrow-back"></i> Back
+        </a>
+    </div>
 
+    <form id="purchase-form"
+          action="{{ route('purchase.store') }}"
+          method="POST"
+          enctype="multipart/form-data">
+        @csrf
 
-                        </tbody>
-                        <tfoot class="tfoot active">
-                            <th colspan="3">Total</th>
-                            <th id="total_qty">0</th>
-                            <th></th>
-                            <th></th>
-                            <th id="sub_tax_total">0.00</th>
-                            <th id="sub_discount_total">0.00</th>
-                            <th id="total">0.00</th>
-                            {{-- <th><i class="dripicons-trash"></i></th> --}}
-                        </tfoot>
-                    </table>
-                </div>
-                <div class="container-fluid">
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="col-md-8 text-right">
-                                    <strong>Order Note</strong>
-                                </label>
-                                <textarea name="order_note" class="form-control" cols="30" rows="2">{{ old('order_note') }}</textarea>
-                            </div>
-                            <div class="form-group my-2">
-                                <label class="col-md-8 text-right">
-                                    <strong>Purchase Document</strong>
-                                </label>
-                                <input type="file" class="form-control" name="document">
+        <div class="row">
+            <div class="col-xl-9 col-lg-8">
 
-                            </div>
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="col-md-8 text-right">
-                                            <strong>Payment Method</strong>
-                                        </label>
-                                        <Select class="form-control {{ $errors->has('payment_method') ? 'is-invalid' : '' }}" name="payment_method" id="payment_method">
-                                            <option value="">Select Method</option>
-                                            @foreach ($methods as $method)
-                                                <option @if(old('payment_method') == $method->id) selected @endif value="{{ $method->id }}">{{ $method->name }}</option>
-                                            @endforeach
-                                        </Select>
-                                        @if ($errors->has('payment_method'))
-                                        <span class="invalid-feedback mb-0">
-                                        <strong>{{ $errors->first('payment_method') }}</strong>
-                                        </span>
-                                        @endif
-                                    </div>
-                                </div>
-                                @if(array_search('accounts',load_pack_option()) != false)
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="col-md-8 text-right">
-                                            <strong>Account *</strong>
-                                        </label>
-                                        <input type="hidden" name="h_bank_account" id="h_bank_account">
-                                        <Select class="form-control {{ $errors->has('account') ? 'is-invalid' : '' }}" name="account" id="add_account">
-                                            <option value="">Select Account</option>
-
-                                        </Select>
-                                        @if ($errors->has('account'))
-                                        <span class="invalid-feedback mb-0">
-                                        <strong>{{ $errors->first('account') }}</strong>
-                                        </span>
-                                        @endif
-                                    </div>
-                                </div>
-                                @else
-                                {{-- <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="col-md-8 text-right">
-                                            <strong>Payment Status *</strong>
-                                        </label>
-
-                                        <Select class="form-control {{ $errors->has('payment_status') ? 'is-invalid' : '' }}" name="payment_status" id="payment_status">
-                                            <option @if(old('payment_status') == 0) selected @endif value="0">Due</option>
-                                            <option @if(old('payment_status') == 1) selected @endif value="1">Partial</option>
-                                            <option @if(old('payment_status') == 2) selected @endif value="2">Paid</option>
-                                        </Select>
-                                        @if ($errors->has('payment_status'))
-                                        <span class="invalid-feedback mb-0">
-                                        <strong>{{ $errors->first('payment_status') }}</strong>
-                                        </span>
-                                        @endif
-                                    </div>
-                                </div> --}}
-                                @endif
-                            </div>
-
+                {{-- Supplier / Billing --}}
+                <div class="p-card">
+                    <div class="p-card-header">
+                        <div class="icon-box icon-blue">
+                            <i class="bx bx-buildings"></i>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group row mt-1">
-                                <label class="col-md-6 text-right" style="text-align: right;">
-                                    <strong>Total Tax</strong>
-                                </label>
-                                <div class="col-md-6">
-                                    <input disabled type="number" step="any" id="dis_total_tax" name="dis_total_tax" class="form-control" value="{{ old('dis_total_tax') ?? 0 }}" />
-                                </div>
+                        <div>
+                            <h3>Supplier / Billing Information</h3>
+                            <p class="sub">
+                                Search an existing vendor or enter a new one
+                            </p>
+                        </div>
+                    </div>
 
+                    <div class="p-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3 col-sm-6">
+                                <label class="form-label-p">
+                                    Company / Supplier Name
+                                    <span class="req">*</span>
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bx bx-user"></i>
+                                    <input type="text"
+                                           name="name"
+                                           class="form-control vendor-auto-search @error('name') is-invalid @enderror"
+                                           value="{{ old('name') }}"
+                                           placeholder="Supplier name"
+                                           autocomplete="off"
+                                           required>
+                                </div>
+                                @error('name')
+                                    <span class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
                             </div>
-                            <div class="form-group row mt-1">
-                                <label class="col-md-6 text-right" style="text-align: right;">
-                                    <strong>Shipping Cost</strong>
-                                </label>
-                                <div class="col-md-6">
-                                    <input type="number" step="any"  id="sub_shipping_cost" name="shipping_cost" class="form-control" value="{{ old('shipping_cost') ?? 0 }}" />
-                                </div>
 
+                            <div class="col-md-3 col-sm-6">
+                                <label class="form-label-p">
+                                    Company / Supplier Email
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bx bx-envelope"></i>
+                                    <input type="email"
+                                           name="email"
+                                           class="form-control vendor-auto-search @error('email') is-invalid @enderror"
+                                           value="{{ old('email') }}"
+                                           placeholder="email@company.com"
+                                           autocomplete="off">
+                                </div>
+                                @error('email')
+                                    <span class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
                             </div>
-                            <div class="form-group row mt-1">
-                                <label class="col-md-6 text-right" style="text-align: right;">
-                                    <strong>Order Discount</strong>
-                                </label>
-                                <div class="col-md-6">
-                                    <input type="number" step="any"  id="sub_order_discount" name="order_discount" class="form-control" value="{{ old('order_discount') ?? 0 }}" />
-                                </div>
 
+                            <div class="col-md-3 col-sm-6">
+                                <label class="form-label-p">
+                                    Company / Supplier Mobile
+                                </label>
+                                <div class="input-icon">
+                                    <i class="bx bx-phone"></i>
+                                    <input type="tel"
+                                           name="mobile"
+                                           class="form-control vendor-auto-search @error('mobile') is-invalid @enderror"
+                                           value="{{ old('mobile') }}"
+                                           placeholder="01xxxxxxxxx"
+                                           autocomplete="off">
+                                </div>
+                                @error('mobile')
+                                    <span class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
                             </div>
 
-                            <div class="form-group row mt-1">
-                                <label class="col-md-6 text-right" style="text-align: right;">
-                                    <strong>Paid</strong>
+                            <div class="col-md-3 col-sm-6">
+                                <label class="form-label-p">
+                                    Company / Supplier Address
                                 </label>
-                                <div class="col-md-6">
-                                    <input type="number" step="any" id="paid_amount" name="paid_amount" class="form-control" value="{{ old('paid_amount') ?? 0 }}" />
+                                <div class="input-icon">
+                                    <i class="bx bx-map"></i>
+                                    <input type="text"
+                                           name="address"
+                                           class="form-control vendor-auto-search @error('address') is-invalid @enderror"
+                                           value="{{ old('address') }}"
+                                           placeholder="Street, city"
+                                           autocomplete="off">
                                 </div>
-
+                                @error('address')
+                                    <span class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
                             </div>
-                            <div class="form-group row mt-1">
-                                <label class="col-md-6 text-right" style="text-align: right;">
-                                    <strong>Due</strong>
+
+                            <div class="col-md-3 col-sm-6">
+                                <label class="form-label-p">
+                                    Purchase Date <span class="req">*</span>
                                 </label>
-                                <div class="col-md-6">
-                                    <input disabled type="number" step="any" id="due_amount" name="due_amount" class="form-control" value="{{ old('due_amount') ?? 0 }}" />
+                                <div class="input-icon">
+                                    <i class="bx bx-calendar"></i>
+                                    <input type="text"
+                                           name="purchase_date"
+                                           class="form-control datepicker @error('purchase_date') is-invalid @enderror"
+                                           value="{{ old('purchase_date', date('Y-m-d')) }}"
+                                           autocomplete="off"
+                                           required>
+                                </div>
+                                @error('purchase_date')
+                                    <span class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
+                            </div>
+
+                            @if(auth()->user()->user_type == 0 || auth()->user()?->role?->is_admin == 1)
+                                <div class="col-md-3 col-sm-6">
+                                    <label class="form-label-p">Branch</label>
+                                    <input type="hidden"
+                                           name="h_branch"
+                                           id="h_branch"
+                                           value="{{ old('h_branch', auth()->user()?->branch?->name) }}">
+                                    <select name="branch"
+                                            id="select_branch"
+                                            class="form-control select_branch">
+                                        <option value="">Select Branch</option>
+                                    </select>
+                                    @error('branch')
+                                        <span class="invalid-feedback d-block">
+                                            {{ $message }}
+                                        </span>
+                                    @enderror
+                                </div>
+                            @else
+                                <div class="col-md-3 col-sm-6">
+                                    <label class="form-label-p">Branch</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           value="{{ auth()->user()?->branch?->name }}"
+                                           disabled>
+                                    <input type="hidden"
+                                           name="branch"
+                                           value="{{ auth()->user()->branch_id }}">
+                                </div>
+                            @endif
+
+                            <div class="col-md-3 col-sm-6">
+                                <label class="form-label-p">Purchase Status</label>
+                                <select name="status"
+                                        class="form-control @error('status') is-invalid @enderror">
+                                    <option value="1" {{ old('status', 1) == 1 ? 'selected' : '' }}>Received</option>
+                                    <option value="2" {{ old('status') == 2 ? 'selected' : '' }}>Partial</option>
+                                    <option value="3" {{ old('status') == 3 ? 'selected' : '' }}>Pending</option>
+                                    <option value="4" {{ old('status') == 4 ? 'selected' : '' }}>Ordered</option>
+                                </select>
+                                @error('status')
+                                    <span class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Product Picker --}}
+                <div class="p-card">
+                    <div class="p-card-header">
+                        <div class="icon-box icon-green">
+                            <i class="bx bx-package"></i>
+                        </div>
+                        <div>
+                            <h3>Add Products</h3>
+                            <p class="sub">
+                                Select products by category, code or barcode
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="p-card-body">
+                        <div class="picker-row">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3 col-sm-6">
+                                    <label class="form-label-p">Select Category</label>
+                                    <select id="select_category"
+                                            class="form-control"
+                                            data-in="1">
+                                        <option value="">Category</option>
+                                    </select>
                                 </div>
 
+                                <div class="col-md-4 col-sm-6">
+                                    <label class="form-label-p">Select Product</label>
+                                    <select id="select_product"
+                                            class="form-control"
+                                            data-in="1">
+                                        <option value="">Product</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-5 col-sm-12">
+                                    <label class="form-label-p">
+                                        Quick Search / Barcode
+                                    </label>
+                                    <div class="search-box input-group">
+                                        <button class="btn barcode-addon"
+                                                type="button"
+                                                id="barcode-focus">
+                                            <i class="bx bx-barcode"></i>
+                                        </button>
+                                        <input type="text"
+                                               id="productcodeSearch"
+                                               name="product_code_name"
+                                               class="form-control"
+                                               placeholder="Type product code and select..."
+                                               autocomplete="off"
+                                               style="border-radius:0 8px 8px 0;">
+                                    </div>
+                                    <div id="auto-serach-res-f"
+                                         style="width:100%;position:relative;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Order Items --}}
+                <div class="p-card table-card">
+                    <div class="p-card-header">
+                        <div class="icon-box icon-purple">
+                            <i class="bx bx-list-ul"></i>
+                        </div>
+                        <div>
+                            <h3>Order Items</h3>
+                            <p class="sub">
+                                Review quantities, prices, tax and discounts
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="table-scroll">
+                        <table class="order-list table-responsive-sm">
+                            <thead>
+                                <tr>
+                                    <th width="20%">Product</th>
+                                    <th width="10%">Manufacture</th>
+                                    <th width="10%">Brand</th>
+                                    <th width="10%">Qty</th>
+                                    <th width="13%">Unit</th>
+                                    <th width="10%">Price</th>
+                                    <th width="6%">Tax</th>
+                                    <th width="10%">Discount</th>
+                                    <th width="10%">Total Price</th>
+                                    <th width="4%"></th>
+                                </tr>
+                            </thead>
+                            <tbody class="add-ajax-product">
+                                <tr class="empty-cart-row">
+                                    <td colspan="10">
+                                        <div class="empty-cart">
+                                            <i class="bx bx-cart"></i>
+                                            <p>
+                                                No products added yet —
+                                                select a product above to begin.
+                                            </p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="tfoot active">
+                                <tr>
+                                    <th colspan="3" style="text-align:right;">Total</th>
+                                    <th id="total_qty">0</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th id="sub_tax_total">0.00</th>
+                                    <th id="sub_discount_total">0.00</th>
+                                    <th id="total">0.00</th>
+                                    <th></th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Additional Information --}}
+                <div class="p-card">
+                    <div class="p-card-header">
+                        <div class="icon-box icon-orange">
+                            <i class="bx bx-note"></i>
+                        </div>
+                        <div>
+                            <h3>Additional Information</h3>
+                            <p class="sub">
+                                Order notes and supporting documents
+                            </p>
+                        </div>
+                    </div>
+                    <div class="p-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-7">
+                                <label class="form-label-p">Order Note</label>
+                                <textarea name="order_note"
+                                          class="form-control"
+                                          rows="3"
+                                          placeholder="Any remark about this purchase...">{{ old('order_note') }}</textarea>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label-p">Purchase Document</label>
+                                <input type="file"
+                                       name="document"
+                                       class="form-control @error('document') is-invalid @enderror">
+                                <small class="text-muted" style="font-size:11.5px;">
+                                    Attach invoice / challan file (optional)
+                                </small>
+                                @error('document')
+                                    <span class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            {{-- Right Sidebar --}}
+            <div class="col-xl-3 col-lg-4 col-sidebar">
+
+                {{-- Payment --}}
+                <div class="p-card">
+                    <div class="p-card-header">
+                        <div class="icon-box icon-blue">
+                            <i class="bx bx-credit-card"></i>
+                        </div>
+                        <div>
+                            <h3>Payment</h3>
+                            <p class="sub">Method &amp; account</p>
+                        </div>
+                    </div>
+                    <div class="p-card-body pt-3">
+                        <div class="mb-3">
+                            <label class="form-label-p">Payment Method</label>
+                            <select name="payment_method"
+                                    id="payment_method"
+                                    class="form-control @error('payment_method') is-invalid @enderror">
+                                <option value="">Select Method</option>
+                                @foreach($methods as $method)
+                                    <option value="{{ $method->id }}"
+                                        {{ old('payment_method') == $method->id ? 'selected' : '' }}>
+                                        {{ $method->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('payment_method')
+                                <span class="invalid-feedback d-block">
+                                    {{ $message }}
+                                </span>
+                            @enderror
+                        </div>
+
+                        @if(in_array('accounts', load_pack_option()))
+                            <div class="mb-1">
+                                <label class="form-label-p">Account</label>
+                                <input type="hidden"
+                                       name="h_bank_account"
+                                       id="h_bank_account"
+                                       value="{{ old('h_bank_account') }}">
+                                <select name="account"
+                                        id="add_account"
+                                        class="form-control @error('account') is-invalid @enderror">
+                                    <option value="">Select Account</option>
+                                </select>
+                                @error('account')
+                                    <span class="invalid-feedback d-block">
+                                        {{ $message }}
+                                    </span>
+                                @enderror
+                            </div>
+                        @endif
+                    </div>
+                </div>
+
+                {{-- Order Summary --}}
+                <div class="p-card summary-card"
+                     style="position:sticky;top:15px;">
+                    <div class="p-card-header">
+                        <div class="icon-box icon-green">
+                            <i class="bx bx-receipt"></i>
+                        </div>
+                        <div>
+                            <h3>Order Summary</h3>
+                            <p class="sub">Live calculation</p>
+                        </div>
+                    </div>
+
+                    <div class="p-card-body pt-2 pb-3">
+                        <div class="sum-row">
+                            <span><i class="bx bx-box me-1"></i> Items</span>
+                            <span class="val" id="item">0</span>
+                        </div>
+                        <div class="sum-row">
+                            <span>Subtotal</span>
+                            <span class="val" id="subtotal">0.00</span>
+                        </div>
+                        <div class="sum-row">
+                            <span>Total Tax</span>
+                            <span class="val" id="order_tax">0.00</span>
+                        </div>
+                        <div class="sum-row">
+                            <span>Item Discount</span>
+                            <span class="val"
+                                  id="order_discount_items"
+                                  style="color:#12a05c;">0.00</span>
+                        </div>
+
+                        <div class="row g-2 mt-1">
+                            <div class="col-12">
+                                <label class="form-label-p mb-1">
+                                    Shipping Cost
+                                </label>
+                                <input type="number"
+                                       step="any"
+                                       min="0"
+                                       id="sub_shipping_cost"
+                                       name="shipping_cost"
+                                       class="form-control"
+                                       value="{{ old('shipping_cost', 0) }}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label-p mb-1">
+                                    Order Discount
+                                </label>
+                                <input type="number"
+                                       step="any"
+                                       min="0"
+                                       id="sub_order_discount"
+                                       name="order_discount"
+                                       class="form-control"
+                                       value="{{ old('order_discount', 0) }}">
                             </div>
                         </div>
 
+                        <div class="sum-row mt-2">
+                            <span style="font-weight:600;color:#101828;">
+                                Total Discount
+                            </span>
+                            <span class="val" id="order_discount">0.00</span>
+                        </div>
+                        <div class="sum-row">
+                            <span>Shipping</span>
+                            <span class="val" id="shipping_cost">0.00</span>
+                        </div>
 
-                    </div>
-                    <div class="form-group my-2" style="text-align: right">
-                        <button type="submit" class="btn btn-primary" id="submit-btn">Submit</button>
+                        <div class="row g-2 mt-1">
+                            <div class="col-12">
+                                <label class="form-label-p mb-1">
+                                    Paid Amount
+                                </label>
+                                <input type="number"
+                                       step="any"
+                                       min="0"
+                                       id="paid_amount"
+                                       name="paid_amount"
+                                       class="form-control"
+                                       value="{{ old('paid_amount', 0) }}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label-p mb-1">
+                                    Due Amount
+                                </label>
+                                <input type="number"
+                                       step="any"
+                                       id="due_amount"
+                                       name="due_amount"
+                                       class="form-control"
+                                       value="{{ old('due_amount', 0) }}"
+                                       readonly>
+                            </div>
+                        </div>
+
+                        <div class="grand-total-box d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="gt-label">Grand Total</p>
+                                <p class="gt-value mb-0" id="grand_total">
+                                    0.00
+                                </p>
+                            </div>
+                            <i class="bx bx-wallet"
+                               style="font-size:26px;color:rgba(255,255,255,.35);"></i>
+                        </div>
+
+                        <input type="hidden" name="item" id="item_input" value="0">
+                        <input type="hidden" name="total_qty" id="total_qty_input" value="0">
+                        <input type="hidden" name="is_ini_p" id="is_ini_p" value="0">
+                        <input type="hidden" name="total_cost" id="subtotal_input" value="0">
+                        <input type="hidden" name="total_tax" id="order_tax_input" value="0">
+                        <input type="hidden" name="total_discount" id="order_discount_input" value="0">
+                        <input type="hidden" name="grand_total" id="grand_total_input" value="0">
+                        <input type="hidden" name="dis_total_tax" id="dis_total_tax" value="0">
+
+                        <div class="form-group mt-3 mb-0">
+                            <button type="submit"
+                                    class="btn btn-primary"
+                                    id="submit-btn">
+                                <i class="bx bx-check me-1"></i>
+                                Submit Purchase
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="container-fluid">
-                    <table class="table table-bordered table-condensed totals">
-                        <td><strong>Items</strong>
-                            <input type="hidden" name="item" id="item_input">
-                            <input type="hidden" name="total_qty" id="total_qty_input">
-                            <input type="hidden" name="is_ini_p" id="is_ini_p" value="0">
-                            <span class="pull-right" id="item">0.00</span>
-                        </td>
-                        <td><strong>Total</strong>
-                            <input type="hidden" name="total_cost" id="subtotal_input">
-                            <span class="pull-right" id="subtotal">0.00</span>
-                        </td>
-                        <td><strong>Order Tax</strong>
-                            <input type="hidden" name="total_tax" id="order_tax_input">
-                            <span class="pull-right" id="order_tax">0.00</span>
-                        </td>
-                        <td><strong>Discount</strong>
-                             <input type="hidden" name="total_discount" id="order_discount_input">
-                            <span class="pull-right" id="order_discount">0.00</span>
-                        </td>
-                        <td><strong>Shipping Cost</strong>
-                            <span class="pull-right" id="shipping_cost">0.00</span>
-                        </td>
-                        <td><strong>Grand Total</strong>
-                            <input type="hidden" name="grand_total" id="grand_total_input">
-                            <span class="pull-right" id="grand_total">0.00</span>
-                        </td>
-                    </table>
-                </div>
             </div>
         </div>
     </form>
 </div>
 @endsection
+
+@php
+    $purchaseHasAccounts = in_array('accounts', load_pack_option());
+
+    $purchaseCanSelectBranch =
+        auth()->user()->user_type == 0 ||
+        auth()->user()?->role?->is_admin == 1;
+
+    $purchaseOldProducts = [];
+
+    foreach (old('product_id', []) as $index => $productId) {
+        $purchaseOldProducts[] = [
+            'id' => $productId,
+            'qty' => old('qty.' . $index, 1),
+            'unit' => old('unit.' . $index),
+            'price' => old('per_cost.' . $index),
+            'discount' => old('discount.' . $index),
+            'tax' => old('tax.' . $index),
+        ];
+    }
+
+    $purchaseOldBranchId = old(
+        'branch',
+        auth()->user()?->branch_id
+    );
+
+    $purchaseOldBranchName = old(
+        'h_branch',
+        auth()->user()?->branch?->name
+    );
+
+    $purchaseOldAccountId = old('account');
+    $purchaseOldAccountName = old('h_bank_account');
+    $purchaseCustomErrors = session('cus_errors', []);
+@endphp
+
 @section('script')
+<script src="{{ asset('public/assets/js/jquery.bootstrap-touchspin.js') }}"></script>
 
-
-<script src="{{asset('public/assets/js/jquery.bootstrap-touchspin.js') }}"></script>
 <script>
-    var selected_vendor_id = 0;
-    var selected_vendor_field = "";
-    var selected_vendor_f_value = "";
-    var selected_vendor_name = "";
-    var selected_vendor_email = "";
-    var selected_vendor_mobile= "";
-    var selected_vendor_address = "";
-    var auto_serach_modal=0;
-    var p_row_no = 1;
-    var auto_serach_product_modal=0;
-    $('#productcodeSearch').on("keyup",function(){
-        var arg=this;
-        $('.auto-search-product').remove();
-        if($(this).val() != ""){
-            var curval = $(this).val().trim();
-            var is_barcode = 0;
-            if(curval.indexOf('nbr') !== -1){
-                is_barcode = 1;
-            }
-            $.ajax({
-                url: "{{route('auto-search.product') }}",
-                method: 'GET',
-                data:{
-                    value:curval,
-                    is_barcode:is_barcode
-                },
-                success: function(data) {
-                    if(data.status == "success"){
-                        auto_serach_product_modal =1;
-                        $('#auto-serach-res-f').html(data.data);
-                    }else{
-                        $('#auto-serach-res-f').html(data.data);
-                    }
-                    if(is_barcode == 1){
-                        $(arg).val('');
-                        $('.auto-search-res-product').first().trigger('click');
-                        $('.auto-search-product').slideUp();
-                    }
+$(document).ready(function () {
+    'use strict';
 
+    const config = {
+        routes: {
+            vendorSearch: "{{ route('auto-search.vendor') }}",
+            productSearch: "{{ route('auto-search.product') }}",
+            productDetails: "{{ route('get_product_details_by_id') }}",
+            categories: "{{ route('select2.product.categories') }}",
+            products: "{{ route('select2.products.by_category') }}",
+            units: "{{ route('select2.product.units') }}",
+            branches: "{{ route('select2.branches') }}",
+            accounts: "{{ route('select2.balance_accounts') }}"
+        },
+        hasAccounts: {{ $purchaseHasAccounts ? 'true' : 'false' }},
+        canSelectBranch: {{ $purchaseCanSelectBranch ? 'true' : 'false' }},
+        oldBranch: {
+            id: {{ Illuminate\Support\Js::from($purchaseOldBranchId) }},
+            name: {{ Illuminate\Support\Js::from($purchaseOldBranchName) }}
+        },
+        oldAccount: {
+            id: {{ Illuminate\Support\Js::from($purchaseOldAccountId) }},
+            name: {{ Illuminate\Support\Js::from($purchaseOldAccountName) }}
+        },
+        oldProducts: {{ Illuminate\Support\Js::from($purchaseOldProducts) }},
+        customErrors: {{ Illuminate\Support\Js::from($purchaseCustomErrors) }}
+    };
 
-                }
-            });
-        }else{
+    let rowNumber = 0;
+    let vendorXHR = null;
+    let productXHR = null;
+    let vendorTimer = null;
+    let productTimer = null;
+    let vendorSearchVersion = 0;
+    let productSearchVersion = 0;
+    let isSubmitting = false;
 
+    const pendingProducts = new Set();
+    const $form = $('#purchase-form');
 
+    function parseNumber(value) {
+        const parsed = parseFloat(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function positiveNumber(value) {
+        return Math.max(0, parseNumber(value));
+    }
+
+    function formatMoney(value) {
+        return parseNumber(value).toFixed(2);
+    }
+
+    function showError(message) {
+        if (typeof toastr !== 'undefined') {
+            toastr.error(message);
+        } else {
+            alert(message);
         }
-    });
-     $(document).on('click','.auto-search-res-product',function(){
-         auto_serach_product_modal =0;
-        var product = JSON.parse($(this).attr('data'));
-        $('#productcodeSearch').val("");
-        console.log(product.p_id);
-        console.log('res',$('.add-ajax-product').find('.pro-row-'+product.p_id));
-        if($('.add-ajax-product').find('.pro-row-'+product.p_id).length == 0){
-            FillProductOption(product.p_id,p_row_no);
-            p_row_no++;
+    }
+
+    function showWarning(message) {
+        if (typeof toastr !== 'undefined') {
+            toastr.warning(message);
+        } else {
+            alert(message);
         }
-        $('.auto-search-product').slideUp();
-    });
-    $('.vendor-auto-search').on('keyup',function(){
-        var arg=this;
-        $('.auto-search').remove();
-        if($(this).val() != ""){
-            $.ajax({
-                url: "{{route('auto-search.vendor') }}",
-                method: 'GET',
-                data:{
-                    field:$(this).attr('name'),
-                    value:$(this).val().trim(),
-                },
-                success: function(data) {
-                    if(data.status == "success"){
-                        auto_serach_modal=1;
-                        selected_vendor_field = $(arg).attr('name');
-                        selected_vendor_f_value = data.f_data[selected_vendor_field];
-                        // console.log(selected_vendor_f_value);
+    }
 
-                        $(arg).after(data.data);
-                        if(data.f_data){
-                            if(selected_vendor_id != data.f_data.id){
-                                selected_vendor_id = data.f_data.id;
-                                selected_vendor_name = data.f_data.name;
-                                selected_vendor_email = data.f_data.email;
-                                selected_vendor_mobile= data.f_data.mobile;
-                                selected_vendor_address = data.f_data.address;
-                                // var old_sel_val = $('input[name="'+selected_vendor_field+'"]').val();
-                                // $('input[name="name"]').val(data.f_data.name);
-                                // $('input[name="email"]').val(data.f_data.email);
-                                // $('input[name="mobile"]').val(data.f_data.mobile);
-                                // $('input[name="address"]').val(data.f_data.address);
-                                // $('input[name="'+selected_vendor_field+'"]').val(old_sel_val);
-                            }
-
-                        }
-                    }else{
-                        auto_serach_modal=1;
-                        selected_vendor_id=0;
-                        $(arg).after(data.data);
-                        var old_val = arg.value;
-                        // $('input[name="name"]').val('');
-                        // $('input[name="email"]').val('');
-                        // $('input[name="mobile"]').val('');
-                        // $('input[name="address"]').val('');
-                        // $(arg).val(old_val);
-                    }
-
-
-                }
-            });
-        }else{
-            selected_vendor_id=0;
-            // $('input[name="name"]').val('');
-            // $('input[name="email"]').val('');
-            // $('input[name="mobile"]').val('');
-            // $('input[name="address"]').val('');
-
+    function parseData(value) {
+        if (typeof value === 'object' && value !== null) {
+            return value;
         }
-
-    });
-    $(document).on('click','.auto-search-res',function(){
-        //console.log(JSON.parse($(this).attr('data')));
-        auto_serach_modal =0;
-        var vendor = JSON.parse($(this).attr('data'));
-        $('input[name="name"]').val(vendor.name);
-        $('input[name="email"]').val(vendor.email);
-        $('input[name="mobile"]').val(vendor.mobile);
-        $('input[name="address"]').val(vendor.address);
-        $('.auto-search').slideUp();
-    });
-
-    $(document).on('click',function(event) {
-        if(auto_serach_modal == 1){
-            if (!$(event.target).closest(".auto-search").length) {
-                if ($('.auto-search').is(":visible"))
-                {
-                    auto_serach_modal=0;
-                    $('.auto-search').slideUp();
-                }
-
-                if(selected_vendor_id != 0){
-                    $('input[name="name"]').val(selected_vendor_name);
-                    $('input[name="email"]').val(selected_vendor_email);
-                    $('input[name="mobile"]').val(selected_vendor_mobile);
-                    $('input[name="address"]').val(selected_vendor_address);
-                   // $('input[name="'+selected_vendor_field+'"]').val(selected_vendor_f_value);
-                }
-            }
+        try {
+            return JSON.parse(value);
+        } catch (error) {
+            return null;
         }
-        console.log(auto_serach_modal);
-        if(auto_serach_product_modal == 1){
-            if (!$(event.target).closest(".auto-search-product").length) {
-                if ($('.auto-search-product').is(":visible"))
-                {
-                    $('#productcodeSearch').val("");
-                    auto_serach_product_modal=0;
-                    $('.auto-search-product').slideUp();
-                }
-            }
-        }
+    }
 
-    });
-    // $(document).on('click','*:not(.auto-search *)',function(){
-    //     console.log(this);
-    // });
-    $(".datepicker").flatpickr();
-    @if(auth()->user()->user_type == 0 || auth()->user()?->role?->is_admin == 1)
-        $('.select_branch').select2({
-        placeholder: 'Select Branch',
-        allowClear: true,
-        width:'100%',
-        dropdownAutoWidth : true,
-        containerCssClass: 'select-sm',
-        ajax: {
-            url: '{{route('select2.branches')}}',
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-            return {
-                value: $.trim(params.term),
-            };
-            },
-            processResults: function (response) {
-
-            return {
-                results: response
-            };
-            },
-            cache: true
-        }
-        }).on('select2:select', function (e) {
-            var data = e.params.data;
-            $('#h_branch').val(data.text);
-
-        });
-        var branch_option = new Option("{{ old('h_branch',auth()->user()?->branch?->name) }}","{{ old('branch',auth()->user()?->branch_id)}}", true, true);
-        console.log(branch_option);
-        $('.select_branch').append(branch_option).trigger('change');
-    @endif
-    $('a[data-action="collapse"]').on("click", function (e) {
-      e.preventDefault();
-      $(this)
-        .closest(".card")
-        .children(".card-content")
-        .collapse("toggle");
-      // Adding bottom padding on card collapse
-      $(this)
-        .closest(".card")
-        .children(".card-header")
-        .css("padding-bottom", "1.5rem");
-      $(this)
-        .closest(".card")
-        .find('[data-action="collapse"]')
-        .toggleClass("rotate");
-    });
-    touchQty(1);
-    function touchQty(i_val){
-        $(document).find('.select_qty_'+i_val).TouchSpin({
-            min: '1',
-            max: 'atuo',
-            step: 1,
-            decimals: 2,
-            forcestepdivisibility: 'none',
-            buttondown_class: "btn btn-primary",
-            buttonup_class: "btn btn-primary"
+    function getRows() {
+        return $('.add-ajax-product tr').filter(function () {
+            const product = $(this).find('.select_product_code');
+            return product.length > 0 &&
+                String(product.attr('data-id') || '0') !== '0';
         });
     }
 
-
-
-    $(document).find('#select_category').select2({
-        placeholder: 'Select Category',
-        allowClear: true,
-        width:'100%',
-        dropdownAutoWidth : true,
-        containerCssClass: 'select-sm',
-        ajax: {
-            url: '{{route('select2.product.categories')}}',
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-            return {
-                value: $.trim(params.term),
-            };
-            },
-            processResults: function (response) {
-            return {
-                results: response
-            };
-            },
-            cache: true
-        }
-    });
-    $(document).find('#select_product').select2({
-        placeholder: 'Select Product',
-        allowClear: true,
-        width:'100%',
-        dropdownAutoWidth : true,
-        containerCssClass: 'select-sm',
-        ajax: {
-            url: '{{route('select2.products.by_category')}}',
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-            return {
-                cat_id:$('#select_category').val(),
-                value: $.trim(params.term),
-            };
-            },
-            processResults: function (response) {
-                return {
-                    results: response
-                };
-            },
-            cache: true
-        }
-    });
-
-    var product_price=[];
-    $(document).on('change','.select_qty,.select_purchase_price',function(){
-        priceCalculation();
-    });
-    $(document).on('keyup','.select_qty,.select_purchase_price,.select_discount_price,#sub_order_discount,#sub_shipping_cost,#due_amount',function(){
-        priceCalculation();
-    });
-    $(document).on('keyup','#paid_amount',function(){
-
-        priceCalculation(1);
-    });
-    function priceCalculation(paid_o = 0){
-        var p_total =0;
-        var total_qty =0;
-        var sub_discount=0;
-        var sub_tax=0;
-        var is_ini = 0;
-        $('.select_product_code ').each(function(){
-            if($(this).attr('data-id') != 0){
-                var row_id = $(this).attr('data-in');
-
-                var qty = $('.select_qty_'+row_id).val();
-                var is_inital = $('.is_inital'+row_id).val();
-                if(is_ini != 1){
-                    is_ini =is_inital;
-                }
-                var price = $('.purchase_price_'+row_id).val();
-                var total = (parseInt(qty) || 0) * (parseFloat(price) || 0);
-                var dis=0,tax=0;
-                if($('.discount_price_'+row_id).attr('is-per') == 1){
-
-                    dis = total * parseInt($('.discount_price_'+row_id).attr('dis-per'))/100;
-                    //dis = dis.toFixed(2);
-                    $('.discount_price_'+row_id).val(dis.toFixed(2));
-                    // console.log(total * parseInt($('.discount_price_'+row_id).attr('dis-per'))/100);
-                }else{
-                    dis = parseFloat($('.discount_price_'+row_id).val()) || 0;
-                }
-                console.log(total);
-                if($('.tax_'+row_id).attr('is_per') == 1){
-
-                    tax = (total) * parseInt($('.tax_'+row_id).attr('dis-per'))/100;
-                    tax = parseFloat(tax);
-                    //tax = tax.toFixed(2);
-                    $('.tax_'+row_id).val(tax.toFixed(2));
-                    // console.log(total * parseInt($('.discount_price_'+row_id).attr('dis-per'))/100);
-                }else{
-                   tax = parseFloat($('.tax_'+row_id).val()) || 0;
-                }
-                sub_discount += dis;
-                sub_tax += tax;
-                p_total += total;
-                total_qty +=  parseInt(qty) || 0;
-                $('.total_price_'+row_id).val(total);
-            }
-
-        });
-        $('#is_ini_p').val(is_ini);
-        console.log("tax : "+ sub_tax.toFixed(2));
-        $('#sub_tax_total').html(sub_tax.toFixed(2));
-        $('#dis_total_tax').val(sub_tax.toFixed(2));
-        $('#sub_discount_total').html(sub_discount.toFixed(2));
-        $('#total_qty').html(total_qty);
-         $('#total_qty_input').val(total_qty);
-        $('#total').html(p_total);
-        var total_items = $('table.order-list tbody tr:last').index();
-        if(total_items < 0){
-            total_items = 0;
-        }else{
-           total_items = total_items+1;
-        }
-        $('#item').html(total_items);
-        $('#item_input').val(total_items);
-        $('#subtotal').html(p_total);
-        $('#subtotal_input').val(p_total);
-        var total_discount = sub_discount+parseFloat($('#sub_order_discount').val());
-        var shipping_cost= $('#sub_shipping_cost').val();
-        var grand_total =parseFloat(sub_tax) + parseFloat(p_total)+(parseFloat(shipping_cost) || 0) - (parseFloat(total_discount) || 0);
-
-        if(paid_o == 0){
-            @if(array_search('accounts',load_pack_option()) != false)
-                if($('#payment_method').val() > 0  &&  $('#add_account').val() > 0){
-                    $('#paid_amount').val(grand_total.toFixed(2));
-                }else{
-                    $('#paid_amount').val(0);
-                }
-            @else
-                if($('#payment_method').val() > 0){
-                    $('#paid_amount').val(grand_total.toFixed(2));
-                }else{
-                    $('#paid_amount').val(0);
-                }
-            @endif
-        }
-        // console.log(grand_total)
-        // // grand_total =grand_total.toFixed(2);
-        // console.log(grand_total)
-        // if(paid_o == 0){
-        //      $('#paid_amount').val(grand_total.toFixed(2));
-        // }
-        var paid_amount = $('#paid_amount').val() ?? 0;
-        var due_amount = parseFloat(grand_total) - parseFloat(paid_amount);
-
-        due_amount =due_amount.toFixed(2);
-        $('#due_amount').val(due_amount);
-        $('#order_discount_input').val(total_discount.toFixed(2));
-        $('#order_discount').html(total_discount.toFixed(2));
-        $('#order_tax_input').val(sub_tax.toFixed(2));
-        $('#order_tax').html(sub_tax.toFixed(2));
-        $('#shipping_cost').html(shipping_cost);
-        $('#grand_total_input').val(grand_total.toFixed(2));
-        $('#grand_total').html(grand_total.toFixed(2));
+    function productAlreadyAdded(id) {
+        return getRows().filter(function () {
+            const currentId = $(this)
+                .find('.select_product_code')
+                .attr('data-id');
+            return String(currentId) === String(id);
+        }).length > 0;
     }
 
-    $(document).on('change','#select_product',function(){
-        if(this.value != 0){
-            var id=$(this).val();
-            FillProductOption(id,p_row_no);
-            $(this).val(0).trigger('change');
-            p_row_no++;
-        }else{
-            // console.log(this.value);
+    function showEmptyCart() {
+        if (getRows().length > 0) {
+            $('.empty-cart-row').remove();
+            return;
         }
 
-
-        // $(this).val(0).trigger('change');
-    });
-    function FillProductOption(id,row_no,old=0,qty=1,unit_option=null){
-         $.ajax({
-            url: "{{route('get_product_details_by_id') }}",
-            method: 'GET',
-            data:{
-                is_sale:0,
-                qty:qty,
-                old:0,
-                id:id,
-                row_id:row_no
-            },
-            success: function(data) {
-                if($('.add-ajax-product').find('.pro-row-'+id).length == 0){
-                    $('.add-ajax-product').append(data.data_view);
-
-                    initalUnit(row_no);
-                    touchQty(row_no);
-
-
-                    //product_price[data.p_data.id] = data.p_data.product_p_price;
-                    // var p_price =  data.p_data.product_p_price[0];
-                    if(data.unit_id > 0){
-                        var unit_option = new Option(data.unit_name, data.unit_id, true, true);
-                        $('.select_unit_'+row_no).append(unit_option).trigger('change');
-                        // if(unit_option){
-                        //     $('.select_unit_'+row_no).append(unit_option).trigger('change');
-                        // }
-                    }
-
-                    // var unit_option = new Option(data.unit_name, data.unit_id, true, true);
-                    // $('.select_unit_'+row_no).append(unit_option).trigger('change');
-
-
-                    priceCalculation();
-                }
-            }
-        });
-
-        // addAnotherRow(arg);
+        $('.add-ajax-product').html(
+            '<tr class="empty-cart-row">' +
+                '<td colspan="10">' +
+                    '<div class="empty-cart">' +
+                        '<i class="bx bx-cart"></i>' +
+                        '<p>No products added yet — select a product above to begin.</p>' +
+                    '</div>' +
+                '</td>' +
+            '</tr>'
+        );
     }
 
-    function addAnotherRow(arg){
-        p_row_no++;
-        var myvar = '<tr id="row_'+p_row_no+'">'+
-            '<td><label data-in="'+p_row_no+'" data-id="0" class="select_product_code select_product_code_'+p_row_no+'">Code..</label><input type="hidden" name="product_id[]" class="select_product_id_'+p_row_no+'"></td>'+
-        '                            <td>'+
+    function setupSelect2(selector, placeholder, url, extraData) {
+        const $element = $(selector);
 
-        '                                <select data-in="'+p_row_no+'" class="form-control select_color_'+p_row_no+' select_color mb-0" name="color[]">'+
-        '                                    <option value="">Color</option>'+
-        '                                </select>'+
-        '                            </td>'+
-        '                            <td>'+
-        '                                <select data-in="'+p_row_no+'" class="form-control select_size select_size_'+p_row_no+' mb-0" name="size[]">'+
-        '                                    <option value="">Size</option>'+
-        '                                </select>'+
-        '                            </td>'+
-        '                            <td>'+
-        '                                <input data-in="'+p_row_no+'" class="form-control select_qty_'+p_row_no+' select_qty touchspin " name="qty[]" value="1" type="number" placeholder="Qty">'+
-        '                            </td>'+
-        '                            <td>'+
-        '                                <select data-in="'+p_row_no+'" class="select_unit select_unit_'+p_row_no+' form-control mb-0" name="unit[]">'+
-        '                                    <option>Unit</option>'+
-        '                                    <option>Piece</option>'+
-        '                                    <option>Pata</option>'+
-        '                                    <option>Box</option>'+
-        '                                    <option>Carton</option>'+
-        ''+
-        '                                </select>'+
-        '                            </td>'+
-        '                            <td>'+
-        '                               <input data-in="'+p_row_no+'" class="form-control purchase_price_'+p_row_no+' select_purchase_price " name="per_cost[]" type="text" placeholder="Price">'+
-        '                            </td>'+
-        '                            <td>'+
-        '                               <input class="form-control discount_price_'+p_row_no+' select_discount_price " type="text" placeholder="Discount" name="discount[]">'+
-        '                            </td>'+
-        '                            <td>'+
-        '                               <input data-in="'+p_row_no+'" type="text" class="form-control total_price_'+p_row_no+'  select_total_price" name="total[]" placeholder="Total">'+
-        '                            </td>'+
-        '                        </tr>';
-        var curlastrow = $('#row_'+arg);
-        $(curlastrow).after(myvar);
-        initalColor(p_row_no);
-        initalSize(p_row_no);
-        touchQty(p_row_no);
+        if (!$element.length || !$.fn.select2) {
+            return;
+        }
 
-    }
-    @if(old('product_id'))
-        @foreach (old('product_id') as $k=>$product_id)
-            @php
-                $unit=App\Models\Inventory\Unit::find(old('unit')[$k]);
-            @endphp
-            var unit_option = new Option("{{$unit?->name}}","{{$unit?->id}}", true, true);
-            FillProductOption("{{$product_id}}",p_row_no,0,"{{ old('qty')[$k] }}",unit_option);
-            p_row_no++;
-        @endforeach
-    @endif
+        if ($element.hasClass('select2-hidden-accessible')) {
+            $element.select2('destroy');
+        }
 
-    function initalUnit(r_no){
-        $(document).find('.select_unit_'+r_no).select2({
-            placeholder: 'Select Unit',
+        $element.select2({
+            placeholder: placeholder,
             allowClear: true,
-            width:'100%',
-            dropdownAutoWidth : true,
-            containerCssClass: 'select-sm',
+            width: '100%',
+            dropdownAutoWidth: true,
             ajax: {
-                url: '{{route('select2.product.units')}}',
+                url: url,
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
-                return {
-                    p_id:$('.select_product_code_'+r_no).attr('data-id'),
-                    value: $.trim(params.term),
-                };
+                    const data = {
+                        value: $.trim(params.term || '')
+                    };
+                    if (typeof extraData === 'function') {
+                        Object.assign(data, extraData());
+                    }
+                    return data;
                 },
                 processResults: function (response) {
+                    if (Array.isArray(response)) {
+                        return { results: response };
+                    }
                     return {
-                        results: response
+                        results: response.results || []
                     };
                 },
                 cache: true
@@ -969,61 +1296,949 @@
         });
     }
 
-    @if(Session::has('cus_errors'))
-        @foreach (Session::get('cus_errors') as $k=>$error)
-            toastr.error("{{ $error }}");
+    function selectExistingOption(selector, id, label) {
+        if (id === null || id === undefined || id === '') {
+            return;
+        }
+        const option = new Option(
+            label || String(id),
+            id,
+            true,
+            true
+        );
+        $(selector).append(option).trigger('change');
+    }
 
-            // console.log("{{ Session::get('errors')->color }}");
-        @endforeach
-    @endif
-    $(document).on('click','.delete_item',function(){
-        $(this).parent().parent().remove();
+    if (typeof flatpickr !== 'undefined') {
+        $('.datepicker').flatpickr({
+            dateFormat: 'Y-m-d',
+            allowInput: true
+        });
+    }
+
+    if (config.canSelectBranch) {
+        setupSelect2(
+            '#select_branch',
+            'Select Branch',
+            config.routes.branches
+        );
+
+        selectExistingOption(
+            '#select_branch',
+            config.oldBranch.id,
+            config.oldBranch.name
+        );
+
+        $('#select_branch').on('select2:select', function (event) {
+            $('#h_branch').val(event.params.data.text);
+        });
+
+        $('#select_branch').on('select2:clear', function () {
+            $('#h_branch').val('');
+        });
+    }
+
+    setupSelect2(
+        '#select_category',
+        'Select Category',
+        config.routes.categories
+    );
+
+    setupSelect2(
+        '#select_product',
+        'Select Product',
+        config.routes.products,
+        function () {
+            return {
+                cat_id: $('#select_category').val() || ''
+            };
+        }
+    );
+
+    $('#select_category').on('change', function () {
+        $('#select_product').val(null).trigger('change');
+    });
+
+    $('#select_product').on('select2:select', function (event) {
+        const id = event.params.data.id;
+        if (id) {
+            addProduct(id);
+        }
+        $('#select_product').val(null).trigger('change');
+    });
+
+    function clearVendorSearch() {
+        $('.auto-search').remove();
+    }
+
+    function fillVendor(vendor) {
+        $('input[name="name"]').val(vendor.name || '');
+        $('input[name="email"]').val(vendor.email || '');
+        $('input[name="mobile"]').val(vendor.mobile || '');
+        $('input[name="address"]').val(vendor.address || '');
+        clearVendorSearch();
+    }
+
+    $('.vendor-auto-search').on('input', function () {
+        const input = this;
+        clearTimeout(vendorTimer);
+
+        const field = $(input).attr('name');
+        const value = $.trim($(input).val());
+
+        vendorSearchVersion++;
+        const currentVersion = vendorSearchVersion;
+
+        if (vendorXHR) {
+            vendorXHR.abort();
+        }
+
+        clearVendorSearch();
+
+        if (value.length < 2) {
+            return;
+        }
+
+        vendorTimer = setTimeout(function () {
+            vendorXHR = $.ajax({
+                url: config.routes.vendorSearch,
+                method: 'GET',
+                data: {
+                    field: field,
+                    value: value
+                },
+                success: function (response) {
+                    if (currentVersion !== vendorSearchVersion) {
+                        return;
+                    }
+                    if (response && response.data) {
+                        $(input).after(response.data);
+                    }
+                },
+                error: function (xhr, status) {
+                    if (status !== 'abort') {
+                        console.error('Vendor search error', xhr);
+                    }
+                }
+            });
+        }, 300);
+    });
+
+    $(document).on('click', '.auto-search-res', function (event) {
+        event.preventDefault();
+
+        const vendor = parseData($(this).attr('data'));
+
+        if (!vendor) {
+            showError('Invalid supplier information.');
+            return;
+        }
+
+        vendorSearchVersion++;
+
+        if (vendorXHR) {
+            vendorXHR.abort();
+        }
+
+        fillVendor(vendor);
+    });
+
+    function clearProductSearch() {
+        $('#auto-serach-res-f').empty();
+        $('.auto-search-product').remove();
+    }
+
+    function runProductSearch(value, isBarcode) {
+        productSearchVersion++;
+        const currentVersion = productSearchVersion;
+
+        if (productXHR) {
+            productXHR.abort();
+        }
+
+        productXHR = $.ajax({
+            url: config.routes.productSearch,
+            method: 'GET',
+            data: {
+                value: value,
+                is_barcode: isBarcode ? 1 : 0
+            },
+            success: function (response) {
+                if (currentVersion !== productSearchVersion) {
+                    return;
+                }
+
+                clearProductSearch();
+
+                if (response && response.data) {
+                    $('#auto-serach-res-f').html(response.data);
+                }
+
+                if (isBarcode && response.status === 'success') {
+                    const $first = $(
+                        '#auto-serach-res-f .auto-search-res-product'
+                    ).first();
+
+                    if ($first.length) {
+                        $first.trigger('click');
+                    }
+                }
+            },
+            error: function (xhr, status) {
+                if (status !== 'abort') {
+                    console.error('Product search error', xhr);
+                }
+            }
+        });
+    }
+
+    $('#productcodeSearch').on('input', function () {
+        clearTimeout(productTimer);
+
+        const value = $.trim($(this).val());
+
+        if (productXHR) {
+            productXHR.abort();
+        }
+
+        if (!value) {
+            productSearchVersion++;
+            clearProductSearch();
+            return;
+        }
+
+        const isBarcode = value.toLowerCase().includes('nbr');
+
+        productTimer = setTimeout(function () {
+            runProductSearch(value, isBarcode);
+        }, isBarcode ? 50 : 250);
+    });
+
+    $('#barcode-focus').on('click', function () {
+        $('#productcodeSearch').focus();
+    });
+
+    $(document).on('click', '.auto-search-res-product', function (event) {
+        event.preventDefault();
+
+        const product = parseData($(this).attr('data'));
+
+        if (!product || !product.p_id) {
+            showError('Invalid product information.');
+            return;
+        }
+
+        productSearchVersion++;
+
+        if (productXHR) {
+            productXHR.abort();
+        }
+
+        $('#productcodeSearch').val('');
+        clearProductSearch();
+        addProduct(product.p_id);
+    });
+
+    $(document).on('click', function (event) {
+        if (!$(event.target).closest(
+            '.vendor-auto-search, .auto-search'
+        ).length) {
+            clearVendorSearch();
+        }
+
+        if (!$(event.target).closest(
+            '#productcodeSearch, #auto-serach-res-f'
+        ).length) {
+            clearProductSearch();
+        }
+    });
+
+    function initializeUnit(currentRow) {
+        setupSelect2(
+            '.select_unit_' + currentRow,
+            'Select Unit',
+            config.routes.units,
+            function () {
+                return {
+                    p_id: $(
+                        '.select_product_code_' + currentRow
+                    ).attr('data-id')
+                };
+            }
+        );
+    }
+
+    function initializeQuantity(currentRow) {
+        const $input = $('.select_qty_' + currentRow);
+
+        if (!$input.length || !$.fn.TouchSpin) {
+            return;
+        }
+
+        if ($input.data('touchspin')) {
+            return;
+        }
+
+        $input.TouchSpin({
+            min: 1,
+            max: 999999999,
+            step: 1,
+            decimals: 2,
+            forcestepdivisibility: 'none',
+            verticalbuttons: false,
+            buttondown_txt: '−',
+            buttonup_txt: '+',
+            buttondown_class: 'btn btn-light',
+            buttonup_class: 'btn btn-light'
+        });
+    }
+
+    function restoreRow(currentRow, item) {
+        if (!item) {
+            return;
+        }
+
+        if (item.qty !== null && item.qty !== undefined) {
+            $('.select_qty_' + currentRow).val(item.qty);
+        }
+
+        if (item.price !== null && item.price !== undefined) {
+            $('.purchase_price_' + currentRow).val(item.price);
+        }
+
+        if (item.discount !== null && item.discount !== undefined) {
+            $('.discount_price_' + currentRow).val(item.discount);
+        }
+
+        if (item.tax !== null && item.tax !== undefined) {
+            $('.tax_' + currentRow).val(item.tax);
+        }
+
+        if (item.unit) {
+            const selector = '.select_unit_' + currentRow;
+            const $unit = $(selector);
+
+            const exists = $unit.find('option').filter(function () {
+                return String(this.value) === String(item.unit);
+            });
+
+            if (exists.length) {
+                $unit.val(String(item.unit)).trigger('change');
+            } else {
+                selectExistingOption(
+                    selector,
+                    item.unit,
+                    String(item.unit)
+                );
+            }
+        }
+    }
+
+    function addProduct(productId, restoreData = null) {
+        const id = String(productId);
+
+        if (!id || id === '0') {
+            return Promise.resolve(false);
+        }
+
+        if (productAlreadyAdded(id) || pendingProducts.has(id)) {
+            if (!restoreData) {
+                showWarning('This product is already added.');
+            }
+            return Promise.resolve(false);
+        }
+
+        const currentRow = ++rowNumber;
+        pendingProducts.add(id);
+
+        return new Promise(function (resolve) {
+            $.ajax({
+                url: config.routes.productDetails,
+                method: 'GET',
+                data: {
+                    is_sale: 0,
+                    qty: restoreData ? restoreData.qty : 1,
+                    old: 0,
+                    id: id,
+                    row_id: currentRow
+                },
+                success: function (response) {
+                    if (!response || !response.data_view) {
+                        showError('Product details not found.');
+                        resolve(false);
+                        return;
+                    }
+
+                    if (productAlreadyAdded(id)) {
+                        resolve(false);
+                        return;
+                    }
+
+                    $('.empty-cart-row').remove();
+                    $('.add-ajax-product').append(response.data_view);
+
+                    initializeUnit(currentRow);
+                    initializeQuantity(currentRow);
+
+                    if (response.unit_id) {
+                        selectExistingOption(
+                            '.select_unit_' + currentRow,
+                            response.unit_id,
+                            response.unit_name
+                        );
+                    }
+
+                    if (restoreData) {
+                        restoreRow(currentRow, restoreData);
+                    }
+
+                    priceCalculation();
+                    resolve(true);
+                },
+                error: function (xhr) {
+                    console.error('Product load error', xhr);
+                    showError('Unable to load product.');
+                    resolve(false);
+                },
+                complete: function () {
+                    pendingProducts.delete(id);
+                    showEmptyCart();
+                }
+            });
+        });
+    }
+
+    window.FillProductOption = function (
+        id,
+        rowNo,
+        old,
+        qty,
+        unitOption
+    ) {
+        return addProduct(id, {
+            qty: qty || 1,
+            unit: unitOption ? unitOption.value : null
+        });
+    };
+
+    window.touchQty = initializeQuantity;
+    window.initalUnit = initializeUnit;
+
+    $(document).on('click', '.delete_item', function (event) {
+        event.preventDefault();
+        $(this).closest('tr').remove();
+        showEmptyCart();
         priceCalculation();
     });
-    $('#payment_method').on('change',function(){
-        if(this.value == 1){
+
+    if (config.hasAccounts && $('#add_account').length) {
+        setupSelect2(
+            '#add_account',
+            'Select Bank Account',
+            config.routes.accounts,
+            function () {
+                return {
+                    method_id: $('#payment_method').val()
+                };
+            }
+        );
+
+        selectExistingOption(
+            '#add_account',
+            config.oldAccount.id,
+            config.oldAccount.name
+        );
+
+        $('#add_account').on('select2:select', function (event) {
+            $('#h_bank_account').val(event.params.data.text);
+        });
+
+        $('#add_account').on('select2:clear', function () {
+            $('#h_bank_account').val('');
+        });
+    }
+
+    $('#payment_method').on('change', function () {
+        if (String($(this).val()) === '1') {
             $('.method_show').hide();
-        }else{
+        } else {
             $('.method_show').show();
         }
-        priceCalculation();
-    });
-    @if(array_search('accounts',load_pack_option()) != false)
-    $('#add_account').select2({
-        theme: "bootstrap-5",
-        placeholder: 'Select Bank Account',
-        allowClear: true,
-        width:'100%',
-        dropdownAutoWidth : true,
-        containerCssClass: 'select-sm',
-        ajax: {
-            url: '{{route('select2.balance_accounts')}}',
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    method_id:$('#payment_method').val(),
-                    value: $.trim(params.term),
-                };
-            },
-            processResults: function (response) {
-                console.log(response);
-                return {
-                    results: response
-                };
-            },
-            cache: true
-        }
-    }).on('select2:select', function (e) {
-        var data = e.params.data;
-        $('#h_bank_account').val(data.text);
 
-    });
-    $(document).on('change','#add_account',function(){
+        if (config.hasAccounts && $('#add_account').length) {
+            $('#add_account').val(null).trigger('change');
+            $('#h_bank_account').val('');
+        }
+
         priceCalculation();
     });
-    var bank_account_option = new Option("{{ old('h_bank_account') }}","{{ old('account')}}", true, true);
-    $('#add_account').append(bank_account_option).trigger('change');
-    @endif
+
+    $('#add_account').on('change', function () {
+        priceCalculation();
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Price Calculation
+    |--------------------------------------------------------------------------
+    */
+    function priceCalculation() {
+        let subtotal = 0;
+        let totalQty = 0;
+        let totalTax = 0;
+        let itemDiscount = 0;
+        let totalItems = 0;
+        let initialFlag = 0;
+
+        getRows().each(function () {
+            const $row = $(this);
+
+            const currentRow = $row
+                .find('.select_product_code')
+                .attr('data-in');
+
+            const qty = positiveNumber(
+                $row.find('.select_qty_' + currentRow).val()
+            );
+
+            const price = positiveNumber(
+                $row.find('.purchase_price_' + currentRow).val()
+            );
+
+            const baseTotal = qty * price;
+
+            // -----------------------------
+            // Discount calculation
+            // -----------------------------
+            const $discount = $row.find(
+                '.discount_price_' + currentRow
+            );
+
+            let discount = 0;
+
+            if ($discount.length) {
+                const isPercentage =
+                    String($discount.attr('is-per')) === '1';
+
+                if (isPercentage) {
+                    const discountRate = positiveNumber(
+                        $discount.attr('dis-per')
+                    );
+
+                    discount = baseTotal * discountRate / 100;
+
+                    $discount.val(formatMoney(discount));
+                } else {
+                    discount = positiveNumber($discount.val());
+                }
+            }
+
+            discount = Math.min(discount, baseTotal);
+
+            // -----------------------------
+            // Tax calculation
+            // -----------------------------
+            const taxableAmount = Math.max(
+                0,
+                baseTotal - discount
+            );
+
+            const taxType = $row
+                .find('.select_tax_type')
+                .val() || 'fixed';
+
+            const taxValue = positiveNumber(
+                $row.find('.select_tax_rate').val()
+            );
+
+            let tax = 0;
+
+            if (taxType === 'percentage') {
+                tax = taxableAmount * taxValue / 100;
+            } else {
+                tax = taxValue;
+            }
+
+            // Update hidden tax amount
+            $row.find('.calculated_tax')
+                .val(formatMoney(tax));
+
+            // -----------------------------
+            // Product total
+            // -----------------------------
+            const rowTotal = taxableAmount + tax;
+
+            $row.find('.total_price_' + currentRow)
+                .val(formatMoney(rowTotal));
+
+            // Update original purchase total
+            const originalPrice = positiveNumber(
+                $row.find(
+                    '.hidden_purchase_price_' + currentRow
+                ).val()
+            );
+
+            $row.find('.purchase_total_price_' + currentRow)
+                .val(formatMoney(qty * originalPrice));
+
+            // Initial product flag
+            const isInitial = $row.find(
+                '.is_inital' + currentRow
+            ).val();
+
+            if (String(isInitial) === '1') {
+                initialFlag = 1;
+            }
+
+            // Add to summary
+            subtotal += baseTotal;
+            totalQty += qty;
+            totalTax += tax;
+            itemDiscount += discount;
+            totalItems++;
+        });
+
+        // -----------------------------
+        // Shipping and order discount
+        // -----------------------------
+        const shipping = positiveNumber(
+            $('#sub_shipping_cost').val()
+        );
+
+        const orderDiscount = positiveNumber(
+            $('#sub_order_discount').val()
+        );
+
+        const totalDiscount = itemDiscount + orderDiscount;
+
+        // -----------------------------
+        // Grand total
+        // -----------------------------
+        const grandTotal = Math.max(
+            0,
+            subtotal + totalTax + shipping - totalDiscount
+        );
+
+        // -----------------------------
+        // Payment
+        // -----------------------------
+        const paidAmount = positiveNumber(
+            $('#paid_amount').val()
+        );
+
+        const dueAmount = Math.max(
+            0,
+            grandTotal - paidAmount
+        );
+
+        // -----------------------------
+        // Table footer
+        // -----------------------------
+        $('#total_qty').text(totalQty.toFixed(2));
+
+        $('#sub_tax_total').text(formatMoney(totalTax));
+
+        $('#sub_discount_total').text(
+            formatMoney(itemDiscount)
+        );
+
+        $('#total').text(formatMoney(subtotal));
+
+        // -----------------------------
+        // Sidebar summary
+        // -----------------------------
+        $('#item').text(totalItems);
+
+        $('#subtotal').text(formatMoney(subtotal));
+
+        $('#order_tax').text(formatMoney(totalTax));
+
+        $('#order_discount_items').text(
+            formatMoney(itemDiscount)
+        );
+
+        $('#order_discount').text(
+            formatMoney(totalDiscount)
+        );
+
+        $('#shipping_cost').text(formatMoney(shipping));
+
+        $('#grand_total').text(formatMoney(grandTotal));
+
+        $('#due_amount').val(formatMoney(dueAmount));
+
+        // -----------------------------
+        // Hidden form values
+        // -----------------------------
+        $('#item_input').val(totalItems);
+
+        $('#total_qty_input').val(totalQty.toFixed(2));
+
+        $('#subtotal_input').val(formatMoney(subtotal));
+
+        $('#order_tax_input').val(formatMoney(totalTax));
+
+        $('#order_discount_input').val(
+            formatMoney(totalDiscount)
+        );
+
+        $('#grand_total_input').val(
+            formatMoney(grandTotal)
+        );
+
+        $('#dis_total_tax').val(formatMoney(totalTax));
+
+        $('#is_ini_p').val(initialFlag);
+
+        return {
+            totalItems,
+            totalQty,
+            subtotal,
+            totalTax,
+            itemDiscount,
+            orderDiscount,
+            totalDiscount,
+            shipping,
+            grandTotal,
+            paidAmount,
+            dueAmount
+        };
+    }
+
+    $(document).on(
+        'input change',
+        '.select_qty, ' +
+        '.select_purchase_price, ' +
+        '.select_discount_price, ' +
+        '#sub_order_discount, ' +
+        '#sub_shipping_cost, ' +
+        '#paid_amount',
+        '.add-ajax-product .select_tax_rate',
+        function () {
+            priceCalculation();
+        }
+    );
+
+    $(document).on(
+        'input keyup change',
+        '.add-ajax-product .select_tax_rate',
+        function () {
+            priceCalculation();
+        }
+    );
+
+    $(document).on(
+        'change',
+        '.add-ajax-product .select_tax_type',
+        function () {
+            priceCalculation();
+        }
+    );
+
+    $(document).on(
+        'touchspin.on.startspin touchspin.on.stopspin',
+        '.select_qty',
+        function () {
+            priceCalculation();
+        }
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation
+    |--------------------------------------------------------------------------
+    */
+    function validatePurchase() {
+        const totals = priceCalculation();
+
+        const supplierName = $.trim(
+            $('input[name="name"]').val()
+        );
+
+        if (!supplierName) {
+            showError('Please enter supplier name.');
+            $('input[name="name"]').focus();
+            return false;
+        }
+
+        if (!$('input[name="purchase_date"]').val()) {
+            showError('Please select purchase date.');
+            $('input[name="purchase_date"]').focus();
+            return false;
+        }
+
+        /* if (config.canSelectBranch && !$('#select_branch').val()) {
+            showError('Please select branch.');
+            $('#select_branch').select2('open');
+            return false;
+        } */
+
+        if (totals.totalItems <= 0) {
+            showError('Please add at least one product.');
+            $('#productcodeSearch').focus();
+            return false;
+        }
+
+        let rowInvalid = false;
+
+        getRows().each(function () {
+            const $row = $(this);
+            const $qty = $row.find('.select_qty');
+            const $price = $row.find('.select_purchase_price');
+
+            if (parseNumber($qty.val()) <= 0) {
+                showError('Product quantity must be greater than zero.');
+                $qty.focus();
+                rowInvalid = true;
+                return false;
+            }
+
+            if (
+                $.trim($price.val()) === '' ||
+                parseNumber($price.val()) < 0
+            ) {
+                showError('Please enter a valid purchase price.');
+                $price.focus();
+                rowInvalid = true;
+                return false;
+            }
+
+            const $unit = $row.find('.select_unit');
+
+            if ($unit.length && !$unit.val()) {
+                showError('Please select product unit.');
+
+                if ($unit.hasClass('select2-hidden-accessible')) {
+                    $unit.select2('open');
+                } else {
+                    $unit.focus();
+                }
+
+                rowInvalid = true;
+                return false;
+            }
+        });
+
+        if (rowInvalid) {
+            return false;
+        }
+
+        const maximumDiscount =
+            totals.subtotal + totals.totalTax + totals.shipping;
+
+        if (totals.totalDiscount > maximumDiscount) {
+            showError('Discount cannot exceed purchase amount.');
+            $('#sub_order_discount').focus();
+            return false;
+        }
+
+        if (totals.paidAmount > totals.grandTotal + 0.001) {
+            showError('Paid amount cannot exceed grand total.');
+            $('#paid_amount').focus();
+            return false;
+        }
+
+        if (
+            totals.paidAmount > 0 &&
+            !$('#payment_method').val()
+        ) {
+            showError('Please select payment method.');
+            $('#payment_method').focus();
+            return false;
+        }
+
+        if (
+            config.hasAccounts &&
+            totals.paidAmount > 0 &&
+            $('#add_account').length &&
+            !$('#add_account').val()
+        ) {
+            showError('Please select payment account.');
+
+            if ($('#add_account').hasClass('select2-hidden-accessible')) {
+                $('#add_account').select2('open');
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Form Submission
+    |--------------------------------------------------------------------------
+    */
+    $form.on('submit', function (event) {
+        if (isSubmitting) {
+            event.preventDefault();
+            return false;
+        }
+
+        if (pendingProducts.size > 0) {
+            event.preventDefault();
+            showWarning(
+                'Please wait until all products finish loading.'
+            );
+            return false;
+        }
+
+        if (!validatePurchase()) {
+            event.preventDefault();
+            return false;
+        }
+
+        isSubmitting = true;
+
+        $('#submit-btn')
+            .prop('disabled', true)
+            .html(
+                '<i class="bx bx-loader-alt bx-spin me-1"></i>' +
+                ' Saving Purchase...'
+            );
+
+        return true;
+    });
+
+    /*
+    |--------------------------------------------------------------------------
+    | Restore Products After Validation Error
+    |--------------------------------------------------------------------------
+    */
+    async function restoreOldProducts() {
+        if (!Array.isArray(config.oldProducts)) {
+            return;
+        }
+
+        for (const item of config.oldProducts) {
+            if (item.id) {
+                await addProduct(item.id, item);
+            }
+        }
+
+        priceCalculation();
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Laravel Errors
+    |--------------------------------------------------------------------------
+    */
+    if (Array.isArray(config.customErrors)) {
+        config.customErrors.forEach(function (error) {
+            showError(String(error));
+        });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Initial Setup
+    |--------------------------------------------------------------------------
+    */
+    showEmptyCart();
+    restoreOldProducts();
+    priceCalculation();
+
+});
 </script>
 @endsection

@@ -94,7 +94,7 @@ class ProductionOrderController extends Controller
         ]);
 
         return redirect()
-            ->route('production.production-orders.index')
+            ->route('production.orders.index')
             ->with('success', 'Production order created successfully.');
     }
 
@@ -148,7 +148,7 @@ class ProductionOrderController extends Controller
         $order->update($validated);
 
         return redirect()
-            ->route('production.production-orders.index')
+            ->route('production.orders.index')
             ->with('success', 'Production order updated successfully.');
     }
 
@@ -162,7 +162,7 @@ class ProductionOrderController extends Controller
             ->delete();
 
         return redirect()
-            ->route('production.production-orders.index')
+            ->route('production.orders.index')
             ->with('success', 'Production order deleted successfully.');
     }
 }

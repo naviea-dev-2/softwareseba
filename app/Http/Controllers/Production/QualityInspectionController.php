@@ -32,7 +32,7 @@ class QualityInspectionController extends Controller
         )
             ->with([
                 'productionOrder:id,order_number,product_id',
-                'productionOrder.product:id,title',
+                'productionOrder.product:id,product_name',
                 'workOrder:id,work_order_number',
             ])
             ->latest()
@@ -52,7 +52,7 @@ class QualityInspectionController extends Controller
         )->latest()->get();
 
         $workOrders = WorkOrder::where(
-            'user_id',
+            'business_id',
             $this->businessId
         )->latest()->get();
 
@@ -119,7 +119,7 @@ class QualityInspectionController extends Controller
         )->latest()->get();
 
         $workOrders = WorkOrder::where(
-            'user_id',
+            'business_id',
             $this->businessId
         )->latest()->get();
 
