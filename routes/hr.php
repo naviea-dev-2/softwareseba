@@ -71,6 +71,7 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::get('select2-driver_employee','App\Http\Controllers\Hr\HrController@select2DriverEmployee')->name('select2.driver_employee');
     Route::get('select2-asr_employee','App\Http\Controllers\Hr\HrController@select2AsrEmployee')->name('select2.asr_employee');
     Route::get('select2-dsr_employee','App\Http\Controllers\Hr\HrController@select2DsrEmployee')->name('select2.dsr_employee');
+    Route::post('/employee/change-status', [ App\Http\Controllers\Hr\HrController::class,'changeEmployeeStatus'])->name('employee.changeStatus');
     //end employee
 
     //shiftManage

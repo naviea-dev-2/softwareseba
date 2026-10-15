@@ -342,7 +342,7 @@ class HrController extends Controller
         }
         return view('Hr.employee.manageEmployee');
     }
-    function ajaxEmployee(Request $request){
+    function ajaxEmployeeOld(Request $request){
         $columns = [
             0=>'employees.id',
             0=>'employees.id',
@@ -399,6 +399,7 @@ class HrController extends Controller
                 $nestedData['email'] =$data_v->email;
                 $nestedData['mobile'] =$data_v->mobile;
                 $nestedData['join_date'] =$data_v->join_date;
+                $nestedData['status'] =$data_v->status == 1 ? "Active" : 'Inactive';
                 $nestedData['salary'] =auth()->user()->currency_symbol.' '. round($data_v->salary,2);
 
                 $nestedData['options']='';
@@ -423,6 +424,258 @@ class HrController extends Controller
    
         return response()->json($json_data);
     }
+    
+    public function ajaxEmployee(Request $request)
+    {
+        // DataTable column ordering
+        $columns = [
+            0 => 'employees.id',
+            2 => 'employees.employee_id',
+            3 => 'employees.employee_name',
+            4 => 'departments.name',
+            5 => 'designations.name',
+            6 => 'employees.email',
+            7 => 'employees.mobile',
+            8 => 'employees.salary',
+            9 => 'employees.join_date',
+        ];
+
+        // Total counts for tabs
+        $counts = Employee::query()
+            ->selectRaw('COUNT(*) as all_count')
+            ->selectRaw('COALESCE(SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END), 0) as active_count')
+            ->selectRaw('COALESCE(SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END), 0) as inactive_count')
+            ->first();
+
+        $totalData = (int) $counts->all_count;
+
+        // Base query
+        $datalist = Employee::query()
+            ->leftJoin(
+                'departments',
+                'departments.id',
+                '=',
+                'employees.department_id'
+            )
+            ->leftJoin(
+                'designations',
+                'designations.id',
+                '=',
+                'employees.designation_id'
+            );
+
+        // Filter by selected tab: 1 = Active, 0 = Inactive
+        $status = $request->input('status');
+
+        if (in_array((string) $status, ['0', '1'], true)) {
+            $datalist->where('employees.status', (int) $status);
+        }
+
+        // DataTable search
+        $search = trim((string) $request->input('search.value', ''));
+
+        if ($search !== '') {
+            $datalist->where(function ($query) use ($search) {
+                $query->where(
+                    'employees.employee_name',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'departments.name',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'designations.name',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.employee_id',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.email',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.mobile',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.salary',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.join_date',
+                    'LIKE',
+                    "%{$search}%"
+                );
+            });
+        }
+
+        // Total records after status and search filters
+        $totalFiltered = (clone $datalist)->count('employees.id');
+
+        // Safe ordering
+        $orderColumnIndex = (int) $request->input('order.0.column', 0);
+
+        $order = $columns[$orderColumnIndex] ?? 'employees.id';
+
+        $dir = strtolower($request->input('order.0.dir', 'desc')) === 'asc'
+            ? 'asc'
+            : 'desc';
+
+        // Pagination
+        $start = max(0, (int) $request->input('start', 0));
+        $limit = (int) $request->input('length', 10);
+
+        $datalist->select(
+            'employees.*',
+            'departments.name as depart_name',
+            'designations.name as desi_name'
+        );
+
+        $datalist->orderBy($order, $dir);
+
+        if ($limit > 0) {
+            $datalist->offset($start)->limit($limit);
+        }
+
+        $employees = $datalist->get();
+
+        $data = [];
+
+        $p_edit = can_p('editEmployee');
+        $p_delete = can_p('deleteEmployee');
+
+        $i = $start + 1;
+
+        foreach ($employees as $employee) {
+            $nestedData = [];
+
+            $nestedData['id'] = $i;
+            $nestedData['employee_name'] = $employee->employee_name;
+            $nestedData['employee_code'] = $employee->employee_id;
+
+            $nestedData['image'] = '<img src="' .
+                e($employee->employee_image_show) .
+                '" style="height:50px;width:50px;object-fit:cover;">';
+
+            $nestedData['department'] = $employee->depart_name ?? '';
+            $nestedData['designation'] = $employee->desi_name ?? '';
+            $nestedData['email'] = $employee->email;
+            $nestedData['mobile'] = $employee->mobile;
+            $nestedData['join_date'] = $employee->join_date;
+            
+            $nestedData['status'] = (int) $employee->status === 1
+                ? '<span class="badge text-bg-success">Active</span>'
+                : '<span class="badge  text-bg-danger">Inactive</span>';
+
+            $nestedData['salary'] = auth()->user()->currency_symbol .
+                ' ' . round((float) $employee->salary, 2);
+
+            $nestedData['options'] = '';
+            if($p_edit){
+                $nestedData['options'] .= '<a href="'.route('editEmployee',$employee->id).'" class="btn btn-primary "><i class="bx bx-edit" style="margin: -10px;"></i></a>';
+            }
+            
+            if($p_delete){
+                $nestedData['options'] .= '<a del_data="'. $employee->id .'" data-action="'.route('deleteEmployee',$employee->id).'" class="m-1 del_hr_data btn btn-danger "><i class="bx bx-trash" style="margin: -10px;"></i></a>';
+            }    
+            // if ($p_edit) {
+            //     $nestedData['options'] .=
+            //         '<a href="' . route('editEmployee', $employee->id) .
+            //         '" class="btn btn-primary">' .
+            //         '<i class="bx bx-edit"></i></a>';
+            // }
+
+            // if ($p_delete) {
+            //     $nestedData['options'] .=
+            //         '<a del_data="' . $employee->id .
+            //         '" data-action="' . route('deleteEmployee', $employee->id) .
+            //         '" class="m-1 del_hr_data btn btn-danger">' .
+            //         '<i class="bx bx-trash"></i></a>';
+            // }
+            $statusButtonClass = (int) $employee->status === 1
+                ? 'btn-warning'
+                : 'btn-success';
+
+            $statusButtonText = (int) $employee->status === 1
+                ? 'Deactivate'
+                : 'Activate';
+
+            $nestedData['options'] .= '
+                <button type="button"
+                    class="btn ' . $statusButtonClass . ' btn-sm change-employee-status"
+                    data-id="' . $employee->id . '"
+                    data-status="' . $employee->status . '">
+                    ' . $statusButtonText . '
+                </button>
+            ';
+
+            $data[] = $nestedData;
+            $i++;
+        }
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $totalData,
+            'recordsFiltered' => $totalFiltered,
+            'data' => $data,
+
+            // Employee tab counts
+            'counts' => [
+                'all' => $totalData,
+                'active' => (int) $counts->active_count,
+                'inactive' => (int) $counts->inactive_count,
+            ],
+        ]);
+    }
+
+    public function changeEmployeeStatus(Request $request)
+    {
+        if (!can_p('editEmployee')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to change employee status.',
+            ], 403);
+        }
+
+        $validated = $request->validate([
+            'id' => ['required', 'integer', 'exists:employees,id'],
+            'status' => ['required', 'in:0,1'],
+        ]);
+
+        $employee = Employee::findOrFail($validated['id']);
+
+        // Prevent stale requests from changing an unexpected status.
+        if ((int) $employee->status !== (int) $validated['status']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee status has already changed. Please refresh.',
+            ], 409);
+        }
+
+        $newStatus = (int) $employee->status === 1 ? 0 : 1;
+
+        $employee->status = $newStatus;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $newStatus,
+            'message' => $newStatus === 1
+                ? 'Employee activated successfully.'
+                : 'Employee deactivated successfully.',
+        ]);
+    }
+
 
     public function addEmployee(){
         if(can_p('addEmployee') == false){
@@ -930,21 +1183,6 @@ class HrController extends Controller
 
 
                 }
-                // dd($absent);
-                // salary Sheet Generate
-               
-                // if($absent>1){
-                //     // dd($absentRoll);
-                //     $deduct=($basicSalary*($absentRoll->first/100))+(($absent-1)*($basicSalary*($absentRoll->other/100)));
-
-                // }
-                // else if($absent==1){
-                //     $deduct=$basicSalary*($absentRoll->first/100);
-                // }
-                // else{
-                //     $deduct=0;
-                // }
-                // dd($absent);
                 $deduct=$oneDaySalary * $absent;
                 //  dd($absent);
                 // calculation
