@@ -101,7 +101,7 @@ class leavePartController extends Controller
                 'alert-type'=>'success'
              );
 
-            return redirect()->route('leavePart.view');
+        return redirect()->to(route('leaveApplication.view') . '#leavePart');
 
     }
 

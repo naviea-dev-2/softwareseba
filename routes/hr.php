@@ -15,7 +15,6 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::post('/attendanceStoreIn', 'App\Http\Controllers\Hr\EmployeeController@attendanceStoreIn')->name('attendanceStoreIn');
     Route::post('/attendanceStoreOut', 'App\Http\Controllers\Hr\EmployeeController@attendanceStoreOut')->name('attendanceStoreOut');
     Route::get('/deleteAttendance/{id}', 'App\Http\Controllers\Hr\EmployeeController@deleteAttendance')->name('deleteAttendance');
-
     //end attendance
 
     //notice
@@ -250,8 +249,6 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::post('/emploan-store','App\Http\Controllers\Hr\emploanController@store')->name('emploan.store');
     Route::get('/emploan-edit','App\Http\Controllers\Hr\emploanController@edit')->name('emploan.edit');
     Route::get('/emploan-delete/{id}','App\Http\Controllers\Hr\emploanController@delete')->name('emploan.delete');
-    // Route::get('/emp-bank-account','App\Http\Controllers\Hr\emploanController@empbankaccount')->name('empbankaccount.callByBankID');
-    // Route::get('/com-bank-account','App\Http\Controllers\Hr\emploanController@combankaccount')->name('combankaccount.callByBankID');
     Route::get('/emploan-loan-legder','App\Http\Controllers\Hr\emploanController@loanLegder')->name('emploan.loanLegder');
 
     //bonuspay
@@ -262,23 +259,34 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::get('/bonuspay-edit','App\Http\Controllers\Hr\bonuspayController@edit')->name('bonuspay.edit');
     Route::post('/bonuspay-search','App\Http\Controllers\Hr\bonuspayController@search')->name('bonuspay.search');
     Route::get('/bonuspay-delete/{id}','App\Http\Controllers\Hr\bonuspayController@delete')->name('bonuspay.delete');
-    //empbankaccount
-    Route::get('/empbankaccount-view','App\Http\Controllers\Hr\empbankaccountController@view')->name('empbankaccount.view');
-    Route::post('/empbankaccount-store','App\Http\Controllers\Hr\empbankaccountController@store')->name('empbankaccount.store');
-    Route::get('/empbankaccount-edit','App\Http\Controllers\Hr\empbankaccountController@edit')->name('empbankaccount.edit');
-    Route::get('/empbankaccount-delete/{id}','App\Http\Controllers\Hr\empbankaccountController@delete')->name('empbankaccount.delete');
-
-    //bank
-    // Route::get('/bank-view','App\Http\Controllers\accounts\bankController@view')->name('bank.view');
-    // Route::post('/bank-store','App\Http\Controllers\accounts\bankController@store')->name('bank.store');
-    // Route::get('/bank-edit','App\Http\Controllers\accounts\bankController@edit')->name('bank.edit');
-    // Route::post('/bank-delete','App\Http\Controllers\accounts\bankController@delete')->name('bank.delete');
-
-    //bankaccount
-    Route::get('/bank-account-view','App\Http\Controllers\accounts\bankaccountController@view')->name('bankaccount.view');
-    Route::post('/bank-account-store','App\Http\Controllers\accounts\bankaccountController@store')->name('bankaccount.store');
-    Route::get('/bank-account-edit','App\Http\Controllers\accounts\bankaccountController@edit')->name('bankaccount.edit');
-    Route::post('/bank-account-delete','App\Http\Controllers\accounts\bankaccountController@delete')->name('bankaccount.delete');
-
-    //account head
+    //salary head
+    Route::prefix('salary-head')->group(function () {
+        Route::get('index',[App\Http\Controllers\Hr\SalaryHeadController::class,'index'])->name('school.salary_head.index');
+        Route::post('ajax',[App\Http\Controllers\Hr\SalaryHeadController::class,'ajaxSalaryHead'])->name('school.salary_head.ajax');
+        Route::get('edit/{id}',[App\Http\Controllers\Hr\SalaryHeadController::class,'edit'])->name('school.salary_head.edit');
+        Route::post('update/{id}',[App\Http\Controllers\Hr\SalaryHeadController::class,'update'])->name('school.salary_head.update');
+        Route::post('store', [App\Http\Controllers\Hr\SalaryHeadController::class,"store"])->name('school.salary_head.store');
+        Route::post('delete',[App\Http\Controllers\Hr\SalaryHeadController::class,'delete'])->name('school.salary_head.delete');
+        Route::get('status/{id}',[App\Http\Controllers\Hr\SalaryHeadController::class,'updateStatus'])->name('school.salary_head.status');
+    });
+    //payroll_assign
+    Route::prefix('payroll-assign')->group(function () {
+        Route::get('index',[App\Http\Controllers\Hr\PayrollAssignController::class,'index'])->name('school.payroll_assign.index');
+        Route::post('search',[App\Http\Controllers\Hr\PayrollAssignController::class,'search'])->name('school.payroll_assign.search');
+        Route::post('store',[App\Http\Controllers\Hr\PayrollAssignController::class,'store'])->name('school.payroll_assign.store');
+    });
+    //salary_slip
+    Route::prefix('salary-slip')->group(function () {
+        Route::get('index',[App\Http\Controllers\Hr\SalarySlipController::class,'index'])->name('school.salary_slip.index');
+        Route::post('search',[App\Http\Controllers\Hr\SalarySlipController::class,'search'])->name('school.salary_slip.search');
+        Route::post('store',[App\Http\Controllers\Hr\SalarySlipController::class,'store'])->name('school.salary_slip.store');
+    });
+    //salay-payment
+    Route::prefix('salary-payment')->group(function () {
+        Route::get('index',[App\Http\Controllers\Hr\SalarySlipController::class,'indexPayment'])->name('school.salary_payment.index');
+        Route::post('search',[App\Http\Controllers\Hr\SalarySlipController::class,'searchPayment'])->name('school.salary_payment.search');
+        Route::post('store',[App\Http\Controllers\Hr\SalarySlipController::class,'storePayment'])->name('school.salary_payment.store');
+        Route::post('delete',[App\Http\Controllers\Hr\SalarySlipController::class,'deletePayment'])->name('school.salary_payment.delete');
+    });
+   
 });

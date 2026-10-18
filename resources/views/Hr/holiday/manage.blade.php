@@ -369,6 +369,6 @@
             form.find('button[type=submit]').attr('disabled', false).html('Save');
         });
         return false;
-    })
+    });
 </script>
 @endsection

@@ -71,20 +71,20 @@
 @endsection
 @section('script')
 <script>
-var variableName = "{{ date('Y-m') }}";
+    var variableName = "{{ date('Y-m') }}";
     const myInput = document.querySelector(".datetimepicker");
-flatpickr(document.querySelector(".datetimepicker"), {
-    altInput:true,
-    defaultDate: new Date(variableName),
-    plugins: [
-        new monthSelectPlugin({
-        shorthand: true, //defaults to false
-        dateFormat: "Y-m", //defaults to "F Y"
-        altFormat: "Y-m", //defaults to "F Y"
-        theme: "dark" // defaults to "light"
-        })
-    ]
-});
+    flatpickr(document.querySelector(".datetimepicker"), {
+        altInput:true,
+        defaultDate: new Date(variableName),
+        plugins: [
+            new monthSelectPlugin({
+            shorthand: true, //defaults to false
+            dateFormat: "Y-m", //defaults to "F Y"
+            altFormat: "Y-m", //defaults to "F Y"
+            theme: "dark" // defaults to "light"
+            })
+        ]
+    });
         $("#empID").select2({
             theme: "bootstrap-5",
             placeholder:"Select Employee" ,

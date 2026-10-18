@@ -461,49 +461,6 @@ class EmployeeController extends Controller
         return response()->json($empId);
     }
 
-//     public function manageShift(){
-//         // $employee = DB::table('employee_info')->get();
-//         $shift = DB::table('shift')->get();
-//         return view('Hr.shiftManage.manage',compact('shift'));
-//     }
-
-//     public function shiftManageStore(Request $request){
-//         DB::table('shift')->insert([
-//             'shiftName' =>$request->shiftName,
-//             'startTime'=>$request->startTime,
-//             'endTime'=>$request->endTime,
-//         ]);
-
-//         return redirect('/manageShift');
-//     }
-
-//      public function DeleteShift($id){
-//         DB::table('shift')->where('id',$id)->delete();
-//         return redirect('/manageShift');
-
-//     }
-
-//     public function editShift(Request $request, $id)
-// {
-//     $shift = DB::table('shift')->where('id', $id)->first();
-//     return response()->json($shift);
-
-// }
-
-//     public function updateShift(Request $request, $id){
-//     $id = $request->input('id');
-//     $shiftName = $request->input('shiftName');
-//     $startTime = $request->input('startTime');
-//     $endTime = $request->input('endTime');
-
-//     DB::table('shift')
-//         ->where('id', $id)
-//         ->update(['shiftName' => $shiftName, 'startTime' => $startTime, 'endTime' => $endTime]);
-
-//         return redirect ('/manageShift')
-//             ->with('msg', 'Employee Info updated Successfully');
-// }
-
 
     public function viewAbsentRollSetup()
     {

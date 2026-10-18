@@ -92,7 +92,7 @@ class leaveTaglineController extends Controller
                 'alert-type'=>'success'
              );
 
-            return redirect()->route('leaveTagline.view');
+       return redirect()->to(route('leaveApplication.view') . '#leaveTagline');
 
     }
 
