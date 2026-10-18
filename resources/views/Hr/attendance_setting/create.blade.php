@@ -85,6 +85,12 @@
         dateFormat: "H:i",
         defaultDate: time24, // safer Laravel format
         allowInput: true,
+        {{-- onChange: function(selectedDates, timeStr) {
+            $("#delayTime_text").text(to12HourFormat(timeStr));
+        } --}}
+        onReady: function(selectedDates, timeStr) {
+            $("#delayTime_text").text(to12HourFormat(timeStr));
+        },
         onChange: function(selectedDates, timeStr) {
             $("#delayTime_text").text(to12HourFormat(timeStr));
         }
@@ -95,9 +101,15 @@
         dateFormat: "H:i",
         defaultDate: time24, // safer Laravel format
         allowInput: true,
+        onReady: function(selectedDates, timeStr) {
+            $("#entry_last_time_text").text(to12HourFormat(timeStr));
+        },
         onChange: function(selectedDates, timeStr) {
             $("#entry_last_time_text").text(to12HourFormat(timeStr));
         }
+        {{-- onChange: function(selectedDates, timeStr) {
+            $("#entry_last_time_text").text(to12HourFormat(timeStr));
+        } --}}
     });
 </script>
 @endsection

@@ -84,21 +84,33 @@
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i",
-        defaultDate: "{{$d_time}}", // safer Laravel format
+        defaultDate: "{{ $p->delay_time }}", // safer Laravel format
         allowInput: true,
+        onReady: function(selectedDates, timeStr) {
+            $("#delayTime_text").text(to12HourFormat(timeStr));
+        },
         onChange: function(selectedDates, timeStr) {
             $("#delayTime_text").text(to12HourFormat(timeStr));
         }
+        {{-- onChange: function(selectedDates, timeStr) {
+            $("#delayTime_text").text(to12HourFormat(timeStr));
+        } --}}
     });
     $("#entry_last_time").flatpickr({
         enableTime: true,
         noCalendar: true,
         dateFormat: "H:i",
-        defaultDate: "{{$et_time}}", // safer Laravel format
+        defaultDate: "{{ $p->last_entry_time}}", // safer Laravel format
         allowInput: true,
+        onReady: function(selectedDates, timeStr) {
+            $("#entry_last_time_text").text(to12HourFormat(timeStr));
+        },
         onChange: function(selectedDates, timeStr) {
             $("#entry_last_time_text").text(to12HourFormat(timeStr));
         }
+        {{-- onChange: function(selectedDates, timeStr) {
+            $("#entry_last_time_text").text(to12HourFormat(timeStr));
+        } --}}
     });
 </script>
 @endsection

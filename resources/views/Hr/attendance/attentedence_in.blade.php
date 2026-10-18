@@ -14,22 +14,6 @@
                             <form method="POST" action="{{ route('attendanceStoreIn') }}" enctype="multipart/form-data" class="in_data_form" novalidate>
                                 @csrf
                                 <div class="row">
-                                    {{-- <div class="col-sm-3">
-                                        <label for="">Department *</label>
-                                        <select class="form-control " id="deptID" name="deptID" required>
-
-                                            <option value="" disabled selected>-- Select One --</option>
-                                            @foreach ($departments as $dept)
-                                            <option value="{{ $dept->id }}">{{ $dept->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <div class="col-sm-3">
-                                        <label for="">Designation *</label>
-                                        <select class="form-control " id="desigID" name="desigID" required>
-
-                                        </select>
-                                    </div> --}}
 
                                     <div class="col-sm-6">
                                         <label for="">Employee ID*</label>
@@ -75,10 +59,6 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button> -->
             </div>
         </div>
     </div>
