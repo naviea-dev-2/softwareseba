@@ -1,67 +1,31 @@
 @extends('inc.master')
-
 @section('content')
-<div class="p-6 max-w-3xl mx-auto">
-    <div class="flex items-center gap-3 mb-6">
-        <a href="{{ route('production.machines.index') }}" class="p-2 hover:bg-gray-100 rounded-lg">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-        </a>
-        <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M12 2v2"/><path d="M12 22v-2"/><path d="m20 12 2 0"/><path d="m2 12 2 0"/><path d="m16.24 7.76 1.41-1.41"/><path d="m4.93 19.07 1.41-1.41"/><path d="m19.07 19.07-1.41-1.41"/><path d="m7.76 7.76-1.41-1.41"/></svg>
-            {{ isset($machine) ? 'Edit Machine' : 'New Machine' }}
-        </h1>
-    </div>
-
-    <form method="POST" action="{{ isset($machine) ? route('production.machines.update', $machine) : route('production.machines.store') }}" class="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
-        @csrf
-        @if(isset($machine)) @method('PUT') @endif
-
-        <div class="grid grid-cols-2 gap-5">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Name <span class="text-red-500">*</span></label>
-                <input name="name" value="{{ old('name', $machine->name ?? '') }}" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Machine Code</label>
-                <input name="machine_code" value="{{ old('machine_code', $machine->machine_code ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-5">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                <input name="type" value="{{ old('type', $machine->type ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Model</label>
-                <input name="model" value="{{ old('model', $machine->model ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none">
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-5">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Capacity per Hour</label>
-                <input name="capacity_per_hour" type="number" step="0.01" value="{{ old('capacity_per_hour', $machine->capacity_per_hour ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none">
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none bg-white">
-                    @foreach(['active','inactive','under_maintenance','retired'] as $s)
-                    <option value="{{ $s }}" {{ old('status', $machine->status ?? 'active') === $s ? 'selected' : '' }}>{{ ucwords(str_replace('_', ' ', $s)) }}</option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-
-        <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Location</label>
-            <input name="location" value="{{ old('location', $machine->location ?? '') }}" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none">
-        </div>
-
-        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
-            <a href="{{ route('production.machines.index') }}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</a>
-            <button type="submit" class="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50">{{ isset($machine) ? 'Update' : 'Create' }}</button>
-        </div>
-    </form>
-</div>
+<style>
+.mf-wrap{max-width:1240px;margin:auto;padding:25px 18px 55px;color:#293b50}.mf-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px;margin-bottom:23px}.mf-title{display:flex;align-items:center;gap:14px}.mf-icon{width:55px;height:55px;background:#e8f0ff;border-radius:15px;color:#285fcb;display:grid;place-items:center;font-size:26px}.mf-top h2{font-size:26px;color:#1e324b;font-weight:800;margin:0}.mf-top p{color:#8492a6;margin:5px 0 0}.mf-layout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:20px;align-items:start}.mf-panel{background:#fff;border:1px solid #e4eaf1;border-radius:17px;box-shadow:0 5px 22px rgba(27,48,74,.05);overflow:hidden;margin-bottom:20px}.mf-panel-head{display:flex;align-items:center;gap:12px;padding:20px 23px;border-bottom:1px solid #eaf0f5}.mf-panel-icon{width:42px;height:42px;border-radius:12px;background:#edf3ff;color:#2b63ca;display:grid;place-items:center;font-size:22px}.mf-panel-head h4{font-size:16px;font-weight:800;margin:0;color:#223851}.mf-panel-head p{font-size:12px;color:#8b99aa;margin:4px 0 0}.mf-panel-body{padding:23px}.mf-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:19px}.mf-field label{font-size:13px;font-weight:750;color:#34485f;display:block;margin-bottom:8px}.mf-field input,.mf-field select{width:100%;min-height:47px;border:1px solid #dbe4ef;border-radius:10px;padding:10px 13px;background:#fff;color:#293d53;outline:none}.mf-field input:focus,.mf-field select:focus{border-color:#3b70db;box-shadow:0 0 0 3px #3b70db1c}.mf-field .mf-invalid{border-color:#e35a64}.mf-help{font-size:11px;color:#8c9aac;margin-top:7px}.mf-error{font-size:12px;color:#c32b3c;margin-top:6px}.mf-req{color:#e54d5c}.mf-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:12px 18px;font-size:13px;font-weight:750;text-decoration:none!important;cursor:pointer}.mf-primary{background:#2860ce;color:#fff!important}.mf-light{background:#edf2f8;color:#39516b!important}.mf-btn:hover{filter:brightness(.97)}.mf-save{width:100%;margin-bottom:10px}.mf-summary{background:#f5f8fe;border:1px solid #e6eefb;border-radius:12px;padding:16px;font-size:12px;line-height:1.7;color:#62748b}.mf-summary strong{color:#2d425d}.mf-alert{background:#fff1f2;color:#b91c1c;border:1px solid #fecdd3;border-radius:12px;padding:13px 16px;margin-bottom:17px}.mf-span{grid-column:1/-1}.mf-tag{font-size:11px;background:#edf7ef;color:#148250;border-radius:50px;padding:5px 10px;font-weight:750}@media(max-width:950px){.mf-layout{grid-template-columns:1fr}}@media(max-width:650px){.mf-wrap{padding:15px 10px}.mf-grid{grid-template-columns:1fr}.mf-panel-body{padding:17px}.mf-panel-head{padding:17px}.mf-top h2{font-size:22px}}
+</style>
+@php($isEdit = isset($machine))
+<div class="mf-wrap">
+<div class="mf-top"><div class="mf-title"><div class="mf-icon"><i class="bx bx-cog"></i></div><div><h2>{{ $isEdit ? 'Edit Machine' : 'Add New Machine' }}</h2><p>{{ $isEdit ? 'Update machine specifications and operating status' : 'Register a production machine and its technical details' }}</p></div></div><a class="mf-btn mf-light" href="{{ route('production.machines.index') }}"><i class="bx bx-arrow-back"></i> Machine List</a></div>
+@if($errors->any())<div class="mf-alert"><strong>Please review the form:</strong><ul style="margin:8px 0 0">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<form method="POST" action="{{ $isEdit ? route('production.machines.update', $machine) : route('production.machines.store') }}">
+@csrf
+@if($isEdit)
+@method('PUT')
+@endif
+<div class="mf-layout"><div>
+<div class="mf-panel"><div class="mf-panel-head"><div class="mf-panel-icon"><i class="bx bx-info-circle"></i></div><div><h4>Machine Identification</h4><p>Basic details used throughout production operations</p></div></div><div class="mf-panel-body"><div class="mf-grid">
+<div class="mf-field"><label for="name">Machine Name <span class="mf-req">*</span></label><input id="name" name="name" required maxlength="255" class="@error('name') mf-invalid @enderror" placeholder="e.g. Roller Mill 01" value="{{ old('name', $machine->name ?? '') }}">@error('name')<div class="mf-error">{{ $message }}</div>@enderror</div>
+<div class="mf-field"><label for="machine_code">Machine Code</label><input id="machine_code" name="machine_code" placeholder="e.g. RM-001" value="{{ old('machine_code', $machine->machine_code ?? '') }}" class="@error('machine_code') mf-invalid @enderror">@error('machine_code')<div class="mf-error">{{ $message }}</div>@enderror</div>
+<div class="mf-field"><label for="type">Machine Type</label><input id="type" name="type" placeholder="e.g. Roller Mill, Separator, Grinder" value="{{ old('type', $machine->type ?? '') }}" class="@error('type') mf-invalid @enderror">@error('type')<div class="mf-error">{{ $message }}</div>@enderror</div>
+<div class="mf-field"><label for="model">Model</label><input id="model" name="model" placeholder="e.g. RM-500" value="{{ old('model', $machine->model ?? '') }}" class="@error('model') mf-invalid @enderror">@error('model')<div class="mf-error">{{ $message }}</div>@enderror</div>
+</div></div></div>
+<div class="mf-panel"><div class="mf-panel-head"><div class="mf-panel-icon"><i class="bx bx-tachometer"></i></div><div><h4>Production &amp; Operation</h4><p>Machine throughput, operating state and location</p></div></div><div class="mf-panel-body"><div class="mf-grid">
+<div class="mf-field"><label for="capacity_per_hour">Capacity Per Hour</label><input id="capacity_per_hour" name="capacity_per_hour" type="number" min="0" step="0.01" placeholder="e.g. 5.00" value="{{ old('capacity_per_hour', $machine->capacity_per_hour ?? '') }}" class="@error('capacity_per_hour') mf-invalid @enderror"><div class="mf-help">Use one consistent unit for your machines (e.g. tons of wheat input per hour).</div>@error('capacity_per_hour')<div class="mf-error">{{ $message }}</div>@enderror</div>
+<div class="mf-field"><label for="status">Operating Status</label><select id="status" name="status" class="@error('status') mf-invalid @enderror">@foreach(['active'=>'Active','inactive'=>'Inactive','under_maintenance'=>'Under Maintenance','retired'=>'Retired'] as $value=>$label)<option value="{{ $value }}" @selected(old('status', $machine->status ?? 'active') === $value)>{{ $label }}</option>@endforeach</select>@error('status')<div class="mf-error">{{ $message }}</div>@enderror</div>
+<div class="mf-field mf-span"><label for="location">Machine Location</label><input id="location" name="location" placeholder="e.g. Mill A / Processing Floor 1" value="{{ old('location', $machine->location ?? '') }}" class="@error('location') mf-invalid @enderror"><div class="mf-help">Identify where the machine is installed for planning and maintenance.</div>@error('location')<div class="mf-error">{{ $message }}</div>@enderror</div>
+</div></div></div>
+</div><aside>
+<div class="mf-panel"><div class="mf-panel-head"><div class="mf-panel-icon"><i class="bx bx-check-shield"></i></div><div><h4>{{ $isEdit ? 'Save Changes' : 'Create Machine' }}</h4><p>Review before saving</p></div></div><div class="mf-panel-body"><div class="mf-summary"><strong>Machine Register</strong><br>Machine details are used for production planning, capacity assignments and equipment tracking.<br><br><span class="mf-tag">{{ $isEdit ? 'Editing Existing' : 'New Registration' }}</span></div><div style="margin-top:18px"><button type="submit" class="mf-btn mf-primary mf-save"><i class="bx bx-save"></i> {{ $isEdit ? 'Update Machine' : 'Save Machine' }}</button><a href="{{ route('production.machines.index') }}" class="mf-btn mf-light mf-save">Cancel</a></div></div></div>
+</aside></div>
+</form></div>
 @endsection

@@ -5,12 +5,49 @@
 
 <title>Edit Product</title>
 <style>
+.product-ui{max-width:1500px;margin:auto;padding:26px 18px 48px;color:#132b4b}
+.product-head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.product-title{font-size:27px;font-weight:750;margin:0;color:#132b4b}
+.product-subtitle{color:#71829a;margin:5px 0 0}
+.product-icon{width:54px;height:54px;display:grid;place-items:center;background:#e7f1ff;color:#2563eb;border-radius:15px;font-size:27px}
+.product-panel{background:#fff;border:1px solid #e1e9f3;border-radius:16px;box-shadow:0 8px 28px rgba(27,54,90,.045);margin-bottom:20px;overflow:hidden}
+.product-panel-header{padding:21px 24px;border-bottom:1px solid #eaf0f7;display:flex;align-items:center;gap:13px}
+.product-panel-header h5{font-size:17px;font-weight:750;margin:0;color:#132b4b}
+.product-panel-header p{font-size:13px;color:#71829a;margin:3px 0 0}
+.product-panel-body{padding:24px}
+.product-ui .btn{border-radius:9px;font-weight:600;padding:10px 17px}
+.product-ui .btn-primary{background:#2463eb;border-color:#2463eb}
+.product-ui .form-label{font-size:13px;font-weight:700;color:#34465f;margin-bottom:8px}
+.product-ui .form-control,.product-ui .form-select,.product-ui .select2-container--bootstrap-5 .select2-selection{border:1px solid #d9e3ef;border-radius:9px;min-height:45px;background-color:#fff}
+.product-ui .form-control:focus,.product-ui .form-select:focus{border-color:#80aaff;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.product-ui .select2-container{width:100%!important}
+.product-ui .field-hint{font-size:12px;color:#8090a3;margin-top:6px}
+.product-ui .section-kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:#2563eb;margin-bottom:17px}
+.product-ui .product-side{position:sticky;top:20px}
+.product-ui .image-preview{height:190px;max-width:100%;object-fit:contain;border-radius:12px;border:1px dashed #cbd8e8;background:#f7faff;padding:12px}
+.product-ui .product-table thead th{background:#2b415a;color:#fff;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border:0;padding:16px 14px;white-space:nowrap}
+.product-ui .product-table tbody td{padding:14px;vertical-align:middle;border-color:#e9eff6;font-size:13px}
+.product-ui .product-table tbody tr:hover{background:#f7faff}
+.product-ui .dataTables_filter input{margin-left:8px;border:1px solid #d9e3ef;border-radius:9px;padding:9px 12px;min-width:270px}
+.product-ui .dataTables_length select{border:1px solid #d9e3ef;border-radius:8px;padding:7px}
+.product-ui .dataTables_wrapper .dataTables_paginate .paginate_button{border-radius:8px!important}
+.product-ui .error-show .select2-selection{border-color:#dc3545!important}
+@media(max-width:767px){.product-ui{padding:16px 10px}.product-panel-body{padding:17px}.product-panel-header{padding:17px}.product-title{font-size:23px}.product-ui .dataTables_filter input{min-width:0;width:180px}}
+</style>
+<style>
     label{
        font-size: 1rem;
     }
 </style>
 @endsection
 @section('content')
+<div class="product-ui">
+<div class="product-head">
+<div class="d-flex align-items-center gap-3"><div class="product-icon"><i class="bx bx-edit-alt"></i></div>
+<div><h2 class="product-title">Edit Product</h2><p class="product-subtitle">Update product details, pricing and variations</p></div></div>
+<a href="{{ url()->previous() }}" class="btn btn-outline-secondary"><i class="bx bx-arrow-back me-1"></i> Back</a>
+</div>
+<div class="product-panel"><div class="product-panel-header"><div class="product-icon" style="width:42px;height:42px;font-size:21px"><i class="bx bx-info-circle"></i></div><div><h5>Product Information</h5><p>Manage product identity, classification and prices</p></div></div><div class="product-panel-body">
 <div class="content-area">
     {{-- <div class="container-fluid">
         <div class="row row-card-one">
@@ -22,8 +59,8 @@
         </div>
     </div> --}}
 
-    <div class="container pt-0">
-        <h4 class="text-center"><b>Edit Product</b></h4>
+    <div class="container-fluid px-0">
+        
         <div class="row row-card-one">
             <div class="col-sm-12">
                 <!-- start form here -->
@@ -32,17 +69,17 @@
                     @php
                         $b_type_id = auth()->user()->business->business_type_id;
                     @endphp
-                    <div class="row">
+                    <div class="row g-3">
                         <input type="hidden" value="{{ $product->id }}" name="id" id="edit_data_id" required>
                         @if($b_type_id != 16)
-                        <div class="col-sm-4 @error('manufacture') error-show @enderror">
+                        <div class="col-md-6 @error('manufacture') error-show @enderror">
                             <label for=""><b>Manufacturer</b> *</label>
                             <select id="manufacture" class="form-control select_manufacture" name="manufacture">
                                 <option value="">-- Select One --</option>
                             </select>
                         </div>
                         @endif
-                        <div class="col-sm-4  @error('category') error-show @enderror">
+                        <div class="col-md-6  @error('category') error-show @enderror">
                             <label for=""><b>Category</b> *</label>
                             <select class="form-control select_category" id="category" name="category">
                                 <option>-- Select One --</option>
@@ -51,7 +88,7 @@
                             </select>
                         </div>
                         @if($b_type_id != 16)
-                        <div class="col-sm-4 @error('brand') error-show @enderror">
+                        <div class="col-md-6 @error('brand') error-show @enderror">
                             <label for=""><b>Brand</b> *</label>
                             <select class="form-control select2-brand" id="brand" name="brand">
                                 <option>-- Select One --</option>
@@ -59,32 +96,32 @@
                             </select>
                         </div>
                         @endif
-                        <div class="col-sm-4">
+                        <div class="col-md-6">
                             <label for=""> <b>Product Name</b> *</label>
                             <input @error('product_name')
                             style="border:1px solid red!important;"
                             @enderror type="text" class=" form-control " id="product_name" name="product_name" value="{{ old('product_name') ?? $product->product_name }}" autocomplete="off">
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-md-6">
                             <label for=""> <b>Sku</b> *</label>
                             <input @error('product_code')
                             style="border:1px solid red!important;"
                             @enderror type="text" class=" form-control " value="{{ old('product_code') ?? $product->product_code }}" id="product_code" name="product_code" autocomplete="off">
                         </div>
                         @if($b_type_id != 16)
-                        <div class="col-sm-4">
+                        <div class="col-md-6">
                             <label for=""><b>Batch/DDR No.</b></label>
                             <input @error('batch_no')
                             style="border:1px solid red!important;"
                             @enderror   type="text" class=" form-control " name="batch_no" autocomplete="off" value="{{ old('batch_no') ?? $product->batch_no }}">
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-md-6">
                             <label for=""><b>Manufacture Date</b></label>
                             <input @error('manufacture_date')
                             style="border:1px solid red!important;"
                             @enderror   type="text" class=" form-control datepicker" name="manufacture_date" autocomplete="off" value="{{ old('manufacture_date') ?? $product->manufacture_date }}">
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-md-6">
                             <label for=""><b>Expire Date</b></label>
                             <input @error('exipre_date')
                             style="border:1px solid red!important;"
@@ -92,19 +129,19 @@
                         </div>
                         @endif
                         @if($b_type_id == 6 || $b_type_id == 15)
-                        <div class="col-sm-6">
+                        <div class="col-md-6">
                             <label for=""><b>IMEI 1</b></label>
                             <input @error('imei_1') style="border:1px solid red!important;"
                             @enderror type="text" class=" form-control" name="imei_1" autocomplete="off" value="{{ old('imei_1',$product->imei_1) }}">
                         </div>
-                        <div class="col-sm-6">
+                        <div class="col-md-6">
                             <label for=""><b>IMEI 2</b></label>
                             <input @error('imei_2') style="border:1px solid red!important;"
                             @enderror type="text" class=" form-control" name="imei_2" autocomplete="off" value="{{ old('imei_2',$product->imei_2) }}">
                         </div>
                         @endif
                         @if($b_type_id == 5 )
-                        <div class="col-sm-3">
+                        <div class="col-md-6">
                             <label for=""><b>Product Type</b></label>
                             <select id="p_type" @error('p_type')
                             style="border:1px solid red!important;"
@@ -113,7 +150,7 @@
 
                             </select>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-md-6">
                             <label for=""><b>Generics</b></label>
                             <select @error('generic')
                             style="border:1px solid red!important;"
@@ -124,7 +161,7 @@
                         </div>
 
                         @endif
-                        <div class="col-sm-3">
+                        <div class="col-md-6">
                             <label for=""><b>Discount Type</b></label>
                             <select
                             id="edit_discount_type" name="discount_type" class="form-control ">
@@ -138,11 +175,11 @@
                             </select>
 
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-md-6">
                             <label for=""><b>Discount</b></label>
                             <input id="edit_product_discount" type="number" class=" form-control " name="product_discount" value="{{ old('discount') ?? $product->discount }}" autocomplete="off">
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-md-6">
                             <label for=""><b>Tax</b></label>
                             <select id="tax" name="tax" class="form-control ">
                                 <option value="">Select Tax</option>
@@ -155,17 +192,17 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-md-6">
                             <label for=""><b>Unit</b></label>
                             <select class="add-select2-unit form-control mb-0" name="unit"></select>
                         </div>
                         @if($product->atttribute_sets->count() == 0)
-                        <div class="col-sm-4">
+                        <div class="col-md-6">
                             <label for=""><b>Purchase Price</b></label>
                             <input @error('purchase_price') style="border:1px solid red!important;"
                             @enderror   type="number" step="any" class=" form-control " name="purchase_price" autocomplete="off" value="{{ old('purchase_price') ??  $product->purchase_price }}">
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-md-6">
                             <label for=""><b>Sale Price</b></label>
                             <input @error('sale_price') style="border:1px solid red!important;"
                             @enderror   type="number" step="any" class=" form-control " name="sale_price" autocomplete="off" value="{{ old('sale_price') ?? $product->sale_price }}">
@@ -173,7 +210,7 @@
                         @endif
                     </div>
                      @if($b_type_id != 16)
-                    <div class="row mt-3 mb-3">
+                    <div class="row g-3 mt-4 mb-3">
                         @if($product->atttribute_sets->count() == 0)
                         <div class="col-md-2">
                             <button type="button" data-id="{{ $product->id }}" href="javascript:void(0);" class="btn border js-add-p-attribute">{{ __('Add Attribute') }}</button>
@@ -270,7 +307,7 @@
                         @else
                         <div class="col-md-12">
                              <div class="table-responsive">
-                                <table class="table table-borderless table-theme" style="width:100%;">
+                                <table class="table table-borderless table-theme variation-table" style="width:100%;">
                                     <thead>
                                         <tr>
                                             <th class="checkboxlist text-center"><input class="tp-check-all checkAll" type="checkbox"></th>
@@ -368,17 +405,17 @@
                     @endif
                     <div class="row">
 
-                        <div class="col-sm-6">
+                        <div class="col-md-6">
                             <label for=""><b>Product Image</b></label>
                             <div class="mt-1 mr-2" style="position:relative;box-shadow: 0px 0px 1px 1px;width: 150px;">
-                                <img class="display-upload-img" style="width: 150px;height: 70px;" id="edit_image_show" src="{{ $product->image_show}}" alt="">
+                                <img class="display-upload-img" style="width: 150px;height: 110px;object-fit:contain;border-radius:12px;background:#f7faff;padding:8px;" id="edit_image_show" src="{{ $product->image_show}}" alt="">
                                 <input type="file" name="product_image" class="form-control upload-img" placeholder="Enter Activity Image" style="position: absolute;top: 0;opacity: 0;height: 100%;">
                             </div>
                         </div>
-                        <div class="col-sm-3">
+                        <div class="col-md-6">
                             <br/>
-                            <button class="btn btn-sm btn-primary mt-4 ">
-                                <i class="fa fa-save pr-2"></i>Save
+                            <button type="submit" class="btn btn-primary mt-4 px-4">
+                                <i class="bx bx-save me-1"></i> Update Product
                             </button>
                         </div>
                     </div>
@@ -600,6 +637,7 @@
 <script src="{{ asset('public/assets/js') }}/sweetalert2.all.min.js"></script>
 
 <script>
+     $.ajaxSetup({headers: {"X-CSRF-TOKEN": @json(csrf_token()) }});
      $(".datepicker").flatpickr();
     var row_p = 1;
     var edit_row_p=1;
@@ -658,7 +696,6 @@
         var brand_option = new Option("{{ $o_brand->name }}","{{ $o_brand->id }}", true, true);
         $('.select2-brand').append(brand_option).trigger('change');
     @else
-        $('#brand').append(brand_option).trigger('change');
         var brand_option = new Option("{{ $product->brand?->name }}","{{ $product->brand_id }}", true, true);
         $('#brand').append(brand_option).trigger('change');
     @endif
@@ -739,6 +776,7 @@
     $(document).on('change','.upload-img',function(){
         var files = $(this).get(0).files;
         var reader = new FileReader();
+        if (!files || !files[0]) return;
         reader.readAsDataURL(files[0]);
         var arg=this;
         reader.addEventListener("load", function(e) {
@@ -942,7 +980,7 @@
             },
         });
     });
-    $(document).on("click", "#btn-trigger-delete-version", function () {
+    $(document).on("click", ".btn-trigger-delete-version", function () {
         var id = $(this).attr("data-id");
         Swal.fire({
             title: '{{__("lang.are_you_sure")}}',

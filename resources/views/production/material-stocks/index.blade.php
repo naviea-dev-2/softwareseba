@@ -1,67 +1,566 @@
+
 @extends('inc.master')
 
+@section('head')
+<title>RAW Materials Stock</title>
+@endsection
 @section('content')
-<div class="p-6 max-w-7xl mx-auto">
-    <div class="flex items-center justify-between mb-6">
-        <div class="flex items-center gap-3">
-            <h1 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/><path d="M6 18h12"/><path d="M6 14h12"/><path d="M6 10h12"/></svg>
-                Material Stock
-            </h1>
+
+@php
+    $stockCollection = $stocks->getCollection();
+
+    $totalQuantity = $stockCollection->sum('quantity');
+    $totalReserved = $stockCollection->sum('reserved_quantity');
+
+    $availableQuantity = $totalQuantity - $totalReserved;
+
+    $expiredCount = $stockCollection->filter(function ($item) {
+        return $item->expiry_date &&
+            \Carbon\Carbon::parse($item->expiry_date)->isPast();
+    })->count();
+@endphp
+
+<div class="production-page">
+
+    <div class="production-container">
+
+        {{-- Header --}}
+        <div class="production-header">
+
+            <div>
+                <h2 class="production-page-title">
+                    <i class="bi bi-box-seam me-2"></i>
+                    Material Stock
+                </h2>
+
+                <p class="production-page-subtitle">
+                    Manage raw material inventory, stock quantities,
+                    reservations and expiry dates
+                </p>
+            </div>
+
+            <a href="{{ route('production.material-stock.create') }}"
+               class="btn btn-dark rounded-3 px-4">
+
+                <i class="bi bi-plus-lg me-1"></i>
+                Add Stock
+
+            </a>
+
         </div>
-        <a href="{{ route('production.material-stock.create') }}" class="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-            Add Stock
-        </a>
-    </div>
 
-    <form method="GET" class="relative mb-4">
-        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search stock..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 outline-none">
-    </form>
 
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm">
-            <thead>
-                <tr class="bg-gray-50 border-b border-gray-200">
-                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Material</th>
-                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Batch</th>
-                    <th class="text-right py-3 px-4 font-semibold text-gray-700">Quantity</th>
-                    <th class="text-right py-3 px-4 font-semibold text-gray-700">Reserved</th>
-                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Location</th>
-                    <th class="text-left py-3 px-4 font-semibold text-gray-700">Expiry</th>
-                    <th class="text-right py-3 px-4 font-semibold text-gray-700">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($stocks as $item)
-                <tr class="border-b border-gray-100 hover:bg-gray-50">
-                    <td class="py-3 px-4 font-medium">{{ $item->rawMaterial?->name ?? $item->raw_material_id }}</td>
-                    <td class="py-3 px-4 text-gray-500">{{ $item->batch_number ?? '-' }}</td>
-                    <td class="py-3 px-4 text-right">{{ $item->quantity ?? '-' }}</td>
-                    <td class="py-3 px-4 text-right">{{ $item->reserved_quantity ?? '-' }}</td>
-                    <td class="py-3 px-4 text-gray-500">{{ $item->location ?? '-' }}</td>
-                    <td class="py-3 px-4 text-gray-500">{{ $item->expiry_date ?? '-' }}</td>
-                    <td class="py-3 px-4 text-right">
-                        <div class="flex items-center justify-end gap-2">
-                            <a href="{{ route('production.material-stock.edit', $item) }}" class="p-1.5 hover:bg-gray-200 rounded">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
-                            </a>
-                            <form method="POST" action="{{ route('production.material-stock.destroy', $item) }}" class="inline" onsubmit="return confirm('Are you sure?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="p-1.5 hover:bg-red-100 rounded">
-                                    <svg class="text-red-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                                </button>
-                            </form>
+        {{-- Statistics --}}
+        <div class="row g-3 mb-4">
+
+            {{-- Total Stock Records --}}
+            <div class="col-6 col-lg-3">
+
+                <div class="card production-card production-card-hover production-stat-card">
+
+                    <div class="card-body d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <div class="production-stat-label">
+                                Total Stock Records
+                            </div>
+
+                            <div class="production-stat-value">
+                                {{ number_format($stocks->total()) }}
+                            </div>
                         </div>
-                    </td>
-                </tr>
-                @empty
-                <tr><td colspan="7" class="text-center py-8 text-gray-400">No stock records found</td></tr>
-                @endforelse
-            </tbody>
-        </table>
+
+                        <div class="production-stat-icon bg-soft-primary bg-opacity-10 text-primary">
+                            <i class="bi bi-box-seam-fill fs-4"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- Total Quantity --}}
+            <div class="col-6 col-lg-3">
+
+                <div class="card production-card production-card-hover production-stat-card">
+
+                    <div class="card-body d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <div class="production-stat-label">
+                                Total Quantity
+                            </div>
+
+                            <div class="production-stat-value text-success">
+                                {{ number_format($totalQuantity, 2) }}
+                            </div>
+                        </div>
+
+                        <div class="production-stat-icon bg-soft-success bg-opacity-10 text-success">
+                            <i class="bi bi-boxes fs-4"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- Reserved Quantity --}}
+            <div class="col-6 col-lg-3">
+
+                <div class="card production-card production-card-hover production-stat-card">
+
+                    <div class="card-body d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <div class="production-stat-label">
+                                Reserved Quantity
+                            </div>
+
+                            <div class="production-stat-value text-warning">
+                                {{ number_format($totalReserved, 2) }}
+                            </div>
+                        </div>
+
+                        <div class="production-stat-icon bg-soft-warning bg-opacity-10 text-warning">
+                            <i class="bi bi-lock-fill fs-4"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- Available Quantity --}}
+            <div class="col-6 col-lg-3">
+
+                <div class="card production-card production-card-hover production-stat-card">
+
+                    <div class="card-body d-flex align-items-center justify-content-between">
+
+                        <div>
+                            <div class="production-stat-label">
+                                Available Quantity
+                            </div>
+
+                            <div class="production-stat-value text-info">
+                                {{ number_format($availableQuantity, 2) }}
+                            </div>
+                        </div>
+
+                        <div class="production-stat-icon bg-soft-info bg-opacity-10 text-info">
+                            <i class="bi bi-check2-square fs-4"></i>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- Filters --}}
+        <div class="card production-filter-card mb-4">
+
+            <div class="card-body p-3">
+
+                <form method="GET"
+                      action="{{ route('production.material-stock.index') }}"
+                      class="row g-3 align-items-end">
+
+                    <div class="col-12 col-lg-9">
+
+                        <label class="form-label small fw-semibold text-muted">
+                            Search Material Stock
+                        </label>
+
+                        <div class="production-search">
+
+                            <i class="bi bi-search"></i>
+
+                            <input
+                                type="text"
+                                name="search"
+                                value="{{ request('search') }}"
+                                class="form-control rounded-3"
+                                placeholder="Search by material, batch number, location..."
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-12 col-lg-3 d-flex gap-2">
+
+                        <button type="submit"
+                                class="btn btn-dark rounded-3 flex-fill">
+
+                            <i class="bi bi-funnel-fill me-1"></i>
+                            Filter
+
+                        </button>
+
+                        @if(request()->filled('search'))
+
+                            <a href="{{ route('production.material-stock.index') }}"
+                               class="btn btn-outline-secondary rounded-3"
+                               title="Clear Filters">
+
+                                <i class="bi bi-x-lg"></i>
+
+                            </a>
+
+                        @endif
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+
+        {{-- Stock Table --}}
+        <div class="card production-table-card">
+
+            <div class="table-responsive production-table-responsive">
+
+                <table class="table production-table align-middle"
+                       style="min-width: 1050px;">
+
+                    <thead>
+                        <tr>
+
+                            <th class="first-column">
+                                Material
+                            </th>
+
+                            <th>
+                                Batch Number
+                            </th>
+
+                            <th class="text-end">
+                                Quantity
+                            </th>
+
+                            <th class="text-end">
+                                Reserved
+                            </th>
+
+                            <th class="text-end">
+                                Available
+                            </th>
+
+                            <th>
+                                Location
+                            </th>
+
+                            <th>
+                                Expiry Date
+                            </th>
+
+                            <th class="last-column text-end">
+                                Actions
+                            </th>
+
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                        @forelse($stocks as $item)
+
+                            @php
+                                $quantity = (float) ($item->quantity ?? 0);
+                                $reserved = (float) ($item->reserved_quantity ?? 0);
+                                $available = $quantity - $reserved;
+
+                                $expiryDate = $item->expiry_date
+                                    ? \Carbon\Carbon::parse($item->expiry_date)
+                                    : null;
+
+                                $isExpired = $expiryDate &&
+                                    $expiryDate->isPast();
+
+                                $isExpiringSoon = $expiryDate &&
+                                    !$isExpired &&
+                                    $expiryDate->lte(now()->addDays(30));
+                            @endphp
+
+                            <tr>
+
+                                {{-- Material --}}
+                                <td class="first-column">
+
+                                    <div class="d-flex align-items-center gap-3">
+
+                                        <div class="production-avatar">
+
+                                            <i class="bi bi-box-seam"></i>
+
+                                        </div>
+
+                                        <div>
+
+                                            <div class="fw-semibold text-dark">
+
+                                                {{ $item->rawMaterial?->name ?? 'Material #' . $item->raw_material_id }}
+
+                                            </div>
+
+                                            <div class="text-muted small">
+
+                                                Added
+                                                {{ $item->created_at?->diffForHumans() ?? 'recently' }}
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </td>
+
+
+                                {{-- Batch --}}
+                                <td>
+
+                                    <span class="production-code">
+
+                                        {{ $item->batch_number ?? 'N/A' }}
+
+                                    </span>
+
+                                </td>
+
+
+                                {{-- Quantity --}}
+                                <td class="text-end">
+
+                                    <span class="fw-semibold text-dark">
+
+                                        {{ number_format($quantity, 2) }}
+
+                                    </span>
+
+                                </td>
+
+
+                                {{-- Reserved --}}
+                                <td class="text-end">
+
+                                    <span class="fw-semibold text-warning">
+
+                                        {{ number_format($reserved, 2) }}
+
+                                    </span>
+
+                                </td>
+
+
+                                {{-- Available --}}
+                                <td class="text-end">
+
+                                    <span class="production-badge
+                                        {{ $available > 0
+                                            ? 'bg-success-subtle text-success border border-success-subtle'
+                                            : 'bg-danger-subtle text-danger border border-danger-subtle' }}">
+
+                                        <i class="bi
+                                            {{ $available > 0
+                                                ? 'bi-check-circle-fill'
+                                                : 'bi-exclamation-circle-fill' }}
+                                            me-1"></i>
+
+                                        {{ number_format($available, 2) }}
+
+                                    </span>
+
+                                </td>
+
+
+                                {{-- Location --}}
+                                <td class="text-muted">
+
+                                    <i class="bi bi-geo-alt me-1"></i>
+
+                                    {{ $item->location ?? '-' }}
+
+                                </td>
+
+
+                                {{-- Expiry --}}
+                                <td>
+
+                                    @if($expiryDate)
+
+                                        <div class="d-flex flex-column align-items-start gap-1">
+
+                                            <span class="text-muted small">
+
+                                                <i class="bi bi-calendar3 me-1"></i>
+
+                                                {{ $expiryDate->format('d M Y') }}
+
+                                            </span>
+
+                                            @if($isExpired)
+
+                                                <span class="production-badge bg-danger-subtle text-danger border border-danger-subtle">
+
+                                                    <i class="bi bi-x-circle-fill me-1"></i>
+                                                    Expired
+
+                                                </span>
+
+                                            @elseif($isExpiringSoon)
+
+                                                <span class="production-badge bg-warning-subtle text-warning-emphasis border border-warning-subtle">
+
+                                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                                    Expiring Soon
+
+                                                </span>
+
+                                            @endif
+
+                                        </div>
+
+                                    @else
+
+                                        <span class="text-muted">
+                                            -
+                                        </span>
+
+                                    @endif
+
+                                </td>
+
+
+                                {{-- Actions --}}
+                                <td class="last-column">
+
+                                    <div class="production-actions">
+
+                                        <a href="{{ route('production.material-stock.edit', $item) }}"
+                                           class="btn btn-outline-info btn-sm production-action-btn"
+                                           title="Edit Stock">
+
+                                            <i class="bi bi-pencil-square"></i>
+
+                                        </a>
+
+
+                                        <form
+                                            method="POST"
+                                            action="{{ route('production.material-stock.destroy', $item) }}"
+                                            class="d-inline"
+                                            onsubmit="return confirm('Delete this material stock record? This cannot be undone.')">
+
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button
+                                                type="submit"
+                                                class="btn btn-outline-danger btn-sm production-action-btn"
+                                                title="Delete Stock">
+
+                                                <i class="bi bi-trash3"></i>
+
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @empty
+
+                            <tr>
+
+                                <td colspan="8" class="text-center py-5">
+
+                                    <div class="production-empty-icon mb-3">
+
+                                        <i class="bi bi-box-seam"></i>
+
+                                    </div>
+
+                                    <h5 class="fw-semibold text-muted">
+
+                                        No material stock records found
+
+                                    </h5>
+
+                                    <p class="text-muted small mb-3">
+
+                                        Try adjusting your search or add a new stock record.
+
+                                    </p>
+
+                                    @if(request()->filled('search'))
+
+                                        <a href="{{ route('production.material-stock.index') }}"
+                                           class="btn btn-outline-dark btn-sm rounded-3">
+
+                                            Clear all filters
+
+                                        </a>
+
+                                    @else
+
+                                        <a href="{{ route('production.material-stock.create') }}"
+                                           class="btn btn-dark btn-sm rounded-3">
+
+                                            <i class="bi bi-plus-lg me-1"></i>
+                                            Add Stock
+
+                                        </a>
+
+                                    @endif
+
+                                </td>
+
+                            </tr>
+
+                        @endforelse
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            {{-- Pagination --}}
+            @if($stocks->hasPages())
+
+                <div class="production-pagination">
+
+                    {{ $stocks->appends(request()->query())->links() }}
+
+                </div>
+
+            @endif
+
+        </div>
+
     </div>
-    @if($stocks->hasPages())<div class="mt-4">{{ $items->links() }}</div>@endif
+
 </div>
+
 @endsection

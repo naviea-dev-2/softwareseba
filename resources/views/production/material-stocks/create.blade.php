@@ -1,5 +1,5 @@
 @extends('inc.master')
 
 @section('content')
-    @include('production.workers.form')
+    @include('production.material-stocks.form')
 @endsection
