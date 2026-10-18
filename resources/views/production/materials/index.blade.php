@@ -1,5 +1,8 @@
 @extends('inc.master')
 
+@section('head')
+<title>RAW Materials</title>
+@endsection
 @section('content')
 
 @php

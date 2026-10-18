@@ -1,7 +1,72 @@
 @extends('inc.master')
+
+@section('head')
+<title>Production Order</title>
+@endsection
 @section('content')
-<style>
-.factory-wrap{max-width:1440px;margin:0 auto;padding:24px 16px 48px;color:#25354a}.factory-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px;flex-wrap:wrap}.factory-top h2{font-size:25px;font-weight:750;margin:0}.factory-top p{color:#78889b;margin:5px 0 0}.factory-card{background:#fff;border:1px solid #e5eaf0;border-radius:16px;box-shadow:0 4px 18px rgba(28,43,64,.05);padding:24px;margin-bottom:18px}.factory-card h4{font-weight:700;font-size:15px;margin:0 0 20px}.factory-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.factory-field label{display:block;font-weight:650;margin-bottom:8px;color:#34455a}.factory-field input,.factory-field select,.factory-field textarea{width:100%;border:1px solid #d9e1e9;border-radius:10px;min-height:45px;padding:10px 12px;background:#fff;color:#26374b}.factory-field textarea{min-height:105px}.factory-btn{display:inline-block;border:0;border-radius:9px;padding:11px 17px;background:#2563eb;color:#fff!important;text-decoration:none!important;font-weight:650;cursor:pointer}.factory-btn.light{background:#f1f5f9;color:#334155!important}.factory-btn.danger{background:#fff0f0;color:#b91c1c!important}.factory-table{width:100%;border-collapse:collapse;min-width:720px}.factory-table th{background:#26384d;color:#fff;padding:13px;text-align:left;font-size:12px}.factory-table td{border-bottom:1px solid #e7ebf0;padding:12px;font-size:13px}.factory-table-wrap{overflow-x:auto}.factory-actions{display:flex;gap:7px;flex-wrap:wrap}.factory-actions .factory-btn{padding:7px 10px;font-size:12px}.factory-error{color:#b91c1c;font-size:12px}.factory-alert{padding:12px 16px;border-radius:10px;margin-bottom:15px;background:#ecfdf5;color:#065f46}@media(max-width:700px){.factory-grid{grid-template-columns:1fr}.factory-card{padding:16px}}
-</style>
-<div class="factory-wrap"><div class="factory-top"><div><h2>Production Orders</h2><p>Manage and review production orders</p></div></div><div class="factory-card"><div class="factory-top"><form method="GET" style="display:flex;gap:8px;flex-wrap:wrap"><input class="form-control" name="search" placeholder="Search records" value="{{ request('search') }}"><button class="factory-btn" type="submit">Search</button></form><a class="factory-btn" href="{{ route('production.orders.create') }}">+ Add New</a></div><div class="factory-table-wrap"><table class="factory-table"><thead><tr><th>#</th><th>Order Number</th><th>Product Id</th><th>Quantity Ordered</th><th>Planned Start Date</th><th>Status</th><th>Actions</th></tr></thead><tbody>@forelse($orders as $order)<tr><td>{{ $order->id }}</td><td>{{ $order->order_number ?? "—" }}</td><td>{{ $order->product_id ?? "—" }}</td><td>{{ $order->quantity_ordered ?? "—" }}</td><td>{{ $order->planned_start_date ?? "—" }}</td><td>{{ $order->status ?? "—" }}</td><td><div class="factory-actions"><a class="factory-btn light" href="{{ route('production.orders.show', $order->id) }}">View</a><a class="factory-btn light" href="{{ route('production.orders.edit', $order->id) }}">Edit</a><form method="POST" action="{{ route('production.orders.destroy', $order->id) }}" onsubmit="return confirm('Delete this record?')">@csrf @method('DELETE')<button class="factory-btn danger" type="submit">Delete</button></form></div></td></tr>@empty<tr><td colspan="7" style="text-align:center;padding:28px">No records found</td></tr>@endforelse</tbody></table></div><div style="margin-top:18px">{{ $orders->links() }}</div></div></div>
+@php
+    $pageOrders = $orders->getCollection();
+    $statusStyles = [
+        'draft' => 'bg-secondary-subtle text-secondary',
+        'pending' => 'bg-warning-subtle text-warning-emphasis',
+        'approved' => 'bg-info-subtle text-info-emphasis',
+        'in_progress' => 'bg-primary-subtle text-primary',
+        'completed' => 'bg-success-subtle text-success',
+        'cancelled' => 'bg-danger-subtle text-danger',
+    ];
+@endphp
+<div class="production-page">
+    <div class="production-container">
+        <div class="production-header">
+            <div>
+                <h2 class="production-page-title"><i class="bi bi-gear-wide-connected me-2"></i>Production Orders</h2>
+                <p class="production-page-subtitle">Track mill processing orders, planned quantities and production progress</p>
+            </div>
+            <a href="{{ route('production.orders.create') }}" class="btn btn-dark rounded-3 px-4"><i class="bi bi-plus-lg me-1"></i>Add Production Order</a>
+        </div>
+        @if(session('success'))
+            <div class="alert alert-success rounded-3">{{ session('success') }}</div>
+        @endif
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3"><div class="card production-card production-stat-card"><div class="card-body d-flex align-items-center justify-content-between"><div><div class="production-stat-label">Total Orders</div><div class="production-stat-value">{{ number_format($orders->total()) }}</div></div><div class="production-stat-icon bg-soft-primary text-primary"><i class="bi bi-clipboard-data fs-4"></i></div></div></div></div>
+            <div class="col-6 col-lg-3"><div class="card production-card production-stat-card"><div class="card-body d-flex align-items-center justify-content-between"><div><div class="production-stat-label">Pending (this page)</div><div class="production-stat-value text-warning">{{ $pageOrders->filter(fn($o) => in_array(strtolower(str_replace([' ', '-'], '_', trim((string) $o->status))), ['pending', 'draft']))->count() }}</div></div><div class="production-stat-icon text-warning"><i class="bi bi-clock fs-4"></i></div></div></div></div>
+            <div class="col-6 col-lg-3"><div class="card production-card production-stat-card"><div class="card-body d-flex align-items-center justify-content-between"><div><div class="production-stat-label">In Progress (this page)</div><div class="production-stat-value text-primary">{{ $pageOrders->filter(fn($o) => strtolower(str_replace([' ', '-'], '_', trim((string) $o->status))) === 'in_progress')->count() }}</div></div><div class="production-stat-icon text-primary"><i class="bi bi-arrow-repeat fs-4"></i></div></div></div></div>
+            <div class="col-6 col-lg-3"><div class="card production-card production-stat-card"><div class="card-body d-flex align-items-center justify-content-between"><div><div class="production-stat-label">Completed (this page)</div><div class="production-stat-value text-success">{{ $pageOrders->filter(fn($o) => strtolower(str_replace([' ', '-'], '_', trim((string) $o->status))) === 'completed')->count() }}</div></div><div class="production-stat-icon text-success"><i class="bi bi-check-circle fs-4"></i></div></div></div></div>
+        </div>
+        <div class="card production-filter-card mb-4"><div class="card-body p-3">
+            <form method="GET" action="{{ route('production.orders.index') }}" class="row g-3 align-items-end">
+                <div class="col-12 col-lg-9"><label for="order-search" class="form-label small fw-semibold text-muted">Search Production Orders</label><div class="production-search"><i class="bi bi-search"></i><input id="order-search" name="search" class="form-control rounded-3" value="{{ request('search') }}" placeholder="Search by order number..."></div></div>
+                <div class="col-12 col-lg-3 d-flex gap-2"><button type="submit" class="btn btn-dark rounded-3 flex-fill"><i class="bi bi-funnel-fill me-1"></i>Search</button>@if(request()->filled('search'))<a href="{{ route('production.orders.index') }}" class="btn btn-outline-secondary rounded-3" title="Clear search"><i class="bi bi-x-lg"></i></a>@endif</div>
+            </form>
+        </div></div>
+        <div class="card production-table-card"><div class="table-responsive production-table-responsive">
+            <table class="table production-table align-middle" style="min-width:950px">
+                <thead><tr><th class="first-column">Order</th><th>Product ID</th><th class="text-end">Ordered Quantity</th><th>Planned Start</th><th class="text-center">Status</th><th class="last-column text-end">Actions</th></tr></thead>
+                <tbody>
+                    @forelse($orders as $order)
+                        @php $status = strtolower(str_replace([' ', '-'], '_', trim((string) ($order->status ?? '')))); @endphp
+                        <tr>
+                            <td class="first-column"><div class="d-flex align-items-center gap-3"><div class="production-avatar"><i class="bi bi-gear-wide-connected"></i></div><div><div class="fw-semibold text-dark">{{ $order->order_number ?: 'Order #'.$order->id }}</div><div class="text-muted small">Order ID: {{ $order->id }}</div></div></div></td>
+                            <td>{{ $order->product_id ?? '—' }}</td>
+                            <td class="text-end fw-semibold">{{ is_numeric($order->quantity_ordered) ? number_format((float)$order->quantity_ordered, 2) : ($order->quantity_ordered ?? '—') }}</td>
+                            <td class="text-muted">{{ $order->planned_start_date ? \Carbon\Carbon::parse($order->planned_start_date)->format('d M Y') : '—' }}</td>
+                            <td class="text-center"><span class="production-badge {{ $statusStyles[$status] ?? 'bg-light text-muted border' }}">{{ $status ? ucwords(str_replace('_', ' ', $status)) : '—' }}</span></td>
+                            <td class="last-column"><div class="production-actions">
+                                <a href="{{ route('production.orders.show', $order->id) }}" class="btn btn-outline-secondary btn-sm production-action-btn" title="View"><i class="bi bi-eye"></i></a>
+                                <a href="{{ route('production.orders.edit', $order->id) }}" class="btn btn-outline-info btn-sm production-action-btn" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                                <form method="POST" action="{{ route('production.orders.destroy', $order->id) }}" class="d-inline" onsubmit="return confirm('Delete this production order?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger btn-sm production-action-btn" title="Delete"><i class="bi bi-trash3"></i></button>
+                                </form>
+                            </div></td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" class="text-center py-5"><div class="production-empty-icon mb-3"><i class="bi bi-inboxes"></i></div><h5 class="text-muted">No production orders found</h5><p class="text-muted small">Create an order to start tracking mill production.</p><a href="{{ route('production.orders.create') }}" class="btn btn-dark btn-sm rounded-3">Add Production Order</a></td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>@if($orders->hasPages())<div class="production-pagination">{{ $orders->appends(request()->query())->links() }}</div>@endif</div>
+    </div>
+</div>
 @endsection

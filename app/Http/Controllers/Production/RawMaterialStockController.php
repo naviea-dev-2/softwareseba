@@ -83,7 +83,7 @@ class RawMaterialStockController extends Controller
         ]);
 
         return redirect()
-            ->route('production.material-stocks.index')
+            ->route('production.material-stock.index')
             ->with('success', 'Stock added successfully.');
     }
 
@@ -138,7 +138,7 @@ class RawMaterialStockController extends Controller
         $stock->update($validated);
 
         return redirect()
-            ->route('production.material-stocks.index')
+            ->route('production.material-stock.index')
             ->with('success', 'Stock updated successfully.');
     }
 
@@ -152,7 +152,7 @@ class RawMaterialStockController extends Controller
             ->delete();
 
         return redirect()
-            ->route('production.material-stocks.index')
+            ->route('production.material-stock.index')
             ->with('success', 'Stock deleted successfully.');
     }
 }

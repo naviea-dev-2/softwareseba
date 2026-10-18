@@ -49,6 +49,7 @@ class ProductionPlanController extends Controller
             'plan_period_start' => 'required|date',
             'plan_period_end' => 'required|date',
             'target_quantity' => 'required',
+            'status' => 'required',
             'planned_capacity_hours' => 'nullable',
         ]);
 
@@ -100,6 +101,7 @@ class ProductionPlanController extends Controller
             'plan_period_start' => 'required|date',
             'plan_period_end' => 'required|date',
             'target_quantity' => 'required',
+            'status' => 'required',
             'planned_capacity_hours' => 'nullable',
         ]);
 

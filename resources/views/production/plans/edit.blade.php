@@ -160,9 +160,28 @@
         </div><a class="factory-btn light" href="{{ route('production.plans.index') }}">← Back to list</a>
     </div>
     <div class="factory-card">
-        <h4>Update Information</h4>@if($errors->any())<div class="factory-error">Please correct the highlighted fields.</div>@endif<form method="POST" action="{{ route('production.plans.update', $plan->id) }}">@csrf@method('PUT')
+        <h4>Update Information</h4>@if($errors->any())<div class="factory-error">Please correct the highlighted fields.</div>@endif
+        <form method="POST"
+            action="{{ route('production.plans.update', $plan->id) }}">
+
+            @csrf
+            @method('PUT')
+
             @include('production.plans._fields')
-            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:25px"><a class="factory-btn light" href="{{ route('production.plans.index') }}">Cancel</a><button class="factory-btn" type="submit">Update Record</button></div>
+
+            <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:25px;">
+
+                <a class="factory-btn light"
+                    href="{{ route('production.plans.index') }}">
+                    Cancel
+                </a>
+
+                <button class="factory-btn" type="submit">
+                    Update Record
+                </button>
+
+            </div>
+
         </form>
     </div>
 </div>@endsection
