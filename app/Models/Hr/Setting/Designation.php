@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\Hr;
+namespace App\Models\Hr\Setting;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +10,8 @@ class Designation extends Model
 {
     use HasFactory, Multitenantable, WithBusiness;
     protected $table = "designations";
-    protected $fillable=['name','department_id'];
+    // protected $fillable=['name','department_id'];
+    protected $fillable = ['title', 'department_id', 'level', 'status'];
     public function departments()
     {
         return $this->belongsTo(Department::class, 'department_id', 'id');

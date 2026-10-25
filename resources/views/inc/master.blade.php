@@ -246,7 +246,7 @@
         </footer>
     </div>
 
-    <div class="modal" id="SearchModal" tabindex="-1">
+    {{-- <div class="modal" id="SearchModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-fullscreen-md-down">
             <div class="modal-content">
                 <div class="modal-header gap-2">
@@ -290,7 +290,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <script type="text/javascript">
         function googleTranslateElementInit2() {

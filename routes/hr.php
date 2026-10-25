@@ -2,6 +2,46 @@
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(function () {
+    $only = ['index', 'store', 'update', 'destroy'];
+    Route::get('/hr-setting',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('hr.setting');
+    Route::resource('shift', App\Http\Controllers\Hr\shiftManageController::class)->only($only);
+    Route::resource('departments', App\Http\Controllers\Hr\DepartmentController::class)->only($only);
+    Route::resource('designations', App\Http\Controllers\Hr\DesignationController::class)->only($only);
+    Route::resource('late-rules', App\Http\Controllers\Hr\LateRuleController::class)->parameters(['late-rules' => 'lateRule'])->only($only);
+    Route::resource('holidays', App\Http\Controllers\Hr\HolidayController::class)->only($only);
+    Route::resource('overtime', App\Http\Controllers\Hr\OvertimeController::class)->only($only);
+
+
+    Route::resource('tax-settings', App\Http\Controllers\Hr\TaxSettingController::class)->parameters(['tax-settings' => 'taxSetting'])->only($only);
+    Route::get('tax-settings/{taxSetting}/slabs', [App\Http\Controllers\Hr\TaxSlabController::class, 'index'])->name('tax-slabs.index');
+    Route::post('tax-settings/{taxSetting}/slabs', [App\Http\Controllers\Hr\TaxSlabController::class, 'store'])->name('tax-slabs.store');
+    Route::delete('tax-slabs/{taxSlab}', [App\Http\Controllers\Hr\TaxSlabController::class, 'destroy'])->name('tax-slabs.destroy');
+
+    Route::resource('payroll-months', App\Http\Controllers\Hr\PayrollMonthController::class)->parameters(['payroll-months' => 'payrollMonth'])->only($only);
+    Route::post('payroll-months/{payrollMonth}/generate', [App\Http\Controllers\Hr\PayrollMonthController::class, 'generate'])->name('payroll-months.generate');
+
+    Route::resource('salary-heads', App\Http\Controllers\Hr\SalaryHeadController::class)->parameters(['salary-heads' => 'salaryHead'])->only($only);
+    Route::resource('pay-assignments', App\Http\Controllers\Hr\PayAssignmentController::class)->parameters(['pay-assignments' => 'employee'])->only(['index', 'update']);
+    Route::resource('salary', App\Http\Controllers\Hr\SalaryController::class)->only($only);
+
+    Route::post('salary/generate', [App\Http\Controllers\Hr\SalaryController::class, 'generate'])->name('salary.generate');
+    Route::get('salary/{salary}/payslip', [App\Http\Controllers\Hr\SalaryController::class, 'payslip'])->name('salary.payslip');
+    Route::get('salary/{salary}/details', [App\Http\Controllers\Hr\SalaryController::class, 'details'])->name('salary.details');
+    Route::post('salary/{salary}/refresh-details', [App\Http\Controllers\Hr\SalaryController::class, 'refreshDetails'])->name('salary.refresh');
+
+    Route::resource('advances', App\Http\Controllers\Hr\AdvanceController::class)->parameters(['advances' => 'advance'])->only($only);
+    Route::resource('payments', App\Http\Controllers\Hr\PaymentController::class)->only($only);
+    Route::get('payments/{payment}/slip', [App\Http\Controllers\Hr\PaymentController::class, 'slip'])->name('payments.slip');
+
+    // Route::get('/shift-index',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('shift.index');
+    // Route::get('/departments-index',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('departments.index');
+    // Route::get('/designations-index',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('designations.index');
+    // Route::get('/ate-rules-index',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('late-rules.index');
+    // Route::get('/holidays-index',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('holidays.index');
+    // Route::get('/overtime-index',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('overtime.index');
+    // Route::get('/tax-settings-index',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('tax-settings.index');
+
+
     Route::get('device-mapping/index', [App\Http\Controllers\Hr\DeviceIDMappingController::class,"index"])->name('hr.device_mapping');
     Route::post('device-mappin/ajax', [App\Http\Controllers\Hr\DeviceIDMappingController::class,"ajaxDeviceMapping"])->name('hr.device_mapping.ajax');
     Route::post('device-mapping/store', [App\Http\Controllers\Hr\DeviceIDMappingController::class,"store"])->name('hr.device_mapping.store');
@@ -240,9 +280,9 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
 
     //holiday
     Route::get('/holiday-view','App\Http\Controllers\Hr\holidayController@view')->name('holiday.view');
-    Route::post('/holiday-store','App\Http\Controllers\Hr\holidayController@store')->name('holiday.store');
-    Route::get('/holiday-edit','App\Http\Controllers\Hr\holidayController@edit')->name('holiday.edit');
-    Route::get('/holiday-delete/{id}','App\Http\Controllers\Hr\holidayController@delete')->name('holiday.delete');
+    // Route::post('/holiday-store','App\Http\Controllers\Hr\holidayController@store')->name('holiday.store');
+    // Route::get('/holiday-edit','App\Http\Controllers\Hr\holidayController@edit')->name('holiday.edit');
+    // Route::get('/holiday-delete/{id}','App\Http\Controllers\Hr\holidayController@delete')->name('holiday.delete');
     //emploan
     Route::get('/emploan-view','App\Http\Controllers\Hr\emploanController@view')->name('emploan.view');
     Route::post('/emploan-ajax','App\Http\Controllers\Hr\emploanController@ajaxLoan')->name('emploan.ajax');
@@ -260,15 +300,15 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::post('/bonuspay-search','App\Http\Controllers\Hr\bonuspayController@search')->name('bonuspay.search');
     Route::get('/bonuspay-delete/{id}','App\Http\Controllers\Hr\bonuspayController@delete')->name('bonuspay.delete');
     //salary head
-    Route::prefix('salary-head')->group(function () {
-        Route::get('index',[App\Http\Controllers\Hr\SalaryHeadController::class,'index'])->name('school.salary_head.index');
-        Route::post('ajax',[App\Http\Controllers\Hr\SalaryHeadController::class,'ajaxSalaryHead'])->name('school.salary_head.ajax');
-        Route::get('edit/{id}',[App\Http\Controllers\Hr\SalaryHeadController::class,'edit'])->name('school.salary_head.edit');
-        Route::post('update/{id}',[App\Http\Controllers\Hr\SalaryHeadController::class,'update'])->name('school.salary_head.update');
-        Route::post('store', [App\Http\Controllers\Hr\SalaryHeadController::class,"store"])->name('school.salary_head.store');
-        Route::post('delete',[App\Http\Controllers\Hr\SalaryHeadController::class,'delete'])->name('school.salary_head.delete');
-        Route::get('status/{id}',[App\Http\Controllers\Hr\SalaryHeadController::class,'updateStatus'])->name('school.salary_head.status');
-    });
+    // Route::prefix('salary-head')->group(function () {
+    //     Route::get('index',[App\Http\Controllers\Hr\SalaryHeadController::class,'index'])->name('school.salary_head.index');
+    //     Route::post('ajax',[App\Http\Controllers\Hr\SalaryHeadController::class,'ajaxSalaryHead'])->name('school.salary_head.ajax');
+    //     Route::get('edit/{id}',[App\Http\Controllers\Hr\SalaryHeadController::class,'edit'])->name('school.salary_head.edit');
+    //     Route::post('update/{id}',[App\Http\Controllers\Hr\SalaryHeadController::class,'update'])->name('school.salary_head.update');
+    //     Route::post('store', [App\Http\Controllers\Hr\SalaryHeadController::class,"store"])->name('school.salary_head.store');
+    //     Route::post('delete',[App\Http\Controllers\Hr\SalaryHeadController::class,'delete'])->name('school.salary_head.delete');
+    //     Route::get('status/{id}',[App\Http\Controllers\Hr\SalaryHeadController::class,'updateStatus'])->name('school.salary_head.status');
+    // });
     //payroll_assign
     Route::prefix('payroll-assign')->group(function () {
         Route::get('index',[App\Http\Controllers\Hr\PayrollAssignController::class,'index'])->name('school.payroll_assign.index');

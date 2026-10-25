@@ -1,65 +1,139 @@
-<div class="modal fade" tabindex="-1" id="inTimeModal" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+
+<div class="modal fade attendance-modal"
+     id="inTimeModal"
+     tabindex="-1"
+     aria-labelledby="inTimeModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background-color:#01303f;max-height: 50px;">
-            <h5 class="modal-title" id="exampleModalLabel" style="color:white;line-height:18px;">In Time</h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true" >&times;</span>
-            </button>
-            </div>
-            <div class="modal-body">
-                <div class="container-fluid">
-                    <div class="row row-card-one">
-                        <div class="col-sm-12">
-                            <form method="POST" action="{{ route('attendanceStoreIn') }}" enctype="multipart/form-data" class="in_data_form" novalidate>
-                                @csrf
-                                <div class="row">
 
-                                    <div class="col-sm-6">
-                                        <label for="">Employee ID*</label>
-                                        <select class="form-control employee_select2" id="empID" name="empID" required>
-                                            <option value="">-- wait --</option>
+            <form method="POST"
+                  action="{{ route('attendanceStoreIn') }}"
+                  class="in_data_form"
+                  novalidate>
 
-                                        </select>
-                                    </div>
-                                    @php
-                                        date_default_timezone_set("Asia/Dhaka");
-                                    @endphp
-                                    <div class="col-sm-3">
-                                        <label for="">Duty Date *</label>
-                                        <input type="text" class="datepicker form-control " id="dutyDate" name="dutyDate" autocomplete="off" value="{{ date('Y-m-d') }}" required>
-                                    </div>
-                                </div>
-                                </br>
-                                <div class="row">
-                                    <div class="col-sm-3">
-                                        <label for="">Shift *</label>
-                                        <select class="form-control " id="shiftID" name="shiftID" required>
-                                            <option value="">-- Select One --</option>
-                                                @foreach ($shifts as $shift)
-                                                <option value="{{ $shift->id }}">{{ $shift->shiftName }}</option>
-                                                @endforeach
-                                        </select>
-                                    </div>
+                @csrf
 
-                                    <div class="col-sm-4">
-                                        <label for="">In Time *</label>
-                                        <input type="text" class=" form-control datetimepicker" id="inTime" name="inTime" autocomplete="off">
-                                    </div>
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="inTimeModalLabel">
+                            <i class="fa fa-sign-in me-2"></i>
+                            Employee Check In
+                        </h5>
+                        <small class="text-white-50">
+                            Record employee arrival time
+                        </small>
+                    </div>
 
+                    <button type="button"
+                            class="btn-close btn-close-white"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
 
-                                    <div class="col-sm-3">
-                                        <button class="btn btn-sm btn-primary mt-4 " type="submit">
-                                            <i class="fa fa-save pr-2"></i>Save
-                                        </button>
-                                    </div>
-                                </div>
-                                <!-- </div> -->
-                            </form>
+                <div class="modal-body">
+                    <div class="row g-3">
+
+                        {{-- Employee --}}
+                        <div class="col-12">
+                            <label for="empID">
+                                Employee <span class="text-danger">*</span>
+                            </label>
+
+                            <select class="form-control employee_select2"
+                                    id="empID"
+                                    name="empID"
+                                    required>
+                                <option value="">Select employee</option>
+                            </select>
+
+                            <div class="invalid-feedback"></div>
                         </div>
+
+                        {{-- Duty Date --}}
+                        <div class="col-md-6">
+                            <label for="dutyDate">
+                                Duty Date <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="text"
+                                   class="form-control datepicker"
+                                   id="dutyDate"
+                                   name="dutyDate"
+                                   value="{{ now()->timezone('Asia/Dhaka')->format('Y-m-d') }}"
+                                   placeholder="Select duty date"
+                                   autocomplete="off"
+                                   required>
+
+                            <div class="invalid-feedback"></div>
+                        </div>
+
+                        {{-- Shift --}}
+                        <div class="col-md-6">
+                            <label for="shiftID">
+                                Shift <span class="text-danger">*</span>
+                            </label>
+
+                            <select class="form-control"
+                                    id="shiftID"
+                                    name="shiftID"
+                                    required>
+                                <option value="">Select shift</option>
+
+                                @foreach ($shifts as $shift)
+                                    <option value="{{ $shift->id }}">
+                                        {{ $shift->shiftName }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <div class="invalid-feedback"></div>
+                        </div>
+
+                        {{-- In Time --}}
+                        <div class="col-md-6">
+                            <label for="inTime">
+                                In Time <span class="text-danger">*</span>
+                            </label>
+
+                            <input type="text"
+                                   class="form-control datetimepicker"
+                                   id="inTime"
+                                   name="inTime"
+                                   placeholder="Select arrival time"
+                                   autocomplete="off"
+                                   required>
+
+                            <div class="invalid-feedback"></div>
+                        </div>
+
+                        <div class="col-12">
+                            <small class="text-muted">
+                                <i class="fa fa-info-circle me-1"></i>
+                                Verify the employee, duty date and shift before saving.
+                            </small>
+                        </div>
+
                     </div>
                 </div>
-            </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-light border"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-success px-4">
+                        <i class="fa fa-save me-1"></i>
+                        Save In Time
+                    </button>
+                </div>
+
+            </form>
+
         </div>
     </div>
 </div>
