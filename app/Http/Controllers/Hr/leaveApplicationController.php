@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Hr\LeavePart;
 use App\Models\Hr\LeaveType;
-use App\Models\HrPayroll\LeaveTagline;
+use App\Models\Hr\LeaveTagline;
 use App\Models\Hr\Department;
 use App\Models\Hr\Designation;
 use App\Models\Hr\Employee;
@@ -29,6 +29,13 @@ class leaveApplicationController extends Controller
         //$data['empInfo']=Employee::where('id',Auth::user()->empID)->first();
         $data['leaveTypes']=LeaveType::orderBy('id','DESC')->get();
         $data['departments']=Department::orderBy('id','DESC')->get();
+
+
+        $data['leaveTaglines']=LeaveTagline::orderBy('id','DESC')->get();
+
+        $data['leaveTypes']=LeaveType::orderBy('id','DESC')->get();
+        $data['leaveParts']=LeavePart::orderBy('id','DESC')->get();
+
         return view ('Hr.leave.leaveApplication',$data);
     }
     function ajaxLeave(Request $request){
@@ -272,9 +279,29 @@ class leaveApplicationController extends Controller
         }
         else {
 
-            $leaveApplication=LeaveApplication::where('id',$request->id)->first();
+            $leaveApplication=LeaveApplication::leftJoin('employees','employees.id','leave_applications.empID')
+            ->leftJoin('departments','departments.id','leave_applications.empDeptID')
+            ->leftJoin('designations','designations.id','leave_applications.empDeptID')
+            ->leftJoin('leave_parts','leave_parts.id','leave_applications.leavePartID')
+            ->leftJoin('leave_types','leave_types.id','leave_applications.leaveTypeID')
 
-            $viewApplicationData='Name: '.Employee::where('id',$leaveApplication->empID)->first()->employee_name.'<br/><br/>ID: '.$leaveApplication->empID.'<br/><br/>Department: '.$leaveApplication->empDeptID.'<br/><br/>Designation: '.$leaveApplication->empDesigID.'<br/><br/> Leave Type: '.$leaveApplication->leaveTypeID.'<br/><br/> Leave Part: '.$leaveApplication->leavePartID.'<br/><br/> Day: '.$leaveApplication->leaveDay.'<br/><br/> leave Spend :'.LeaveApplication::where('empID',$leaveApplication->empID)->where('status',1)->where('leaveTypeID',$leaveApplication->leaveTypeID)->sum('leaveDay').'<br/><br/> Start Date :'.date('F j, Y',strtotime($leaveApplication->fromDate)).'<br/><br/> End Date: '.date('F j, Y',strtotime($leaveApplication->toDate)).'<br/><br/> Purpose: '.$leaveApplication->purpose.'<br/><br/>Address:'.$leaveApplication->address.'<br/><br/>Duty cover Employee Name: '.Employee::where('id',$leaveApplication->dcEmpID)->first()->employee_name.'<br/><br/>Duty cover Employee Id: '.$leaveApplication->dcEmpID.'<br/><br/> Duty cover Employee Department: '.$leaveApplication->dcEmpDeptID.'<br/><br/>Duty cover Employee Designation: '.$leaveApplication->dcEmpDesigID.'<br/><br/>';
+            ->select('fromDate','toDate','purpose','cAddress','employee_name','employee_id','empID','leave_applications.leaveTypeID','departments.name as dept_name','designations.name as des_name','levaePartName','leave_types.description as type_name','leaveDay')
+            ->where('leave_applications.id',$request->id)->first();
+            $sendDay = LeaveApplication::where('empID',$leaveApplication->empID)->where('status',1)->where('leaveTypeID',$leaveApplication->leaveTypeID)->sum('leaveDay');
+            // dd($leaveApplication);
+
+            $viewApplicationData='Name: '.$leaveApplication?->employee_name.
+            '<br/><br/>ID: '.$leaveApplication->employee_id.
+            '<br/><br/>Department: '.$leaveApplication->dept_name.
+            '<br/><br/>Designation: '.$leaveApplication->des_name.
+            '<br/><br/> Leave Type: '.$leaveApplication->type_name.
+            '<br/><br/> Leave Part: '.$leaveApplication->levaePartName.
+            '<br/><br/> Day: '.$leaveApplication->leaveDay.
+            '<br/><br/> leave Spend :'.$sendDay.
+            '<br/><br/> Start Date :'.date('F j, Y',strtotime($leaveApplication->fromDate)).
+            '<br/><br/> End Date: '.date('F j, Y',strtotime($leaveApplication->toDate)).
+            '<br/><br/> Purpose: '.$leaveApplication->purpose.
+            '<br/><br/>Address:'.$leaveApplication->address.'<br/><br/>';
         }
 
         return response()->json(['status'=>'ok','viewApplicationData' => $viewApplicationData,'leaveApplicationID'=>$request->id]);

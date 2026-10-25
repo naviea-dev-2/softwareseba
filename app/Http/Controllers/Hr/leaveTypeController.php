@@ -97,13 +97,11 @@ class leaveTypeController extends Controller
         }
         $data=LeaveType::find($id);
         $data->delete();
-
         $notification=array(
                 'message'=>"Delete successfull",
                 'alert-type'=>'success'
              );
-
-            return redirect()->route('leaveType.view');
+        return redirect()->to(route('leaveApplication.view') . '#leaveType');
 
     }
 

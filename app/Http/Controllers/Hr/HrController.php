@@ -1122,12 +1122,9 @@ class HrController extends Controller
                 // join date difference     find
                 
                 $to =Carbon::createFromFormat('Y-m-d', $request->monthDate.'-'.$month->monthTotalDay);
-
                 $from =Carbon::createFromFormat('Y-m-d', $employee->join_date);
-                
                 $dateDiff = $from->diffInDays($to);
                 $dateDiff+=1;
-                // dd($dateDiff);
 
                 $startDate=$request->monthDate.'-1';
                 $startDate=Carbon::createFromFormat('Y-m-d', $startDate);

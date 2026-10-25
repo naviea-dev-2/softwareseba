@@ -93,56 +93,14 @@
 
     <link rel="shortcut icon" href="{{ $gtext['favicon'] ? asset('public/upload/site_setting/'.$gtext['favicon']) : asset('public/assets/images/fav.png') }}" type="image/x-icon">
     <link rel="icon" href="{{ $gtext['favicon'] ? asset('public/upload/site_setting/'.$gtext['favicon']) : asset('public/assets/images/fav.png') }}" type="image/x-icon">
-
     <style>
         :root {
-            --header_back_color: {
-                    {
-                    $f_gtext['header_back_color']
-                }
-            }
-
-            ;
-
-            --header_font_color: {
-                    {
-                    $f_gtext['header_font_color']
-                }
-            }
-
-            ;
-
-            --sidebar_back_color: {
-                    {
-                    $f_gtext['sidebar_back_color']
-                }
-            }
-
-            ;
-
-            --sidebar_font_color: {
-                    {
-                    $f_gtext['sidebar_font_color']
-                }
-            }
-
-            ;
-
-            --sidebar_font_hover_color: {
-                    {
-                    $f_gtext['sidebar_font_hover_color']
-                }
-            }
-
-            ;
-
-            --sidebar_back_hover_color: {
-                    {
-                    $f_gtext['sidebar_back_hover_color']
-                }
-            }
-
-            ;
+            --header_back_color: {{ $f_gtext['header_back_color'] ?? '#ffffff' }};
+            --header_font_color: {{ $f_gtext['header_font_color'] ?? '#000000' }};
+            --sidebar_back_color: {{ $f_gtext['sidebar_back_color'] ?? '#f8f9fa' }};
+            --sidebar_font_color: {{ $f_gtext['sidebar_font_color'] ?? '#212529' }};
+            --sidebar_font_hover_color: {{ $f_gtext['sidebar_font_hover_color'] ?? '#ffffff' }};
+            --sidebar_back_hover_color: {{ $f_gtext['sidebar_back_hover_color'] ?? '#1a6dc8' }};
         }
     </style>
 
