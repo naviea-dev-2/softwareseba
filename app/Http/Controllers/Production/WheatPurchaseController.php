@@ -127,12 +127,12 @@ class WheatPurchaseController extends Controller
     }
     private function owned(int $id): WheatPurchase
     {
-        return WheatPurchase::where('user_id', $this->businessId)->findOrFail($id);
+        return WheatPurchase::where('user_id', $this->businessTypeId)->findOrFail($id);
     }
 
     private function validated(Request $request, ?int $id = null): array
     {
-        $scope = $this->businessId;
+        $scope = $this->businessTypeId;
         $data = $request->validate([
             'purchase_date' => 'nullable|date',
             'weight_slip_no' => ['required', 'string', 'max:100', Rule::unique('production_wheat_purchases')->where('user_id', $scope)->ignore($id)],
