@@ -2,7 +2,7 @@
 
 namespace App\Models\Production;
 
-use App\Models\BankAccount;
+use App\Models\Account\BalanceAccount;
 use App\Models\Production\WheatPurchase;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,6 +25,6 @@ class WheatPurchasePayment extends Model
 
     public function bankAccount()
     {
-        return $this->belongsTo(BankAccount::class);
+        return $this->belongsTo(BalanceAccount::class);
     }
 }
