@@ -1,3 +1,7 @@
+@if (session('status'))
+    <div class="alert">{{ session('status') }}</div>
+@endif
+
 @if(session('success'))
 <div class="alert alert-success alert-dismissible fade show">
     <i class="bx bx-check-circle"></i>
