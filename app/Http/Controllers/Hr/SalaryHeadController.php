@@ -38,6 +38,7 @@ class SalaryHeadController extends Controller
 
     public function update(Request $request, SalaryHead $salaryHead)
     {
+        dd($salaryHead);
         $salaryHead->update($this->validated($request, $salaryHead->id));
 
         return redirect()->route('salary-heads.index')->with('status', 'Salary head updated.');
