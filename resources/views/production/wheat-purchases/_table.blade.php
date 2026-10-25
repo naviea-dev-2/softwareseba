@@ -333,7 +333,7 @@
                                         <option value="">— Select Bank Account —</option>
                                         @foreach($bankAccounts ?? [] as $account)
                                             <option value="{{ $account->id }}">
-                                                {{ $account->acName }} ({{ $account->acNumber }})
+                                                {{ $account->account_name }} ({{ $account->account_number }})
                                             </option>
                                         @endforeach
                                     </select>

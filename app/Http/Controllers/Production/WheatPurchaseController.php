@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Production;
 
 use App\Http\Controllers\Controller;
-use App\Models\BankAccount;
+use App\Models\Account\BalanceAccount;
 use App\Models\Production\RawMaterial;
 use App\Models\Production\WheatPurchase;
 use App\Models\Production\WheatPurchasePayment;
@@ -16,11 +16,16 @@ use Illuminate\Validation\ValidationException;
 class WheatPurchaseController extends Controller
 {
     protected $businessId;
+    protected $businessTypeId;
 
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
             $this->businessId = Auth::user()->business
+                ? Auth::user()->business->id
+                : 0;
+
+            $this->businessTypeId = Auth::user()->business
                 ? Auth::user()->business->business_type_id
                 : 0;
 
@@ -30,7 +35,7 @@ class WheatPurchaseController extends Controller
 
     private function baseQuery(Request $request)
     {
-        return WheatPurchase::query()->where('user_id', $this->businessId)
+        return WheatPurchase::query()->where('user_id', $this->businessTypeId)
             ->when($request->filled('from'), fn($q) => $q->whereDate('purchase_date', '>=', $request->input('from')))
             ->when($request->filled('to'), fn($q) => $q->whereDate('purchase_date', '<=', $request->input('to')))
             ->when($request->filled('supplier'), fn($q) => $q->where('supplier_name', 'like', '%' . $request->input('supplier') . '%'))
@@ -99,9 +104,9 @@ class WheatPurchaseController extends Controller
     /** NEW — bank accounts dropdown data (scoped to the business) */
     private function bankAccounts()
     {
-        return BankAccount::where('business_id', $this->businessId)
-            ->orderBy('acName')
-            ->get(['id', 'acName', 'acNumber']);
+        return BalanceAccount::where('business_id', $this->businessId)
+            ->orderBy('account_name')
+            ->get(['id', 'account_name', 'account_number']);
     }
 
     public function create()
@@ -154,7 +159,7 @@ class WheatPurchaseController extends Controller
     public function store(Request $request)
     {
         $data = $this->validated($request);
-        $data['user_id'] = $this->businessId;
+        $data['user_id'] = $this->businessTypeId;
         WheatPurchase::create($data);
         return redirect()->route('production.wheat-purchases.index')->with('success', 'Wheat delivery saved.');
     }
@@ -201,7 +206,7 @@ class WheatPurchaseController extends Controller
 
         DB::transaction(function () use ($purchase, $validated) {
             WheatPurchasePayment::create([
-                'user_id'           => $this->businessId,
+                'user_id'           => $this->businessTypeId,
                 'wheat_purchase_id' => $purchase->id,
                 'amount'            => $validated['amount'],
                 'method'            => $validated['method'],

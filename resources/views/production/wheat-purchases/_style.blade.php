@@ -1,19 +1,37 @@
 <style>
+/* ============================================================
+   WHEAT MODULE STYLES (merged)
+   ============================================================ */
+
 /* ============ LAYOUT SHELL ============ */
 .wheat-wrap {
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 18px 16px 40px;
+    max-width: 1450px;
+    margin: 22px auto;
+    padding: 0 15px 40px;
+    color: #243247;
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-    color: #1f2937;
 }
 
 .wheat-muted {
-    color: #6b7280;
-    font-size: .85rem;
+    color: #718096;
+    font-size: 13px;
 }
 
 /* ============ PAGE HEADER ============ */
+.wheat-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+.wheat-top h2 {
+    font-size: 25px;
+    font-weight: 750;
+    margin: 0;
+}
+
 .wheat-pagehead {
     display: flex;
     justify-content: space-between;
@@ -24,7 +42,7 @@
     background: linear-gradient(135deg, #065f46 0%, #047857 50%, #0d9488 100%);
     border-radius: 14px;
     color: #fff;
-    box-shadow: 0 10px 24px -12px rgba(4,120,87,.55);
+    box-shadow: 0 10px 24px -12px rgba(4, 120, 87, .55);
     flex-wrap: wrap;
 }
 .wheat-pagehead-left {
@@ -33,9 +51,11 @@
     gap: 14px;
 }
 .wheat-pagehead-icon {
-    width: 48px; height: 48px;
-    display: grid; place-items: center;
-    background: rgba(255,255,255,.18);
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, .18);
     border-radius: 12px;
     font-size: 1.6rem;
     color: #fef3c7;
@@ -61,53 +81,94 @@
 .wheat-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    padding: 8px 14px;
-    border-radius: 9px;
-    font-size: .88rem;
-    font-weight: 600;
-    text-decoration: none;
-    border: 1px solid transparent;
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 8px;
+    background: #234c83;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 13px;
+    font-weight: 650;
     cursor: pointer;
     transition: .15s ease;
     line-height: 1;
 }
-.wheat-btn i { font-size: 1.05rem; }
+.wheat-btn i {
+    font-size: 1.05rem;
+    vertical-align: middle;
+}
+.wheat-btn:hover {
+    filter: brightness(.95);
+}
 
 .wheat-btn.primary {
     background: #059669;
-    color: #fff;
+    color: #fff !important;
 }
 .wheat-btn.primary:hover {
     background: #047857;
+    filter: none;
     transform: translateY(-1px);
-    box-shadow: 0 6px 12px -6px rgba(5,150,105,.6);
+    box-shadow: 0 6px 12px -6px rgba(5, 150, 105, .6);
 }
+
 .wheat-btn.light {
-    background: #ffffff;
-    color: #065f46;
-    border-color: #d1fae5;
+    background: #eff3f8;
+    color: #234c83 !important;
 }
 .wheat-btn.light:hover {
-    background: #ecfdf5;
-    border-color: #a7f3d0;
+    background: #e3eaf3;
+    filter: none;
 }
+
+.wheat-btn.danger {
+    background: #fff1f2;
+    color: #be123c !important;
+}
+.wheat-btn.danger:hover {
+    background: #ffe4e6;
+    filter: none;
+}
+
+.wheat-btn.info {
+    background: #0dcaf0;
+    color: #000 !important;
+    border: 1px solid #0dcaf0;
+}
+.wheat-btn.info:hover {
+    background: #0bb7d8;
+    filter: none;
+}
+
+.wheat-btn.small {
+    padding: 6px 9px;
+    font-size: 12px;
+}
+
+.wheat-btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+/* Header button overrides */
 .wheat-pagehead .wheat-btn.light {
-    background: rgba(255,255,255,.16);
-    color: #fff;
-    border-color: rgba(255,255,255,.35);
+    background: rgba(255, 255, 255, .16);
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, .35);
     backdrop-filter: blur(4px);
 }
 .wheat-pagehead .wheat-btn.light:hover {
-    background: rgba(255,255,255,.28);
+    background: rgba(255, 255, 255, .28);
 }
 
 /* ============ KPI CARDS ============ */
 .wheat-kpis {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     gap: 14px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
 }
 .wheat-kpi {
     display: flex;
@@ -115,18 +176,20 @@
     gap: 14px;
     padding: 16px 18px;
     background: #fff;
+    border: 1px solid #e4e9f0;
     border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 2px 6px -4px rgba(0,0,0,.08);
+    box-shadow: 0 2px 6px -4px rgba(0, 0, 0, .08);
     transition: .15s ease;
 }
 .wheat-kpi:hover {
     transform: translateY(-2px);
-    box-shadow: 0 10px 22px -12px rgba(0,0,0,.25);
+    box-shadow: 0 10px 22px -12px rgba(0, 0, 0, .25);
 }
 .wheat-kpi-icon {
-    width: 46px; height: 46px;
-    display: grid; place-items: center;
+    width: 46px;
+    height: 46px;
+    display: grid;
+    place-items: center;
     border-radius: 10px;
     font-size: 1.4rem;
     flex-shrink: 0;
@@ -147,6 +210,13 @@
     text-overflow: ellipsis;
 }
 
+/* Fallback for plain text KPIs */
+.wheat-kpi > b {
+    display: block;
+    font-size: 22px;
+    margin-top: 6px;
+}
+
 /* KPI color variants */
 .wheat-kpi-deliveries .wheat-kpi-icon { background: #eff6ff; color: #2563eb; }
 .wheat-kpi-kg         .wheat-kpi-icon { background: #ecfeff; color: #0891b2; }
@@ -155,23 +225,30 @@
 .wheat-kpi-paid       .wheat-kpi-icon { background: #dcfce7; color: #15803d; }
 .wheat-kpi-due        .wheat-kpi-icon { background: #fee2e2; color: #b91c1c; }
 
-.wheat-kpi-paid .wheat-kpi-body b   { color: #15803d; }
-.wheat-kpi-due  .wheat-kpi-body b   { color: #b91c1c; }
+.wheat-kpi-paid .wheat-kpi-body b { color: #15803d; }
+.wheat-kpi-due  .wheat-kpi-body b { color: #b91c1c; }
 
 /* ============ CARDS ============ */
 .wheat-card {
     background: #fff;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #e4e9f0;
     border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(29, 43, 68, .045);
+    padding: 22px;
     margin-bottom: 18px;
-    box-shadow: 0 2px 8px -6px rgba(0,0,0,.10);
     overflow: hidden;
+}
+.wheat-card h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 18px;
 }
 .wheat-card-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 14px 20px;
+    margin: -22px -22px 18px;
     border-bottom: 1px solid #f1f5f9;
     background: #fafbff;
 }
@@ -189,7 +266,7 @@
     font-size: 1.15rem;
 }
 .wheat-card-body {
-    padding: 16px 20px;
+    padding: 0;
 }
 .wheat-flex-between {
     display: flex;
@@ -200,6 +277,85 @@
 }
 .wheat-card-filter .wheat-card-body {
     padding-bottom: 8px;
+}
+
+/* ============ FORM FIELDS ============ */
+.wheat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+.wheat-field label {
+    font-weight: 650;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 7px;
+}
+.wheat-field input,
+.wheat-field select,
+.wheat-field textarea {
+    display: block;
+    width: 100%;
+    min-height: 43px;
+    padding: 10px 12px;
+    border: 1px solid #dce3eb;
+    border-radius: 9px;
+    background: #fff;
+    color: #243247;
+    box-sizing: border-box;
+    transition: .15s;
+}
+.wheat-field input:focus,
+.wheat-field select:focus,
+.wheat-field textarea:focus {
+    outline: none;
+    border-color: #4384f4;
+    box-shadow: 0 0 0 3px rgba(36, 101, 238, .1);
+}
+.wheat-field textarea {
+    min-height: 90px;
+}
+
+.wheat-filter {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    align-items: end;
+}
+.wheat-filter .wheat-field input,
+.wheat-filter .wheat-field select {
+    min-height: 40px;
+}
+
+.wheat-full {
+    grid-column: 1 / -1;
+}
+
+/* ============ ACTIONS ROW ============ */
+.wheat-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.wheat-actions-cell {
+    white-space: nowrap;
+    width: 1%;
+}
+.wheat-table .wheat-actions {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    align-items: center;
+}
+.wheat-actions form {
+    margin: 0;
+}
+.wheat-table .wheat-actions .wheat-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 7px;
+    line-height: 1;
 }
 
 /* ============ FILTERED TOTALS STRIP ============ */
@@ -234,49 +390,83 @@
 }
 .wheat-ft-purchase { border-left: 4px solid #d97706; }
 .wheat-ft-purchase b { color: #b45309; }
+.wheat-ft-paid     { border-left: 4px solid #16a34a; }
+.wheat-ft-paid b   { color: #15803d; }
+.wheat-ft-due      { border-left: 4px solid #dc2626; }
+.wheat-ft-due b    { color: #b91c1c; }
 
-.wheat-ft-paid { border-left: 4px solid #16a34a; }
-.wheat-ft-paid b { color: #15803d; }
-
-.wheat-ft-due { border-left: 4px solid #dc2626; }
-.wheat-ft-due b { color: #b91c1c; }
-
-/* ============ TABLE BODY ============ */
-.wheat-table-body {
-    padding: 0 !important;
-}
+/* ============ TABLES ============ */
 .wheat-table-wrap {
     overflow-x: auto;
 }
 .wheat-table {
+    border-collapse: collapse;
     width: 100%;
-    border-collapse: separate;
+    font-size: 13px;
+    white-space: nowrap;
     border-spacing: 0;
-    font-size: .88rem;
 }
+.wheat-table th,
 .wheat-table thead th {
-    background: #f1f5f9;
-    color: #334155;
+    background: #243a57;
+    color: #fff;
+    padding: 12px 10px;
+    text-align: left;
     font-weight: 600;
     font-size: .78rem;
     text-transform: uppercase;
     letter-spacing: .03em;
-    padding: 10px 12px;
-    border-bottom: 1px solid #e2e8f0;
     white-space: nowrap;
-    text-align: left;
+    border-bottom: 1px solid #1f3149;
 }
+.wheat-table td,
 .wheat-table tbody td {
-    padding: 10px 12px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #1f2937;
+    padding: 11px 10px;
+    border-bottom: 1px solid #edf1f5;
+    color: #243247;
     vertical-align: middle;
 }
 .wheat-table tbody tr:hover {
-    background: #f8fafc;
+    background: #f7faff;
 }
-.wheat-right { text-align: right; }
-.wheat-no-print { text-align: center; }
+.wheat-table tbody tr:nth-child(odd) {
+    background: #f8fbff;
+}
+.wheat-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+.wheat-table thead th.wheat-right {
+    text-align: right;
+}
+
+.wheat-table-body {
+    padding: 0 !important;
+}
+
+.wheat-right {
+    text-align: right;
+}
+.wheat-no-print {
+    text-align: center;
+}
+
+/* ============ ALERTS ============ */
+.wheat-alert {
+    padding: 12px 15px;
+    border-radius: 9px;
+    margin-bottom: 15px;
+    background: #e9f8ef;
+    color: #17613c;
+}
+.wheat-invalid {
+    background: #fff4e8;
+    color: #9b4a00;
+}
+.wheat-error {
+    font-size: 12px;
+    color: #c53030;
+    margin-top: 5px;
+}
 
 /* ============ PAGINATION ============ */
 .wheat-pagination {
@@ -285,40 +475,11 @@
     background: #fafbff;
 }
 
-/* small text helpers */
-.text-danger  { color: #dc2626 !important; }
-.text-success { color: #16a34a !important; }
-
-    .wheat-text-danger  { color: #dc3545; }
-    .wheat-text-success { color: #28a745; }
-
-    .wheat-actions-cell {
-        white-space: nowrap;
-        width: 1%;
-    }
-    .wheat-actions {
-        display: inline-flex;
-        flex-wrap: nowrap;
-        gap: 4px;
-        align-items: center;
-    }
-    .wheat-actions form { margin: 0; }
-    .wheat-actions .wheat-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 4px 7px;
-        line-height: 1;
-    }
-    .wheat-btn i        { font-size: 1.1em; vertical-align: middle; }
-    .wheat-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .wheat-btn.info     { background: #0dcaf0; color: #000; border: 1px solid #0dcaf0; }
-    .wheat-btn.info:hover { background: #0bb7d8; }
-/* ============ REPORT PAGE ============ */
+/* ============ PRINT TITLE (hidden on screen) ============ */
 .wheat-print-title {
-    display: none;              /* hidden on screen, shown on print */
+    display: none;
     text-align: center;
-    margin-bottom: 18px;
+    margin: 0 0 20px;
 }
 .wheat-print-title h2 {
     margin: 0 0 2px;
@@ -343,60 +504,115 @@
     color: #64748b;
 }
 
-/* Report table header alignment */
-.wheat-table thead th.wheat-right {
-    text-align: right;
+/* ============ TEXT HELPERS ============ */
+.text-danger,
+.wheat-text-danger  { color: #dc2626 !important; }
+.text-success,
+.wheat-text-success { color: #16a34a !important; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 1200px) {
+    .wheat-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
-/* Ensure summary KPI grid behaves on report page too */
-.wheat-kpis {
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+@media (max-width: 850px) {
+    .wheat-kpis,
+    .wheat-filter,
+    .wheat-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
-/* ============ PRINT STYLES ============ */
+@media (max-width: 560px) {
+    .wheat-grid,
+    .wheat-kpis,
+    .wheat-filter {
+        grid-template-columns: 1fr;
+    }
+    .wheat-wrap {
+        padding: 0 10px 30px;
+    }
+    .wheat-top h2 {
+        font-size: 22px;
+    }
+}
+
+/* ============ PRINT ============ */
 @media print {
     body {
         background: #fff !important;
     }
+
+    .main-menu,
+    .header-navbar,
+    .navbar,
     .wheat-no-print,
+    .wheat-pagehead,
+    .wheat-card-filter,
+    .wheat-pagination,
+    aside,
     nav,
     header,
     footer,
     .sidebar,
-    .breadcrumb,
-    .wheat-pagehead,
-    .wheat-card-filter,
-    .wheat-pagination {
+    .breadcrumb {
         display: none !important;
     }
+
     .wheat-wrap {
         max-width: none;
-        padding: 0;
         margin: 0;
+        padding: 0;
     }
+
     .wheat-card {
-        box-shadow: none;
         border: 1px solid #cbd5e1;
-        page-break-inside: avoid;
+        box-shadow: none;
+        padding: 0;
         margin-bottom: 14px;
         border-radius: 0;
+        page-break-inside: avoid;
     }
     .wheat-card-head {
         background: #f1f5f9 !important;
         border-bottom: 1px solid #cbd5e1;
+        margin: 0;
+        padding: 8px 12px;
     }
+
     .wheat-table {
-        font-size: 11px;
+        font-size: 10px;
+        width: 100% !important;
+        table-layout: auto !important;
     }
+    .wheat-table th,
+    .wheat-table td {
+        padding: 5px;
+        border: 1px solid #ccc !important;
+    }
+    .wheat-table th,
     .wheat-table thead th {
         background: #e2e8f0 !important;
         color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
     .wheat-table tbody td {
         border-bottom: 1px solid #e2e8f0 !important;
     }
+    .wheat-table thead {
+        display: table-header-group;
+    }
+    .wheat-table tr {
+        page-break-inside: avoid;
+    }
+    .wheat-table-wrap {
+        overflow: visible !important;
+    }
 
-    /* Show print-only title */
+    /* Print title */
     .wheat-print-title {
         display: block !important;
         page-break-after: avoid;
@@ -425,19 +641,9 @@
         font-size: 1rem !important;
     }
 
-    /* Ensure table fits the page */
-    .wheat-table-wrap {
-        overflow: visible !important;
-    }
-    .wheat-table {
-        width: 100% !important;
-        table-layout: auto !important;
-    }
-    .wheat-table thead {
-        display: table-header-group; /* repeat headers on each page */
-    }
-    .wheat-table tr {
-        page-break-inside: avoid;
+    @page {
+        size: A4 landscape;
+        margin: 10mm;
     }
 }
 </style>
