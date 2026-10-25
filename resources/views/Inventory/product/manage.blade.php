@@ -680,16 +680,16 @@
             e.preventDefault();
             const id = $(this).attr('data-id');
             Swal.fire({
-                title: @json(__('lang.are_you_sure')),
-                text: @json(__('lang.you_wont_be_able_to_revert_this')),
+                title: "Are you sure ?",
+                text: "You won't be able to restore it",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#2465ee',
                 cancelButtonColor: '#d33',
-                confirmButtonText: @json(__('lang.yes_delete_it')),
-                cancelButtonText: @json(__('lang.cancel'))
+                confirmButtonText: 'Yes Delete It',
+                cancelButtonText:'Cancel'
             }).then(function(result) {
-                if (result.isConfirmed || result.value) window.location = @json(url('product-delete')) + '/' + encodeURIComponent(id);
+                if (result.isConfirmed || result.value) window.location = @json(url('business/product-delete')) + '/' + encodeURIComponent(id);
             });
         });
     });

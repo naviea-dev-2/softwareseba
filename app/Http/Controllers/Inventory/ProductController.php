@@ -84,7 +84,7 @@ class ProductController extends Controller
         {
              $i = $start == 0 ? 1 : $start+1;
             $p_edit = can_p('product.edit');
-           // $p_delete = can_p('product.delete');
+            $p_delete = can_p('product.delete');
             $p_barcode = can_p('product.generate_barcode');
             foreach($products as $product)
             {
@@ -102,9 +102,9 @@ class ProductController extends Controller
                 if($p_barcode){
                     $nestedData['options'] .= '<a class="btn btn-primary data_edit me-2" href="'.route('product.generate_barcode','p_id='.$product->id).'"><i class="bx bx-barcode"></i></a>';
                 }
-               // if($p_delete){
-                // $nestedData['options'] .= '<a href="#" data-id="'.$product->id.'" class="del_data btn btn-danger"><i class="bx bx-trash"></i></a>';
-                //}
+                if($p_delete){
+                $nestedData['options'] .= '<a href="#" data-id="'.$product->id.'" class="del_data btn btn-danger"><i class="bx bx-trash"></i></a>';
+                }
                 $data[] = $nestedData;
 
             }
@@ -618,7 +618,6 @@ class ProductController extends Controller
 
         }catch(\Exception $e){
             DB::rollBack();
-           // dd($e->getMessage());
             $notification=array(
                 'message'=>"Can not Delete!",
                 'alert-type'=>'error'
