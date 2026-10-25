@@ -33,5 +33,6 @@ Route::prefix('business')->middleware(['auth', "is_active", 'permission'])->grou
         Route::get('wheat-purchases/report', [WheatPurchaseController::class, 'report'])->name('wheat-purchases.report');
         Route::get('wheat-purchases/export', [WheatPurchaseController::class, 'export'])->name('wheat-purchases.export');
         Route::resource('wheat-purchases', WheatPurchaseController::class);
+        Route::post('wheat-purchases/{wheat_purchase}/pay', [WheatPurchaseController::class, 'pay'])->name('wheat-purchases.pay');
     });
 });

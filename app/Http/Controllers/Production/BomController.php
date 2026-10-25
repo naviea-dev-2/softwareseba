@@ -125,7 +125,6 @@ class BomController extends Controller
             ->findOrFail($id);
 
         $products = Product::latest()->get();
-
         $rawMaterials = RawMaterial::where(
             'user_id',
             $this->businessId
