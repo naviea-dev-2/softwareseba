@@ -47,8 +47,9 @@
                     $data= $employeeData;
                 @endphp
                 <div class="border p-3">
-                    <form action="{{ route('updateEmployee',$data->id) }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('employee.update',$data->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
+                        @method('PUT')
                         <div class="row">
                             <input type="hidden" value="0" name="id"  >
                             <div class="col-md-3 mt-2">

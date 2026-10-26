@@ -61,7 +61,7 @@
                 Employee
             </h5>
 
-            <a href="{{ route('addEmployee') }}"
+            <a href="{{ route('employee.create') }}"
                class="btn btn-primary">
                 Add Employee
             </a>
@@ -331,7 +331,7 @@ $(document).ready(function () {
             cancelButtonText: '{{ __("lang.cancel") }}'
         }).then(function (result) {
 
-            if (result.isConfirmed) {
+            if (result.value) {
                 window.location = action;
             }
 

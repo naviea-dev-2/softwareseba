@@ -2,8 +2,9 @@
     $tabs = [
        
         ['salary.*', 'salary.index', 'Salary'],
-        ['advances.*', 'advances.index', 'Advance'],
         ['payments.*', 'payments.index', 'Salary Payment'],
+        ['advances.*', 'advances.index', 'Advance'],
+        ['bonuses.*', 'bonuses.index', 'Bonus'],
         ['pay-assignments.*', 'pay-assignments.index', 'Payroll Assign'],
         ['salary-heads.*', 'salary-heads.index', 'Salary Head'],
     ];
