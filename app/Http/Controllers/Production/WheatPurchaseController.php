@@ -150,9 +150,15 @@ class WheatPurchaseController extends Controller
             'remarks' => 'nullable|string',
             'status' => 'required|in:draft,confirmed,cancelled',
         ]);
-        $net = round((float)$data['loaded_weight_kg'] - (float)$data['empty_weight_kg'], 3);
-        $data['net_weight_kg'] = $net;
-        $data['purchase_amount'] = round($net * (float)$data['rate_per_kg'], 2);
+        $net = (float) $data['loaded_weight_kg'] - (float) $data['empty_weight_kg'];
+
+        $data['net_weight_kg'] = number_format($net, 2, '.', '');
+        $data['purchase_amount'] = number_format(
+            $net * (float) $data['rate_per_kg'],
+            2,
+            '.',
+            ''
+        );
         return $data;
     }
 
@@ -190,7 +196,7 @@ class WheatPurchaseController extends Controller
             'bank_account_id' => [
                 'nullable',
                 'required_if:method,bank',
-                Rule::exists('bank_accounts', 'id')->where('business_id', $this->businessId),
+                Rule::exists('balance_accounts', 'id')->where('business_id', $this->businessId),
             ],
             'note'            => ['nullable', 'string', 'max:500'],
         ]);

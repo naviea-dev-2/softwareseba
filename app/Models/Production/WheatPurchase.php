@@ -13,10 +13,10 @@ class WheatPurchase extends Model
     protected $guarded = ['id'];
     protected $casts = [
         'purchase_date' => 'date',
-        'empty_weight_kg' => 'decimal:3',
-        'loaded_weight_kg' => 'decimal:3',
-        'net_weight_kg' => 'decimal:3',
-        'rate_per_kg' => 'decimal:4',
+        'empty_weight_kg' => 'decimal:2',
+        'loaded_weight_kg' => 'decimal:2',
+        'net_weight_kg' => 'decimal:2',
+        'rate_per_kg' => 'decimal:2',
         'purchase_amount' => 'decimal:2',
         'paid_amount' => 'decimal:2',
     ];
