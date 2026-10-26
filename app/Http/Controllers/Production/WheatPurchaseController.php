@@ -76,7 +76,7 @@ class WheatPurchaseController extends Controller
             ->with(['payments' => fn($q) => $q->latest()])
             ->orderByDesc('purchase_date')
             ->orderByDesc('id')
-            ->paginate(25)
+            ->paginate(10)
             ->withQueryString();
 
         $bankAccounts = $this->bankAccounts();
