@@ -48,14 +48,14 @@
                                 : $p->bag_quantity . ' Bag') }}
                     </td>
 
-                    <td class="wheat-right">{{ number_format($p->empty_weight_kg, 3) }}</td>
-                    <td class="wheat-right">{{ number_format($p->loaded_weight_kg, 3) }}</td>
-                    <td class="wheat-right">{{ number_format($p->net_weight_kg, 3) }}</td>
+                    <td class="wheat-right">{{ number_format($p->empty_weight_kg, 2) }}</td>
+                    <td class="wheat-right">{{ number_format($p->loaded_weight_kg, 2) }}</td>
+                    <td class="wheat-right">{{ number_format($p->net_weight_kg, 2) }}</td>
 
                     <td>{{ $p->supplier_name }}</td>
                     <td>{{ $p->slip_receiver }}</td>
 
-                    <td class="wheat-right">{{ number_format($p->rate_per_kg, 4) }}</td>
+                    <td class="wheat-right">{{ number_format($p->rate_per_kg, 2) }}</td>
                     <td class="wheat-right">{{ number_format($p->purchase_amount, 2) }}</td>
 
                     <td class="wheat-right">{{ number_format($paid, 2) }}</td>
