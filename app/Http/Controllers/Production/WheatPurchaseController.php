@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use App\Exports\WheatPurchaseExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class WheatPurchaseController extends Controller
 {
@@ -242,38 +244,27 @@ class WheatPurchaseController extends Controller
         return view('production.wheat-purchases.report', compact('purchases', 'summary', 'monthly', 'suppliers'));
     }
 
+
+
     public function export(Request $request)
     {
-        $purchases = $this->baseQuery($request)->orderBy('purchase_date')->orderBy('id')->cursor();
-        return response()->streamDownload(function () use ($purchases) {
-            $out = fopen('php://output', 'w');
-            fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['SI NO', 'Date', 'Weight ID', 'Vehicle No', 'Driver Name', "Driver's Mobile", 'Quantity', 'Unload Weight (kg)', 'Load Weight (kg)', 'Net Weight (Kg)', 'Party Name', 'Slip Receiver', 'Monthly Purchase TON', 'Per (Price kg)', 'Total Purchase (Price kg)', 'Paid Amount', 'Due Amount']);
-            $n = 0;
-            foreach ($purchases as $p) {
-                $paid = (float) ($p->paid_amount ?? 0);
-                $due  = (float) $p->purchase_amount - $paid;
-                fputcsv($out, [
-                    ++$n,
-                    optional($p->purchase_date)->format('Y-m-d'),
-                    $p->weight_slip_no,
-                    $p->vehicle_no,
-                    $p->driver_name,
-                    $p->driver_mobile,
-                    $p->quantity_description ?: ($p->bag_quantity === null ? '' : $p->bag_quantity . ' Bag'),
-                    $p->empty_weight_kg,
-                    $p->loaded_weight_kg,
-                    $p->net_weight_kg,
-                    $p->supplier_name,
-                    $p->slip_receiver,
-                    '',
-                    $p->rate_per_kg,
-                    $p->purchase_amount,
-                    $paid,
-                    $due
-                ]);
-            }
-            fclose($out);
-        }, 'wheat-purchase-report-' . now()->format('Ymd-His') . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+        // Keep the existing filters.
+        $query = $this->baseQuery($request);
+
+        // Calculate totals for all matching records.
+        $totalPurchase = (float) (clone $query)->sum('purchase_amount');
+        $totalPaid = (float) (clone $query)->sum('paid_amount');
+        $totalDue = $totalPurchase - $totalPaid;
+
+        // Download formatted Excel workbook.
+        return Excel::download(
+            new WheatPurchaseExport(
+                $query,
+                $totalPurchase,
+                $totalPaid,
+                $totalDue
+            ),
+            'wheat-purchase-report-' . now()->format('Ymd-His') . '.xlsx'
+        );
     }
 }
