@@ -43,7 +43,7 @@
                     <h5 class="">Add Employee Information</h5>
                 </div>
                 <div class="border p-3">
-                    <form action="{{ route("storeEmployee") }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route("employee.store") }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <input type="hidden" value="0" name="id"  >

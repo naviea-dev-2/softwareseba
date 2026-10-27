@@ -34,7 +34,7 @@
         .actions{grid-column:1/-1;display:flex;gap:8px}
         .table-wrap{overflow:auto;max-height:560px;border:1px solid var(--border);border-radius:var(--radius)}
         table{width:100%;border-collapse:collapse}
-        th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+        th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--border);white-space:nowrap;border-left: 1px solid #e5e7eb;}
         thead th{position:sticky;top:0;z-index:1;background:var(--bg);font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
         tbody tr:nth-child(even){background:rgba(127,127,127,.04)}
         tbody tr:hover{background:var(--bg)}

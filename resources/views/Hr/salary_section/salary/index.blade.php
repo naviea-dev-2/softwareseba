@@ -22,7 +22,7 @@
         <select name="employee_id">
             <option value="">All employees</option>
             @foreach ($employees as $e)
-                <option value="{{ $e->id }}" @selected(request('employee_id') == $e->id)>{{ $e->name }}</option>
+                <option value="{{ $e->id }}" @selected(request('employee_id') == $e->id)>{{ $e->employee_name }}</option>
             @endforeach
         </select>
         @include('Hr.salary_section.partial.per-page')
@@ -49,7 +49,7 @@
                     @endphp
                     <tr>
                         <td>{{ $r->payroll_month }}</td>
-                        <td>{{ $r->employee->name }}</td>
+                        <td>{{ $r->employee->employee_name }}</td>
                         <td style="text-align:right">{{ number_format($c['basic'], 2) }}</td>
                         <td style="text-align:right">{{ $c['absent_days'] }}</td>
                         <td style="text-align:right">{{ number_format($c['gross'], 2) }}</td>
@@ -94,7 +94,7 @@
                     <select name="employee_id" required>
                         <option value="">— select —</option>
                         @foreach ($employees as $e)
-                            <option value="{{ $e->id }}" @selected(old('employee_id', $editing->employee_id) == $e->id)>{{ $e->name }}</option>
+                            <option value="{{ $e->id }}" @selected(old('employee_id', $editing->employee_id) == $e->id)>{{ $e->employee_name }}</option>
                         @endforeach
                     </select>
                 </label>

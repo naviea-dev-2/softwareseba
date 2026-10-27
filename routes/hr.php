@@ -6,7 +6,10 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::get('/hr-setting',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('hr.setting');
     Route::resource('shift', App\Http\Controllers\Hr\shiftManageController::class)->only($only);
     Route::resource('departments', App\Http\Controllers\Hr\DepartmentController::class)->only($only);
+    Route::get('select2-department','App\Http\Controllers\Hr\DepartmentController@select2Department')->name('select2.department');
     Route::resource('designations', App\Http\Controllers\Hr\DesignationController::class)->only($only);
+    Route::get('select2-designation','App\Http\Controllers\Hr\DesignationController@select2Designation')->name('select2.designation');
+
     Route::resource('late-rules', App\Http\Controllers\Hr\LateRuleController::class)->parameters(['late-rules' => 'lateRule'])->only($only);
     Route::resource('holidays', App\Http\Controllers\Hr\HolidayController::class)->only($only);
     Route::resource('overtime', App\Http\Controllers\Hr\OvertimeController::class)->only($only);
@@ -32,6 +35,22 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::resource('advances', App\Http\Controllers\Hr\AdvanceController::class)->parameters(['advances' => 'advance'])->only($only);
     Route::resource('payments', App\Http\Controllers\Hr\PaymentController::class)->only($only);
     Route::get('payments/{payment}/slip', [App\Http\Controllers\Hr\PaymentController::class, 'slip'])->name('payments.slip');
+
+    // Bonus
+    Route::resource('bonuses', App\Http\Controllers\Hr\BonusController::class)->only($only);
+
+    //employee
+    Route::resource('employee', App\Http\Controllers\Hr\EmployeeController::class);
+    Route::post('/employee/ajax', 'App\Http\Controllers\Hr\EmployeeController@ajaxEmployee')->name('employee.ajax');
+    Route::post('/employee/change-status', [ App\Http\Controllers\Hr\EmployeeController::class,'changeEmployeeStatus'])->name('employee.changeStatus');
+    Route::get('/employee/delete/{id}', 'App\Http\Controllers\Hr\EmployeeController@destroy')->name('employee.delete');
+    Route::get('select2-employee','App\Http\Controllers\Hr\EmployeeController@select2Employee')->name('select2.employee');
+    Route::get('select2-shift-employee','App\Http\Controllers\Hr\EmployeeController@select2ShiftEmployee')->name('select2.employee_s');
+    Route::get('select2-driver_employee','App\Http\Controllers\Hr\EmployeeController@select2DriverEmployee')->name('select2.driver_employee');
+    Route::get('select2-asr_employee','App\Http\Controllers\Hr\EmployeeController@select2AsrEmployee')->name('select2.asr_employee');
+    Route::get('select2-dsr_employee','App\Http\Controllers\Hr\EmployeeController@select2DsrEmployee')->name('select2.dsr_employee');
+    
+    //end employee
 
     // Route::get('/shift-index',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('shift.index');
     // Route::get('/departments-index',[App\Http\Controllers\Hr\shiftManageController::class,"index"])->name('departments.index');
@@ -97,28 +116,8 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
 
     //end salary
 
-    //employee
-    Route::get('/allEmployee', 'App\Http\Controllers\Hr\HrController@allEmployee')->name('allEmployee');
-    Route::post('/employee/ajax', 'App\Http\Controllers\Hr\HrController@ajaxEmployee')->name('employee.ajax');
-    Route::get('/addEmployee', 'App\Http\Controllers\Hr\HrController@addEmployee')->name('addEmployee');
-    Route::post('/storeEmployee', 'App\Http\Controllers\Hr\HrController@storeEmployee')->name('storeEmployee');
-    Route::get('/editEmployee/{id}', 'App\Http\Controllers\Hr\HrController@editEmployee')->name('editEmployee');
-    Route::post('/updateEmployee/{id}', 'App\Http\Controllers\Hr\HrController@updateEmployee')->name('updateEmployee');
-    Route::get('/deleteEmployee/{id}', 'App\Http\Controllers\Hr\HrController@deleteEmployee')->name('deleteEmployee');
-    Route::get('select2-employee','App\Http\Controllers\Hr\HrController@select2Employee')->name('select2.employee');
-    Route::get('select2-shift-employee','App\Http\Controllers\Hr\HrController@select2ShiftEmployee')->name('select2.employee_s');
-    Route::get('select2-driver_employee','App\Http\Controllers\Hr\HrController@select2DriverEmployee')->name('select2.driver_employee');
-    Route::get('select2-asr_employee','App\Http\Controllers\Hr\HrController@select2AsrEmployee')->name('select2.asr_employee');
-    Route::get('select2-dsr_employee','App\Http\Controllers\Hr\HrController@select2DsrEmployee')->name('select2.dsr_employee');
-    Route::post('/employee/change-status', [ App\Http\Controllers\Hr\HrController::class,'changeEmployeeStatus'])->name('employee.changeStatus');
-    //end employee
+    
 
-    //shiftManage
-    Route::get('/shiftManage-view','App\Http\Controllers\Hr\shiftManageController@view')->name('shiftManage.view');
-    Route::post('/shiftManage-store','App\Http\Controllers\Hr\shiftManageController@store')->name('shiftManage.store');
-    Route::get('/shiftManage-edit','App\Http\Controllers\Hr\shiftManageController@edit')->name('shiftManage.edit');
-    Route::get('/shiftManage-delete/{id}','App\Http\Controllers\Hr\shiftManageController@delete')->name('shiftManage.delete');
-    Route::get('/select2-shift', [App\Http\Controllers\Hr\shiftManageController::class, 'select2Shift'])->name('select2.shift');
     //end shift
 
     //leaveType
@@ -162,7 +161,7 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
     Route::post('/updateDepartment/{id}', 'App\Http\Controllers\Hr\HrController@updateDepartment')->name('updateDepartment');
 
     Route::get('/deleteDept/{id}', 'App\Http\Controllers\Hr\HrController@deleteDept')->name('deleteDept');
-    Route::get('select2-department','App\Http\Controllers\Hr\HrController@select2Department')->name('select2.department');
+   
     //end department
 
 
@@ -179,8 +178,7 @@ Route::prefix('business')->middleware(['auth',"is_active",'permission'])->group(
 
     Route::get('/deleteDesg/{id}', 'App\Http\Controllers\Hr\HrController@deleteDesg')->name('deleteDesg');
 
-    Route::get('select2-designation','App\Http\Controllers\Hr\HrController@select2Designation')->name('select2.designation');
-
+    
     Route::get('/getEmpDesig', 'App\Http\Controllers\Hr\HrController@getEmpDesig')->name('getEmpDesig');
 
     Route::post('/getDesigName', 'App\Http\Controllers\Hr\EmployeeController@getDesigName')->name('/getDesigName');

@@ -64,4 +64,12 @@ class DesignationController extends Controller
             'status'        => ['required', 'in:Active,Inactive'],
         ]);
     }
+    function select2Designation(Request $request){
+        $datas = Designation::select('id', 'name')->where('department_id',$request->dept_id)->where("name", "LIKE", "%$request->value%")->get();
+        $res = [];
+        foreach ($datas as $data) {
+            $res[] = ['id' => $data->id, 'text' => $data->name];
+        }
+        return json_encode($res);
+    }
 }

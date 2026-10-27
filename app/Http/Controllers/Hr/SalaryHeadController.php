@@ -38,7 +38,7 @@ class SalaryHeadController extends Controller
 
     public function update(Request $request, SalaryHead $salaryHead)
     {
-        dd($salaryHead);
+        // dd($salaryHead);
         $salaryHead->update($this->validated($request, $salaryHead->id));
 
         return redirect()->route('salary-heads.index')->with('status', 'Salary head updated.');
@@ -57,8 +57,11 @@ class SalaryHeadController extends Controller
 
     private function validated(Request $request, ?int $ignoreId = null): array
     {
+        // dd($ignoreId);
         return $request->validate([
-            'name'   => ['required', 'string', 'max:255', Rule::unique('salary_heads', 'name')->ignore($ignoreId)],
+            'name'   => ['required', 'string', 'max:255',   Rule::unique('salary_heads', 'name')
+            ->ignore($ignoreId)
+            ->where(fn ($query) => $query->where('business_id', auth()->user()->business->id))],
             'type'   => ['required', 'in:Earning,Deduction'],
             'calc'   => ['required', 'in:Fixed,% of Basic'],
             'status' => ['required', 'in:Active,Inactive'],

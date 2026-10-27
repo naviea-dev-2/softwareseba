@@ -212,14 +212,7 @@ class HrController extends Controller
         return redirect()->route('viewDepartment');
 
     }
-    function select2Department(Request $request){
-        $datas = Department::select('id', 'name')->where("name", "LIKE", "%$request->value%")->get();
-        $res = [];
-        foreach ($datas as $data) {
-            $res[] = ['id' => $data->id, 'text' => $data->name];
-        }
-        return json_encode($res);
-    }
+   
     public function viewDesignation(){
         if(can_p('viewDesignation') == false){
             return redirect()->route('dashboard');
@@ -305,14 +298,7 @@ class HrController extends Controller
         return redirect()->route('viewDesignation');
 
     }
-    function select2Designation(Request $request){
-        $datas = Designation::select('id', 'name')->where('department_id',$request->dept_id)->where("name", "LIKE", "%$request->value%")->get();
-        $res = [];
-        foreach ($datas as $data) {
-            $res[] = ['id' => $data->id, 'text' => $data->name];
-        }
-        return json_encode($res);
-    }
+    
     function getEmpDesig(Request $request){
         $designation = DB::table('designations')
         ->where('department_id' , $request->data)
@@ -322,20 +308,7 @@ class HrController extends Controller
             echo "<option value='$desg->id'>" . $desg->name . "</option>";
         }
     }
-    function select2Employee(Request $request){
-        $datas = Employee::select('id', 'employee_name',"mobile","employee_id")
-        ->where(function($q) use($request){
-            $q->where("employee_name", "LIKE", "%$request->value%")
-            ->OrWhere("employee_id", "LIKE", "%$request->value%")
-            ->OrWhere("mobile", "LIKE", "%$request->value%");
-        })
-        ->get();
-        $res = [];
-        foreach ($datas as $data) {
-            $res[] = ['id' => $data->id, 'text' => $data->employee_name.($data->employee_id ? '('.$data->employee_id.')' : '')];
-        }
-        return json_encode($res);
-    }
+   
     public function allEmployee(){
         if(can_p('allEmployee') == false){
             return redirect()->route('dashboard');
@@ -933,47 +906,7 @@ class HrController extends Controller
 
     }
      
-    function select2ShiftEmployee(Request $request){
-        $datas = Employee::select('id', 'employee_name',"employee_id")->where('shift_id',$request->shift_id)
-        ->where(function($q) use($request){
-            $q->where("employee_name", "LIKE", "%$request->value%")
-            ->orWhere("employee_id", "LIKE", "%$request->value%");
-        })
-       
-        ->get();
-        $res = [];
-        foreach ($datas as $data) {
-            $res[] = ['id' => $data->id, 'text' => $data->employee_name." (".$data->employee_id.")"];
-        }
-        return json_encode($res);
-    }
-    function select2DsrEmployee(Request $request){
-        $designations = Designation::where('type',1)->get()->pluck('id');
-        $datas = Employee::select('id', 'employee_name')->whereIn('designation_id',$designations)->where("employee_name", "LIKE", "%$request->value%")->get();
-        $res = [];
-        foreach ($datas as $data) {
-            $res[] = ['id' => $data->id, 'text' => $data->employee_name];
-        }
-        return json_encode($res);
-    }
-    function select2AsrEmployee(Request $request){
-        $designations = Designation::where('type',2)->get()->pluck('id');
-        $datas = Employee::select('id', 'employee_name')->whereIn('designation_id',$designations)->where("employee_name", "LIKE", "%$request->value%")->get();
-        $res = [];
-        foreach ($datas as $data) {
-            $res[] = ['id' => $data->id, 'text' => $data->employee_name];
-        }
-        return json_encode($res);
-    }
-    function select2DriverEmployee(Request $request){
-        $designations = Designation::where('type',3)->get()->pluck('id');
-        $datas = Employee::select('id', 'employee_name')->whereIn('designation_id',$designations)->where("employee_name", "LIKE", "%$request->value%")->get();
-        $res = [];
-        foreach ($datas as $data) {
-            $res[] = ['id' => $data->id, 'text' => $data->employee_name];
-        }
-        return json_encode($res);
-    }
+    
     public function addLeave(){
 
         $employee = Employee::get();

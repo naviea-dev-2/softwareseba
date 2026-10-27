@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Hr;
 
 use App\Http\Controllers\Controller;
 use App\Models\Hr\Attendance;
-use App\Models\Hr\Department;
-use App\Models\Hr\Designation;
+use App\Models\Hr\Setting\Department;
+use App\Models\Hr\Setting\Designation;
 use App\Models\Hr\Employee;
-use App\Models\Hr\Shift;
+use App\Models\Hr\Setting\Shift;
 use App\Models\Hrleave;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -20,495 +20,580 @@ use Redirect;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\AttendanceSetting;
+use Illuminate\Support\Str;
+
 class EmployeeController extends Controller
 {
-    public function applyLeave(){
 
-        $employee = DB::table('employee_info')->get();
-        // $category = DB::table('category')->get(['cat_id','categoryName']);
-
-        return view('Hr.leave.apply_leave',compact('employee'));
-    }
-    function apiLoginUser(Request $request){
-         $mobile = preg_replace('/^(?:\+?880|0)?/','+880',$request->UserId);
-        
-        $user = User::where('mobile',$mobile)->orWhere('email',$request->UserId)->first();
-        if($user){
-            if (auth()->attempt(['email' => $request->UserId, 'password' => $request->Password])){
-                return response()->json(['status' => 'yes',"msg"=>"Login is successfull","user_id"=>$user->business->id]);
-            }
-            else if (auth()->attempt(['mobile' => $mobile, 'password' => $request->Password])){
-               
-                return response()->json(['status' => 'yes',"msg"=>"Login is successfull","user_id"=>$user->business->id]);
-            }else{
-                return response()->json(['status' => 'no',"msg"=>"Your User ID is incorrect."]);
-            }
-        }else{
-            return response()->json(['status' => 'no',"msg"=>"Your User ID is incorrect."]);
-        }
-    }
-    public function storeLeaveApplication(Request $request){
-
-        DB::table('leave')->insert([
-            'empId' => $request->empId,
-            'type'  => $request->type,
-            'part'  => $request->part,
-            'reason' => $request->reason,
-            'address' => $request->address,
-            'department'=>$request->department,
-            'designation'=>$request->designation,
-            // 'status' => $request->status,
-            'from' => $request->from,
-            'to' => $request->to,
-            'day' => $request->day
-        ]);
-
-        return redirect('/manageLeaveApplications');
-    }
-
-    public function manageLeaveApplications(){
-        $viewAll = DB::table('leave')->get();
-        $employee = DB::table('employee_info')->get();
-        return view('Hr.leave.manage',compact('viewAll','employee'));
-    }
-
-    public function manageAttendance(){
-        if(can_p('manageAttendance') == false){
+   public function index(){
+        if(can_p('employee.index') == false){
             return redirect()->route('dashboard');
         }
-       // $viewAll =Hrleave::get();
-        $employees = Employee::get();
-       
-        $departments = Department::get();
-        $shifts = Shift::get();
-        return view('Hr.attendance.manage',compact('departments','employees','shifts'));
+        return view('Hr.employee.manageEmployee');
     }
-
-   
-    function ajaxAttendance(Request $request){
+    
+    
+    public function ajaxEmployee(Request $request)
+    {
+        // DataTable column ordering
         $columns = [
-            'attendances.id',
-            'employees.employee_name',
-            'attendances.dutyDate',
-            'shift.shiftName',
-            'attendances.inTime',
-            'attendances.outTime',
-            'attendances.workingMiniute',
-            'attendances.lateMiniute',
-            'attendances.overtimeMiniute',
-            'attendances.status',
+            0 => 'employees.id',
+            2 => 'employees.employee_id',
+            3 => 'employees.employee_name',
+            4 => 'departments.name',
+            5 => 'designations.name',
+            6 => 'employees.email',
+            7 => 'employees.mobile',
+            8 => 'employees.salary',
+            9 => 'employees.join_date',
         ];
 
-        $totalData = Attendance::count();
-        $totalFiltered = $totalData;
+        // Total counts for tabs
+        $counts = Employee::query()
+            ->selectRaw('COUNT(*) as all_count')
+            ->selectRaw('COALESCE(SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END), 0) as active_count')
+            ->selectRaw('COALESCE(SUM(CASE WHEN status = 0 THEN 1 ELSE 0 END), 0) as inactive_count')
+            ->first();
 
-        $limit = $request->input('length');
-        $start = $request->input('start');
-        $order = $columns[$request->input('order.0.column')];
-        $dir = $request->input('order.0.dir');
-        $search = $request->input('search.value');
+        $totalData = (int) $counts->all_count;
 
-        $datalist = Attendance::leftJoin('shift','shift.id','attendances.shiftID')
-                                ->leftJoin('employees','employees.id','attendances.empID');
-        if(!empty($search)){
+        // Base query
+        $datalist = Employee::query()
+            ->leftJoin(
+                'departments',
+                'departments.id',
+                '=',
+                'employees.department_id'
+            )
+            ->leftJoin(
+                'designations',
+                'designations.id',
+                '=',
+                'employees.designation_id'
+            );
 
-           $datalist =$datalist->where("employees.employee_name","LIKE","%{$search}%")
-                    ->orWhere("shift.shiftName","LIKE","%{$search}%")
-                    ->orWhere("attendances.dutyDate","LIKE","%{$search}%")
-                    ->orWhere("attendances.inTime","LIKE","%{$search}%")
-                    ->orWhere("attendances.outTime","LIKE","%{$search}%");  
+        // Filter by selected tab: 1 = Active, 0 = Inactive
+        $status = $request->input('status');
+
+        if (in_array((string) $status, ['0', '1'], true)) {
+            $datalist->where('employees.status', (int) $status);
         }
-       
-        $totalFiltered = $datalist->count();
-        $datalist = $datalist->select('attendances.*','employees.employee_name as e_name','shift.shiftName as s_name')->offset($start)->limit($limit)->orderBy($order,$dir)->get();
 
-        $data = array();
-        if(!empty($datalist))
-        {
-            $i = $start == 0 ? 1 : $start+1;
-            $p_delete = can_p('deleteAttendance');
-            foreach ($datalist as $data_v) {
-                $nestedData['id'] = $i;
-                $nestedData['employee_name'] = $data_v->e_name;
-                $nestedData['shift_name'] = $data_v->s_name;
-                $nestedData['date'] = $data_v->dutyDate;
-                $nestedData['in_time'] = date("g:i a",strtotime($data_v->inTime));
-                $nestedData['out_time'] = $data_v->outTime !=null ? date("g:i a",strtotime($data_v->outTime)) : '--';
-                $nestedData['working_time'] = intval($data_v->workingMiniute/60).' h : '.intval($data_v->workingMiniute%60).' min';
-                $nestedData['late_time'] = intval($data_v->lateMiniute/60).' h : '.intval($data_v->lateMiniute%60).' min';
-                $nestedData['over_time'] = intval($data_v->overtimeMiniute/60).' h : '.intval($data_v->overtimeMiniute%60).' min';
-                $nestedData['status'] = $data_v->status;
-                $nestedData['options']='';
-                if($p_delete){
-                    $nestedData['options'] .= '<a style="padding: 0 3px;" data-action="'.route('deleteAttendance',$data_v->id).'" class="btn btn-danger del_hr_data" data-id="'.$data_v->id.'"><i style="margin: 0;padding: 0;font-size: 16px;line-height: 18px;" class="bx bx-trash"></i></a>';
-                }
-                
-                $data[] = $nestedData;
-                $i++;
+        // DataTable search
+        $search = trim((string) $request->input('search.value', ''));
+
+        if ($search !== '') {
+            $datalist->where(function ($query) use ($search) {
+                $query->where(
+                    'employees.employee_name',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'departments.name',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'designations.name',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.employee_id',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.email',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.mobile',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.salary',
+                    'LIKE',
+                    "%{$search}%"
+                )
+                ->orWhere(
+                    'employees.join_date',
+                    'LIKE',
+                    "%{$search}%"
+                );
+            });
+        }
+
+        // Total records after status and search filters
+        $totalFiltered = (clone $datalist)->count('employees.id');
+
+        // Safe ordering
+        $orderColumnIndex = (int) $request->input('order.0.column', 0);
+
+        $order = $columns[$orderColumnIndex] ?? 'employees.id';
+
+        $dir = strtolower($request->input('order.0.dir', 'desc')) === 'asc'
+            ? 'asc'
+            : 'desc';
+
+        // Pagination
+        $start = max(0, (int) $request->input('start', 0));
+        $limit = (int) $request->input('length', 10);
+
+        $datalist->select(
+            'employees.*',
+            'departments.name as depart_name',
+            'designations.name as desi_name'
+        );
+
+        $datalist->orderBy($order, $dir);
+
+        if ($limit > 0) {
+            $datalist->offset($start)->limit($limit);
+        }
+
+        $employees = $datalist->get();
+
+        $data = [];
+
+        $p_edit = can_p('editEmployee');
+        $p_delete = can_p('deleteEmployee');
+
+        $i = $start + 1;
+
+        foreach ($employees as $employee) {
+            $nestedData = [];
+
+            $nestedData['id'] = $i;
+            $nestedData['employee_name'] = $employee->employee_name;
+            $nestedData['employee_code'] = $employee->employee_id;
+
+            $nestedData['image'] = '<img src="' .
+                e($employee->employee_image_show) .
+                '" style="height:50px;width:50px;object-fit:cover;">';
+
+            $nestedData['department'] = $employee->depart_name ?? '';
+            $nestedData['designation'] = $employee->desi_name ?? '';
+            $nestedData['email'] = $employee->email;
+            $nestedData['mobile'] = $employee->mobile;
+            $nestedData['join_date'] = $employee->join_date;
+            
+            $nestedData['status'] = (int) $employee->status === 1
+                ? '<span class="badge text-bg-success">Active</span>'
+                : '<span class="badge  text-bg-danger">Inactive</span>';
+
+            $nestedData['salary'] = auth()->user()->currency_symbol .
+                ' ' . round((float) $employee->salary, 2);
+
+            $nestedData['options'] = '';
+            if($p_edit){
+                $nestedData['options'] .= '<a href="'.route('employee.edit',$employee->id).'" class="btn btn-primary "><i class="bx bx-edit" style="margin: -10px;"></i></a>';
             }
+            
+            if($p_delete){
+                $nestedData['options'] .= '<a del_data="'. $employee->id .'" data-action="'.route('employee.delete',$employee->id).'" class="m-1 del_hr_data btn btn-danger "><i class="bx bx-trash" style="margin: -10px;"></i></a>';
+            }    
+            // if ($p_edit) {
+            //     $nestedData['options'] .=
+            //         '<a href="' . route('editEmployee', $employee->id) .
+            //         '" class="btn btn-primary">' .
+            //         '<i class="bx bx-edit"></i></a>';
+            // }
+
+            // if ($p_delete) {
+            //     $nestedData['options'] .=
+            //         '<a del_data="' . $employee->id .
+            //         '" data-action="' . route('deleteEmployee', $employee->id) .
+            //         '" class="m-1 del_hr_data btn btn-danger">' .
+            //         '<i class="bx bx-trash"></i></a>';
+            // }
+            $statusButtonClass = (int) $employee->status === 1
+                ? 'btn-warning'
+                : 'btn-success';
+
+            $statusButtonText = (int) $employee->status === 1
+                ? 'Deactivate'
+                : 'Activate';
+
+            $nestedData['options'] .= '
+                <button type="button"
+                    class="btn ' . $statusButtonClass . ' btn-sm change-employee-status"
+                    data-id="' . $employee->id . '"
+                    data-status="' . $employee->status . '">
+                    ' . $statusButtonText . '
+                </button>
+            ';
+
+            $data[] = $nestedData;
+            $i++;
         }
-        $json_data = [
-           'draw' => intval($request->input('draw')),
-           'recordsTotal' => intval($totalData),
-           'recordsFiltered' => intval($totalFiltered),
-           'data' => $data
-        ];
-   
-        return response()->json($json_data);
-    }
-    function apiStoreAtteandance(Request $request,$b_id){
-        try{
-            DB::beginTransaction();
-            $records = $request->all();
-            // return response()->json($records);
-            foreach ($records as $data) {
-                $a_date = \Carbon\Carbon::parse($data['check_time'])->format('Y-m-d');
-                $employee = Employee::where("employee_id",$data['user_id'])->where("business_id",$b_id)->first();
-                $shift = $employee->shift;
-                if($shift){
-                    // $shift_start_time = $shift->startTime;
-                    // $shift_end_time = $shift->endTime;
-                    $attendance = Attendance::where("empID", $employee->id)
-                    ->where("shiftID", $shift->id)
-                    ->where("dutyDate", $a_date)
-                    ->where("business_id",$b_id)->first();
-                    if($attendance){
 
-                        $startTime = Carbon::parse($attendance->inTime);
-                        $endTime = Carbon::parse($data['check_time']);
-                        $hour=$startTime->diff($endTime)->format('%H');
-                        $min=$startTime->diff($endTime)->format('%I');
-                        $totalWorkingMinnute=($hour*60)+$min;  
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $totalData,
+            'recordsFiltered' => $totalFiltered,
+            'data' => $data,
 
-                        $shift_endTime = Carbon::parse($a_date.' '.$shift->endTime);
-                        $shift_startTime = Carbon::parse($a_date.' '.$shift->startTime);
-                        $eheck_over_time_diff = $endTime->diff($shift_endTime);
-                        $overtimeMiniute = 0;
-                        $out_status = 1;
-                        if($eheck_over_time_diff->invert > 0){
-                            $hour=$endTime->diff($shift_endTime)->format('%H');
-                            $min=$endTime->diff($shift_endTime)->format('%I');
-                            $overtimeMiniute=($hour*60)+$min;
-                        }else{
-                            $eheck_early_time_diff = $shift_endTime->diff($endTime);
-                            if($eheck_early_time_diff->invert > 0){
-                                $out_status=2;
-                            }
-                        }
-
-                        if($attendance->lateMiniute > 0 && $overtimeMiniute > 0){
-                            $overtimeMiniute = $overtimeMiniute-$attendance->lateMiniute;
-                            if($overtimeMiniute < 0){
-                                $overtimeMiniute = 0;
-                            }
-                        }
-
-                        $shift_hour=$shift_startTime->diff($shift_endTime)->format('%H');
-                        $shift_min=$shift_startTime->diff($shift_endTime)->format('%I');
-                        $totalShitWorkingMinute = ($shift_hour*60)+$shift_min;
-
-                        $attendance->outTime = $data['check_time'];
-                        $attendance->workingMiniute = $totalWorkingMinnute;
-                        $attendance->overtimeMiniute = $overtimeMiniute;
-                        $attendance->out_status = $out_status;
-
-                        if($totalShitWorkingMinute > $totalWorkingMinnute){
-                            $attendance->status="Partial";
-                        }else{
-                            if($attendance->lateMiniute > 0){
-                                $attendance->status="Late";
-                            }else{
-                               $attendance->status="Ok"; 
-                            }
-                        }
-                        $attendance->totalShitWorkingMinute = $totalShitWorkingMinute;
-                        $attendance->save();
-                    }else{
-                        $shiftstart_time = Carbon::parse($a_date.' '.$shift->startTime);
-                        $startTime = Carbon::parse($data['check_time']);
-                        $eheck_time_diff = $startTime->diff($shiftstart_time);
-                        $in_status = 1;
-                        $lateMiniute = 0;
-                        if($eheck_time_diff->invert > 0){
-                            $in_status=2;
-                            $hour=$startTime->diff($shiftstart_time)->format('%H');
-                            $min=$startTime->diff($shiftstart_time)->format('%I');
-                            $lateMiniute=($hour*60)+$min;
-                        }
-                        $attendance = new Attendance;
-                        $attendance->empID=$employee->id;
-                        $attendance->shiftID=$shift->id;
-                        $attendance->dutyDate=$a_date;
-                        $attendance->business_id=$b_id;
-                        $attendance->lateMiniute = $lateMiniute;
-                        $attendance->in_status=$in_status;
-                        $attendance->status = "Processing..";
-                        $attendance->inTime = $data['check_time'];
-                        $attendance->save();
-                    }
-                }
-
-               
-            }
-            DB::commit();
-            return response()->json(['status' => 'success',"msg"=>"sss"]);
-        }catch(\Exception $e){
-            DB::rollBack();
-            // dd($e);
-            return response()->json([
-                'status'=>'no',
-                'msg'=>$e->getMessage()
-            ]);
-        }
-    }
-    public function attendanceStoreIn(Request $request){
-        if(can_p('attendanceStoreIn') == false){
-            $data["msg"] ='Attendance In permision is not allowed';
-            $data["error"] ='Attendance In permision is not allowed';
-            $data["status"] ="0";
-            return response()->json($data);
-        }
-        $validator = Validator::make($request->all(),[
-            'empID'=>'required',
-            'shiftID'=>'required',
-            'dutyDate'=>'required',
-            'inTime'=>'required',
+            // Employee tab counts
+            'counts' => [
+                'all' => $totalData,
+                'active' => (int) $counts->active_count,
+                'inactive' => (int) $counts->inactive_count,
+            ],
         ]);
-        if($validator->fails()){
-            return response([
-                'status' => 0,
-                'errors' => $validator->errors()
-            ]);
+    }
+
+    public function changeEmployeeStatus(Request $request)
+    {
+        if (!can_p('editEmployee')) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You do not have permission to change employee status.',
+            ], 403);
         }
+
+        $validated = $request->validate([
+            'id' => ['required', 'integer', 'exists:employees,id'],
+            'status' => ['required', 'in:0,1'],
+        ]);
+
+        $employee = Employee::findOrFail($validated['id']);
+
+        // Prevent stale requests from changing an unexpected status.
+        if ((int) $employee->status !== (int) $validated['status']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee status has already changed. Please refresh.',
+            ], 409);
+        }
+
+        $newStatus = (int) $employee->status === 1 ? 0 : 1;
+
+        $employee->status = $newStatus;
+        $employee->save();
+
+        return response()->json([
+            'success' => true,
+            'status' => $newStatus,
+            'message' => $newStatus === 1
+                ? 'Employee activated successfully.'
+                : 'Employee deactivated successfully.',
+        ]);
+    }
+
+
+    public function create(){
+        if(can_p('addEmployee') == false){
+            return redirect()->route('dashboard');
+        }
+        $departments = Department::get();
+        return view('Hr.employee.addEmployee',compact('departments'));
+    }
+
+    public function store(Request $request){
+        if(can_p('addEmployee') == false){
+            return redirect()->route('dashboard');
+        }
+        $this->validate($request,[
+            'department'=>'required',
+            'designation'=>'required',
+            'empName'=>'required',
+            'fName'=>'required',
+            'mName'=>'required',
+            'cAddress'=>'required',
+            'pAddress'=>'required',
+            'dob'=>'required',
+            'nationality'=>'required',
+            'religion'=>'required',
+            'nid'=>'required',
+            'maritalStatus'=>'required',
+            'gender'=>'required',
+            'mobile'=>'required',
+            'email'=>'required',
+            'empID'=>'required',
+            'salary'=>'required',
+            'joinDate'=>'required',
+            'image'=>'image|mimes:jpeg,png,jpg,webp',
+        ],
+        [
+            'department.required'=> 'Department is required',
+            'designation.required'=> 'Designation is required',
+            'empName.required'=> 'Employee Name is required',
+            'cAddress.required'=> 'Current Address is required',
+            'pAddress.required'=> 'Present Address is required',
+            'dob.required'=> 'Date Of Birth is required',
+            'nationality.required'=> 'Nationality is required',
+            'nid.required'=> 'NID is required',
+            'maritalStatus.required'=> 'Marital Status is required',
+            'gender.required'=> 'Gender is required',
+            'mobile.required'=> 'Mobile is required',
+            'email.required'=> 'Email is required',
+            'empID.required'=> 'Employee ID is required',
+            'joinDate.required'=> 'Join Date is required',
+        ]
+        );
         try{
             DB::beginTransaction();
-            $attendance = Attendance::where('dutyDate', date("Y-m-d", strtotime($request->dutyDate)))->where('empID',$request->empID)->first();
-            if($attendance == null){
-                $attendance = new Attendance();
-            }
-            $shift = Shift::find($request->shiftID);
-            $check_in_time_pre = Carbon::parse($request->dutyDate.' '.$shift->startTime);
-            $check_in_time_pre1 = Carbon::parse($request->dutyDate.' '.$shift->startTime);
-            $emp_in_time = Carbon::parse($request->dutyDate.' '.$request->inTime);
+            // mail sent with login info to employee
 
-            $attendance_setting = AttendanceSetting::first();
-            if($attendance_setting){
-                $check_in_time_pre = Carbon::parse($request->dutyDate.' '.$attendance_setting->delay_time);
+            $employeePassword = Str::random(8);
+
+            // $userData=User::where('email',$request->email)->first();
+            // if(!$userData){
+            //     $userData=new User();
+            // }
+
+            // $userData->fname=$request->empName;
+            // $userData->email=$request->email;
+            // $userData->password=$employeePassword;
+            // $userData->type=20;
+            // $userData->empID=$request->empID;
+            // $userData->save();
+           //if($userData->save()){
+                // $projectDomainName= $request->getSchemeAndHttpHost();
+                // $userData->notify(new SendLoginInfoToEmployee($projectDomainName,$request->email,$request->empName,$employeePassword));
+           // }
+
+            // end mail sent with login info to employee
+            $data=new Employee();
+            // $data->user_id=$userData->id;
+             $file=$request->file('image');
+            if($file){
+                $filename=date('YmdHi').$file->getClientOriginalName();
+                $file->move(public_path('upload/Employee_Image'),$filename);
+                $data->employee_image=$filename;
             }
-            
-            $eheck_time_diff = $emp_in_time->diff($check_in_time_pre);
-            $lateMiniute = 0;
-            $in_status=1;
-            $status = "Ok";
-            if($eheck_time_diff->invert > 0){
-                $in_status=2;
-                $hour = $emp_in_time->diff($check_in_time_pre1)->format('%H');
-                $min  = $emp_in_time->diff($check_in_time_pre1)->format('%I');
-                $lateMiniute=($hour*60)+$min;
-                $status = "Late";
-            }
-            $attendance->empID=$request->empID;
-            $attendance->shiftID=$request->shiftID;
-            $attendance->dutyDate=$request->dutyDate;
-            $attendance->inTime= Carbon::parse($request->dutyDate.' '.$request->inTime);
-            $attendance->workingMiniute=0;
-            $attendance->lateMiniute=$lateMiniute;
-            $attendance->in_status=$in_status;
-            $attendance->overtimeMiniute=0;
-            $attendance->status = $status;
-            $attendance->save();
-            
+            $data->shift_id =$request->shift ?? 0;
+            $data->department_id =$request->department;
+            $data->designation_id =$request->designation;
+            $data->employee_name =$request->empName;
+            $data->father_name =$request->fName;
+            $data->mother_name =$request->mName;
+            $data->cAddress=$request->cAddress;
+            $data->pAddress=$request->pAddress;
+            $data->date_of_birth=$request->dob;
+            $data->nationality=$request->nationality;
+            $data->religion=$request->religion;
+            $data->nid_number=$request->nid;
+            $data->bloodGroup=$request->bloodGroup;
+            $data->maritalStatus=$request->maritalStatus;
+            $data->gender=$request->gender;
+            $data->mobile=$request->mobile;
+            $data->officePhone=$request->officePhone;
+            $data->email=$request->email;
+            $data->employee_id=$request->empID;
+            $data->salary=$request->salary;
+            $data->join_date=$request->joinDate;
+            $data->rejineDate=$request->rejineDate;
+            $data->note=$request->note;
+            $data->save();
             DB::commit();
-            return response([
-                'status' => 1,
-                'success' => 'Save successfully.',
-            ]);
+            $notification=array(
+                'message'=>"Emplopyee Add successfull",
+                'alert-type'=>'success'
+            );
+
+                return redirect()->route('employee.index')->with($notification);
         }catch(\Exception $e){
             DB::rollBack();
             dd($e->getMessage());
-            return response([
-                'status' => 0,
-                'data'=>$e->getMessage(),
-                'error' => 'Something went Wrong!',
-            ]);
-        }
-    }
-    public function attendanceStoreOut(Request $request){
-        if(can_p('attendanceStoreOut') == false){
-            $data["msg"] ='Attendance Out permision is not allowed';
-            $data["error"] ='Attendance Out permision is not allowed';
-            $data["status"] ="0";
-            return response()->json($data);
-        }
-         $validator = Validator::make($request->all(),[
-            'empID'=>'required',
-            'outTime'=>'required',
-            'dutyDate'=>'required',
-        ]);
-        if($validator->fails()){
-            return response([
-                'status' => 0,
-                'errors' => $validator->errors()
-            ]);
+             $notification=array(
+                'message'=>"something went wrong!",
+                'alert-type'=>'error'
+            );
+          return redirect()->route('employee.index')->withInput($request->all())->with($notification);
         }
 
-        try{
-            DB::beginTransaction();
-            $attendance=Attendance::where('dutyDate', date("Y-m-d", strtotime($request->dutyDate)))->where('empID',$request->empID)->first();
-            if($attendance){
-                // start find working minutes, late, overTime etc
-                $startTime = Carbon::parse($attendance->inTime);
-                $endTime = Carbon::parse($request->dutyDate.' '.$request->outTime);
-                // $totalDuration =  $startTime->diff($endTime)->format('%H:%I:%S')." Minutes";
-                // return response()->json(['data'=>$startTime->diff($endTime)]);
-                $hour=$startTime->diff($endTime)->format('%H');
-                $min=$startTime->diff($endTime)->format('%I');
-
-                $totalWorkingMinnute=($hour*60)+$min;
-
-                $shift = $attendance->shift;
-                $shift_startTime = Carbon::parse($request->dutyDate.' '.$shift->startTime);
-                $shift_endTime = Carbon::parse($request->dutyDate.' '.$shift->endTime);
-                //return response()->json(['data'=>$endTime->diff($shift_endTime)]);
-                $eheck_over_time_diff = $endTime->diff($shift_endTime);
-                $overtimeMiniute = 0;
-                $out_status = 1;
-                if($eheck_over_time_diff->invert > 0){
-                    $hour=$endTime->diff($shift_endTime)->format('%H');
-                    $min=$endTime->diff($shift_endTime)->format('%I');
-                    $overtimeMiniute=($hour*60)+$min;
-                }else{
-                    $eheck_early_time_diff = $shift_endTime->diff($endTime);
-                    if($eheck_early_time_diff->invert > 0){
-                        $out_status=2;
-                    }
-                }
-
-                $shift_hour=$shift_startTime->diff($shift_endTime)->format('%H');
-                $shift_min=$shift_startTime->diff($shift_endTime)->format('%I');
-                $totalShitWorkingMinute = ($shift_hour*60)+$shift_min;
-
-                // $data=  Attendance::find($hascheck->id);
-                $attendance->empID=$request->empID;
-                $attendance->dutyDate=$request->dutyDate;
-                $attendance->outTime= Carbon::parse($request->dutyDate.' '.$request->outTime);
-                $attendance->workingMiniute=$totalWorkingMinnute;
-
-                if($attendance->lateMiniute > 0 && $overtimeMiniute > 0){
-                    $overtimeMiniute = $overtimeMiniute-$attendance->lateMiniute;
-                    if($overtimeMiniute < 0){
-                        $overtimeMiniute = 0;
-                    }
-                }
-                $attendance->overtimeMiniute=$overtimeMiniute;
-                $attendance->out_status=$out_status;
-                
-                if($totalShitWorkingMinute > $totalWorkingMinnute){
-                    if($attendance->lateMiniute > 0){
-                        $attendance->status="Late";
-                    }else{
-                         $attendance->status="Partial";
-                    }
-                   
-                }
-
-
-                $attendance->totalShitWorkingMinute = $totalShitWorkingMinute;
-                $attendance->save();
-
-
-            }else{
-                return response([
-                    'status' => 0,
-                    'error' => 'Attendance is not in for this date',
-                ]);
-            }
-
-            DB::commit();
-            return response([
-                'status' => 1,
-                'success' => 'Save successfully.',
-            ]);
-        }catch(\Exception $e){
-            DB::rollBack();
-            return response([
-                'status' => 0,
-                'data'=>$e->getMessage(),
-                'error' => 'Something went Wrong!',
-            ]);
-        }
     }
 
-
-    public function deleteAttendance($id){
-        if(can_p('deleteAttendance') == false){
+    public function edit($id){
+        if(can_p('editEmployee') == false){
             return redirect()->route('dashboard');
         }
-        Attendance::where('id',$id)->delete();
-        return redirect()->route('manageAttendance');
+        $employeeData =Employee::where('id',$id)->first();
+        //dd($employeeData);
+        $departments = Department::get();
 
-    }
-   
-    public function getDesigName(Request $request)
-    {
-        $desigName =Designation::where("department_id",$request->deptID)->select('name', 'id')->get();
-        return response()->json($desigName);
+        $emp_designations = Designation::where('department_id',$employeeData->department_id)->get();
+       // dd($emp_designations);
+        return view('Hr.employee.editEmployee',compact('employeeData','departments','emp_designations'));
     }
 
-    public function getEmployeeId(Request $request)
-    {
-        $empId = Employee::where("designation_id",$request->desigID)->select('employee_id', 'id')->get();
-        return response()->json($empId);
-    }
-
-
-    public function viewAbsentRollSetup()
-    {
-        $absent = DB::table('absent')->get();
-
-        return view('Hr.absentRollSetup.viewAbsentRollSetup',compact('absent'));
-    }
-
-
-    public function storeAbsentRollData(Request $request)
-    {
-        DB::table('absent')->insert([
-            'firstAbsentAmount' =>$request->firstAbsentAmount,
-            'otherAbsentAmount' =>$request->otherAbsentAmount,
+    public function update(Request $request, $id){
+        if(can_p('editEmployee') == false){
+            return redirect()->route('dashboard');
+        }
+        $this->validate($request,[
+            'department'=>'required',
+            'designation'=>'required',
+            'empName'=>'required',
+            'fName'=>'required',
+            'mName'=>'required',
+            'cAddress'=>'required',
+            'pAddress'=>'required',
+            'dob'=>'required',
+            'nationality'=>'required',
+            'religion'=>'required',
+            'nid'=>'required',
+            'maritalStatus'=>'required',
+            'gender'=>'required',
+            'mobile'=>'required',
+            'email'=>'required',
+            'empID'=>'required',
+            'salary'=>'required',
+            'joinDate'=>'required',
+            'image'=>'image|mimes:jpeg,png,jpg,webp',
+      ], [
+            'department.required'=> 'Department is required',
+            'designation.required'=> 'Designation is required',
+            'empName.required'=> 'Employee Name is required',
+            'cAddress.required'=> 'Current Address is required',
+            'pAddress.required'=> 'Present Address is required',
+            'dob.required'=> 'Date Of Birth is required',
+            'nationality.required'=> 'Nationality is required',
+            'nid.required'=> 'NID is required',
+            'maritalStatus.required'=> 'Marital Status is required',
+            'gender.required'=> 'Gender is required',
+            'mobile.required'=> 'Mobile is required',
+            'email.required'=> 'Email is required',
+            'empID.required'=> 'Employee ID is required',
+            'joinDate.required'=> 'Join Date is required',
         ]);
-
-        return redirect('/viewAbsentRollSetup');
+        try{
+             DB::beginTransaction();
+            $data= Employee::find($id);
+           
+            // $userData=User::find($data->user_id);
+            // $userData->fname=$request->empName;
+            // $userData->email=$request->email;
+            // $userData->save();
+            $file=$request->file('image');
+            if($file){
+                $filename=date('YmdHi').$file->getClientOriginalName();
+                $file->move(public_path('upload/Employee_Image'),$filename);
+                @unlink(public_path('upload/Employee_Image/'.$data->image));
+                $data->employee_image=$filename;
+            }
+            // $data->user_id=$userData->id;
+            $data->shift_id =$request->shift ?? 0;
+            $data->department_id =$request->department;
+            $data->designation_id =$request->designation;
+            $data->employee_name =$request->empName;
+            $data->father_name =$request->fName;
+            $data->mother_name =$request->mName;
+            $data->cAddress=$request->cAddress;
+            $data->pAddress=$request->pAddress;
+            $data->date_of_birth=$request->dob;
+            $data->nationality=$request->nationality;
+            $data->religion=$request->religion;
+            $data->nid_number=$request->nid;
+            $data->bloodGroup=$request->bloodGroup;
+            $data->maritalStatus=$request->maritalStatus;
+            $data->gender=$request->gender;
+            $data->mobile=$request->mobile;
+            $data->officePhone=$request->officePhone;
+            $data->email=$request->email;
+            $data->employee_id=$request->empID;
+            $data->salary=$request->salary;
+            $data->join_date=$request->joinDate;
+            $data->rejineDate=$request->rejineDate;
+            $data->note=$request->note;
+            //  dd($data);
+            $data->save();
+            DB::commit();
+            $notification=array(
+                'message'=>"Emplopyee Update successfull",
+                'alert-type'=>'success'
+            );
+            return redirect()->route('employee.index')->with($notification);
+        }catch(\Exception $e){
+            DB::rollBack();
+            dd($e->getMessage());
+            $notification=array(
+                'message'=>"something went wrong!",
+                'alert-type'=>'error'
+            );
+            return back()->with($notification)->withInput(request()->all());
+        }
     }
 
+    public function destroy($id){
+        if(can_p('deleteEmployee') == false){
+            return redirect()->route('dashboard');
+        }
+        try{
+            Employee::where('id',$id)->delete();
+            $notification=array(
+                'message'=>"Emplopyee Deleted successfull",
+                'alert-type'=>'success'
+            );
+            return redirect()->route('employee.index')->with($notification);
+        }catch(\Exception $e){
+            $notification=array(
+                'message'=>"something went wrong!",
+                'alert-type'=>'error'
+            );
+            return redirect()->route('employee.index')->with($notification);
+        }
 
-
-    public function editAbsentRoll(Request $request, $id)
-    {
-    $absent = DB::table('absent')->where('id', $id)->first();
-    return response()->json($absent);
     }
-
-    public function updateAbsentRoll(Request $request, $id){
-    $id = $request->input('id');
-    $firstAbsentAmount = $request->input('firstAbsentAmount');
-    $otherAbsentAmount = $request->input('otherAbsentAmount');
-
-    DB::table('absent')
-        ->where('id', $id)
-        ->update(['firstAbsentAmount' => $firstAbsentAmount, 'otherAbsentAmount' => $otherAbsentAmount]);
-
-        return redirect ('/viewAbsentRollSetup')
-            ->with('msg', 'Absent Roll updated Successfully');
-}
-
-    public function manageAttendanceSorting(Request $req){
-        $viewAll = DB::table('leave')->get();
-        $employee = DB::table('employee_info')->get();
-        $in = DB::table('attendanceIn')->whereBetween('dutyDate', [$req->min , $req->max])->get();
-        $out = DB::table('attendanceOut')->get();
-
-        return view('Hr.attendance.loadManageAttendance',compact('viewAll','employee','in','out'));
+    function select2Employee(Request $request){
+        $datas = Employee::select('id', 'employee_name',"mobile","employee_id")
+        ->where(function($q) use($request){
+            $q->where("employee_name", "LIKE", "%$request->value%")
+            ->OrWhere("employee_id", "LIKE", "%$request->value%")
+            ->OrWhere("mobile", "LIKE", "%$request->value%");
+        })
+        ->get();
+        $res = [];
+        foreach ($datas as $data) {
+            $res[] = ['id' => $data->id, 'text' => $data->employee_name.($data->employee_id ? '('.$data->employee_id.')' : '')];
+        }
+        return json_encode($res);
     }
-
+    function select2ShiftEmployee(Request $request){
+        $datas = Employee::select('id', 'employee_name',"employee_id")->where('shift_id',$request->shift_id)
+        ->where(function($q) use($request){
+            $q->where("employee_name", "LIKE", "%$request->value%")
+            ->orWhere("employee_id", "LIKE", "%$request->value%");
+        })
+       
+        ->get();
+        $res = [];
+        foreach ($datas as $data) {
+            $res[] = ['id' => $data->id, 'text' => $data->employee_name." (".$data->employee_id.")"];
+        }
+        return json_encode($res);
+    }
+    function select2DsrEmployee(Request $request){
+        $designations = Designation::where('type',1)->get()->pluck('id');
+        $datas = Employee::select('id', 'employee_name')->whereIn('designation_id',$designations)->where("employee_name", "LIKE", "%$request->value%")->get();
+        $res = [];
+        foreach ($datas as $data) {
+            $res[] = ['id' => $data->id, 'text' => $data->employee_name];
+        }
+        return json_encode($res);
+    }
+    function select2AsrEmployee(Request $request){
+        $designations = Designation::where('type',2)->get()->pluck('id');
+        $datas = Employee::select('id', 'employee_name')->whereIn('designation_id',$designations)->where("employee_name", "LIKE", "%$request->value%")->get();
+        $res = [];
+        foreach ($datas as $data) {
+            $res[] = ['id' => $data->id, 'text' => $data->employee_name];
+        }
+        return json_encode($res);
+    }
+    function select2DriverEmployee(Request $request){
+        $designations = Designation::where('type',3)->get()->pluck('id');
+        $datas = Employee::select('id', 'employee_name')->whereIn('designation_id',$designations)->where("employee_name", "LIKE", "%$request->value%")->get();
+        $res = [];
+        foreach ($datas as $data) {
+            $res[] = ['id' => $data->id, 'text' => $data->employee_name];
+        }
+        return json_encode($res);
+    }
 
 }
