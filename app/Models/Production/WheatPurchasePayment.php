@@ -3,6 +3,7 @@
 namespace App\Models\Production;
 
 use App\Models\Account\BalanceAccount;
+use App\Models\Inventory\Vendor;
 use App\Models\Production\WheatPurchase;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,7 +12,8 @@ class WheatPurchasePayment extends Model
     protected $table = 'production_wheat_purchase_payments';
 
     protected $fillable = [
-        'wheat_purchase_id',
+        'user_id',
+        'supplier_id',
         'amount',
         'method',
         'bank_account_id',
@@ -25,6 +27,14 @@ class WheatPurchasePayment extends Model
 
     public function bankAccount()
     {
-        return $this->belongsTo(BalanceAccount::class);
+        return $this->belongsTo(BalanceAccount::class, 'bank_account_id', 'id');
+    }
+    public function supplier()
+    {
+        return $this->belongsTo(
+            Vendor::class,
+            'supplier_id',
+            'id'
+        );
     }
 }
