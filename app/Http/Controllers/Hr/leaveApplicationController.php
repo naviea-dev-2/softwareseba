@@ -59,7 +59,7 @@ class leaveApplicationController extends Controller
         $dir = $request->input('order.0.dir');
         $search = $request->input('search.value');
 
-        $datalist = LeaveApplication::leftJoin('employees','employees.id','leave_applications.empID')
+        $datalist = LeaveApplication::leftJoin('employees','employees.id','leave_applications.employee_id')
         ->leftJoin('leave_parts','leave_parts.id','leave_applications.leavePartID')
         ->leftJoin('leave_types','leave_types.id','leave_applications.leaveTypeID');
         if(!empty($search)){
