@@ -1,7 +1,7 @@
 @php
-    $paid   = (float) ($summary['paid'] ?? 0);
-    $amount = (float) ($summary['amount'] ?? 0);
-    $due    = (float) ($summary['due']  ?? max(0, $amount - $paid));
+    $amount = (float) $summary['amount'];
+    $paid   = (float) $summary['paid'];   // from the payments table
+    $due    = (float) $summary['due'];    // purchases minus payments
 @endphp
 
 <div class="wheat-kpis">

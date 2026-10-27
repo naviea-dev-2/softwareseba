@@ -29,10 +29,15 @@ Route::prefix('business')->middleware(['auth', "is_active", 'permission'])->grou
         Route::resource('quality-inspections', QualityInspectionController::class);
         Route::resource('quality-reports', QualityReportController::class);
         Route::resource('history', ProductionHistoryController::class)->only(['index', 'show']);
-        
+
         Route::get('wheat-purchases/report', [WheatPurchaseController::class, 'report'])->name('wheat-purchases.report');
         Route::get('wheat-purchases/export', [WheatPurchaseController::class, 'export'])->name('wheat-purchases.export');
         Route::resource('wheat-purchases', WheatPurchaseController::class);
-        Route::post('wheat-purchases/{wheat_purchase}/pay', [WheatPurchaseController::class, 'pay'])->name('wheat-purchases.pay');
+        //Route::post('wheat-purchases/{wheat_purchase}/pay', [WheatPurchaseController::class, 'pay'])->name('wheat-purchases.pay');
+
+        Route::get('wheat-purchase/supplier-payments', [WheatPurchaseController::class, 'supplierPayments'])->name('wheat-purchases.supplier-payments.index');
+        Route::get('wheat-purchase/supplier-payments/{supplier}', [WheatPurchaseController::class, 'supplierPaymentsShow'])->name('wheat-purchases.supplier-payments.show');
+        Route::post('wheat-purchase/supplier-payments/{supplier}/pay', [WheatPurchaseController::class, 'supplierPaymentsPay'])->name('wheat-purchases.supplier-payments.pay');
+        Route::get('wheat-purchase/supplier-payments-export', [WheatPurchaseController::class, 'supplierPaymentsExport'])->name('wheat-purchases.supplier-payments.export');
     });
 });

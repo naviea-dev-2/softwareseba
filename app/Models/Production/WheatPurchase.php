@@ -2,6 +2,7 @@
 
 namespace App\Models\Production;
 
+use App\Models\Inventory\Vendor;
 use App\Models\Production\WheatPurchasePayment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,9 +25,19 @@ class WheatPurchase extends Model
     {
         return $this->belongsTo(RawMaterial::class, 'raw_material_id');
     }
+    
     public function payments()
     {
         return $this->hasMany(WheatPurchasePayment::class);
+    }
+
+    public function supplier()
+    {
+        return $this->belongsTo(
+            Vendor::class,
+            'supplier_id',
+            'id'
+        );
     }
 
     public function getDueAmountAttribute(): float

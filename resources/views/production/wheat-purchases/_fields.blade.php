@@ -7,7 +7,25 @@
         <div class="wheat-field"><label>Raw Material</label><select name="raw_material_id">
                 <option value="">Wheat (unlinked)</option>@foreach($materials as $material)<option value="{{ $material->id }}" @selected(old('raw_material_id',$p?->raw_material_id)==$material->id)>{{ $material->name }} ({{ $material->unit_of_measure }})</option>@endforeach
             </select></div>
-        <div class="wheat-field"><label>Supplier / Party Name</label><input name="supplier_name" value="{{ old('supplier_name',$p?->supplier_name) }}"></div>
+        <!-- <div class="wheat-field"><label>Supplier / Party Name</label><input name="supplier_name" value="{{ old('supplier_name',$p?->supplier_name) }}"></div> -->
+        <div class="wheat-field">
+            <label>Supplier / Party Name</label>
+
+            <select name="supplier_id">
+                <option value="">Select Supplier</option>
+
+                @foreach($suppliers as $supplier)
+                <option value="{{ $supplier->id }}"
+                    @selected((string) old('supplier_id', $p?->supplier_id) === (string) $supplier->id)>
+                    {{ $supplier->name }}
+                </option>
+                @endforeach
+            </select>
+
+            @error('supplier_id')
+            <small class="text-danger">{{ $message }}</small>
+            @enderror
+        </div>
         <div class="wheat-field"><label>Vehicle No</label><input name="vehicle_no" value="{{ old('vehicle_no',$p?->vehicle_no) }}"></div>
         <div class="wheat-field"><label>Driver Name</label><input name="driver_name" value="{{ old('driver_name',$p?->driver_name) }}"></div>
         <div class="wheat-field"><label>Driver Mobile</label><input name="driver_mobile" value="{{ old('driver_mobile',$p?->driver_mobile) }}"></div>
